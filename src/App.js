@@ -13,13 +13,6 @@ function App() {
   const shouldHideHeader = pagesWithoutHeader.includes(location.pathname);
   return (
     <>
-      <style>{`
-        body, html,#root  {
-          margin: 0;
-          padding: 0;
-          height: 100%;
-        }
-      `}</style>
       <div
         style={{
           backgroundColor: theme.palette.background.default,
