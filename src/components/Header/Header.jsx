@@ -9,7 +9,6 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import Drawer from "@mui/material/Drawer";
-import ClearIcon from "@mui/icons-material/Clear";
 
 import NavigationMenu from "../NavigationMenu/NavigationMenu";
 
@@ -32,7 +31,7 @@ export default function Header() {
         color="theme.secondary.light"
         sx={{
           //backgroundColor: theme.palette.secondary.light,
-          backgroundColor: "#11D8E8",
+          backgroundColor: theme.palette.background.teal,
 
           ...style.wrapper,
           justifyContent: isDesktopScreen ? "space-around" : "space-between",
@@ -82,38 +81,17 @@ export default function Header() {
                 fontSize="large"
               />
             </IconButton>
-            <Drawer anchor="top" open={openHamburgerMenu}>
-              <List
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <ClearIcon
-                  onClick={handleToggleDrawer}
-                  fontSize="large"
-                  sx={{
-                    cursor: "pointer",
-
-                    position: "absolute",
-                    top: "1rem",
-                    left: "1rem",
-                    color: "black",
-                    paddingTop: "0.5rem",
-                  }}
-                />
-                <Typography
-                  variant="h3"
-                  component="a"
-                  color={"black"}
-                  //style={style.heading}
-                >
+            <Drawer
+              anchor="top"
+              open={openHamburgerMenu}
+              onClose={handleToggleDrawer}
+            >
+              <List sx={style.drawerStyle}>
+                <Typography variant="h3" component="a">
                   הארונות שלנו
                 </Typography>
                 <NavigationMenu
-                  color="black"
+                  color="white"
                   toolTipPlacement="left"
                   handleToggleDrawer={handleToggleDrawer}
                 />

@@ -19,5 +19,13 @@ const style = {
     right: "1rem",
     top: "0.3rem",
   },
+  drawerStyle: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    bgcolor: "#0DA4B7",
+    color: "white",
+  },
 };
 export default style;

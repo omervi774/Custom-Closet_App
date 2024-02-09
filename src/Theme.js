@@ -22,6 +22,8 @@ const theme = createTheme({
     background: {
       default: "#757575", // Material Grey
       paper: "#ffffff", // Black
+      teal: "#11D8E8",
+      drakerTeal: "#0DA4B7",
     },
     text: {
       primary: "#FFFFFF", // white
