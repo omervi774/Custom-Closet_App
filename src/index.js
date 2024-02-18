@@ -24,7 +24,6 @@ root.render(
             <Route path="ai" element={<Ai />} />
             <Route path="orders" element={<Orders />} />
             <Route path="phoneLogIn" element={<PhoneLogIn />} />
-            <Route />
           </Route>
         </Routes>
       </BrowserRouter>

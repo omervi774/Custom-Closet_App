@@ -1,13 +1,15 @@
-import React, { useEffect } from "react";
+import React from "react";
+import useData from "../useData";
 
 function Orders(props) {
-  useEffect(() => {
-    fetch("http://localhost:5000/").then((res) => {
-      res.json().then((data) => console.log(data));
-    });
-  }, []); // Empty dependency array to run effect only once
+  const data = useData("http://localhost:5000/");
 
-  return <div>Orders</div>;
+  return (
+    <>
+      {data && <p>{data}</p>}
+      <div>Orders</div>
+    </>
+  );
 }
 
 export default Orders;

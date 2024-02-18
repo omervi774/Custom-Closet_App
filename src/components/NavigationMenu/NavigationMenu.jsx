@@ -9,9 +9,9 @@ function NavigationMenu(props) {
     <>
       {routingItems.map((item) => {
         return (
-          <>
+          <div key={item.id}>
             <Tooltip
-              key={item.id}
+              // key={item.id}
               title={item.label}
               placement={props.toolTipPlacement}
             >
@@ -28,7 +28,7 @@ function NavigationMenu(props) {
                 }}
               />
             </Tooltip>
-          </>
+          </div>
         );
       })}
     </>
