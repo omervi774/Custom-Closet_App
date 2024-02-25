@@ -97,6 +97,7 @@ const StockManagementPage = () => {
                 console.log(event.target.value);
                 setName(event.target.value);
               }}
+              color="black"
             />
 
             <button
