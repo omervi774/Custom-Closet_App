@@ -35,7 +35,7 @@ def get_data():
 def get_stocks():
     collection_ref = db.collection("stocks")
     docs = collection_ref.stream()
-    data = [doc.to_dict() for doc in docs]
+    data = [{"id": doc.id, **doc.to_dict()} for doc in docs]
     return jsonify({"data": data})
 
 @app.post("/stocks")

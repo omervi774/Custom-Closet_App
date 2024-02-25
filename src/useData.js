@@ -12,7 +12,8 @@ function useData(url) {
           throw new Error("Network response was not ok");
         }
         const result = await response.json();
-        setData(result.message);
+        setData(result.data);
+        console.log(result.data);
       } catch (error) {
         setError(error);
       }

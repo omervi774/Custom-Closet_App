@@ -5,3 +5,68 @@ html,
   padding: 0;
   height: 100%;
 }
+
+/* StockManagementPage.css */
+.stock-management-container {
+  margin: 20px;
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.add-button {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.add-button:hover {
+  background-color: #45a049;
+}
+
+.stock-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.stock-table th,
+.stock-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.stock-table th {
+  background-color: #f2f2f2;
+}
+
+.edit-button,
+.delete-button {
+  padding: 8px 12px;
+  margin-right: 5px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.edit-button {
+  background-color: #008cba;
+  color: white;
+  border: none;
+}
+
+.delete-button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+}
+
+.edit-button:hover,
+.delete-button:hover {
+  opacity: 0.8;
+}
