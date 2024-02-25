@@ -1,4 +1,5 @@
 const routingItems = [
+  { id: 4, label: "ניהול מלאי", routing: "stock" },
   { id: 3, label: "בינה מאלכותית", routing: "ai" },
   { id: 2, label: "הזמנות", routing: "orders" },
   { id: 1, label: "דף בית", routing: "/" },

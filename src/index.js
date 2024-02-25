@@ -5,6 +5,7 @@ import App from "./App";
 import Orders from "./pages/Orders";
 import Home from "./pages/Home";
 import Ai from "./pages/Ai";
+import Stock from "./pages/Stock";
 import { ThemeProvider } from "@emotion/react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import PhoneLogIn from "./pages/PhoneLogIn";
@@ -22,6 +23,7 @@ root.render(
           <Route path="/" element={<App />}>
             <Route index element={<Home />} />
             <Route path="ai" element={<Ai />} />
+            <Route path="stock" element={<Stock />} />
             <Route path="orders" element={<Orders />} />
             <Route path="phoneLogIn" element={<PhoneLogIn />} />
           </Route>

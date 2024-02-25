@@ -2,7 +2,7 @@ import React from "react";
 import useData from "../useData";
 
 export default function Home() {
-  const data = useData("http://localhost:5000/iyar");
+  const data = useData("http://localhost:5000/");
   console.log("Home");
   return (
     <>
