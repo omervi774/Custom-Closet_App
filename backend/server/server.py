@@ -48,10 +48,13 @@ def add_new_field():
 @app.put("/stocks/<document_id>")
 def update_field(document_id):
     data = request.json
+    # print(data)
     collection_ref = db.collection("stocks")
     document_ref = collection_ref.document(document_id)
     document_ref.update(data)
-    return jsonify({"message": "document successfully updated"}),200
+    print(document_ref.get().id)
+    print(document_ref.get()._data)
+    return jsonify({"id": document_ref.get().id,**document_ref.get()._data}),200
 
 @app.delete("/stocks/<document_id>")
 def delete_field(document_id):

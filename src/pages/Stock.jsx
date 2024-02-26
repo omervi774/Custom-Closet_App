@@ -1,12 +1,11 @@
 import React from "react";
 import useData from "../useData";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import TextField from "@mui/material/TextField";
-import SendIcon from "@mui/icons-material/Send";
+import { Button } from "@mui/material";
 
 const style = {
   position: "absolute",
@@ -19,17 +18,17 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
-
+let id = "";
 const StockManagementPage = () => {
-  const stockData = useData("http://localhost:5000/stocks");
-  const [id, setid] = useState("");
+  const [stockData, setStockData] = useData("http://localhost:5000/stocks");
+  // const [id, setid] = useState("");
   const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
   const [name, setName] = useState("");
 
   const handleClose = () => {
     setOpen(false);
-    setid("");
+    //setid("");
+    id = "";
   };
 
   return (
@@ -56,7 +55,8 @@ const StockManagementPage = () => {
                   <button
                     onClick={() => {
                       setOpen(true);
-                      setid(item.id);
+                      // setid(item.id);
+                      id = item.id;
                     }}
                     className="edit-button"
                   >
@@ -73,54 +73,69 @@ const StockManagementPage = () => {
             ))}
         </tbody>
       </table>
-      <div>
-        {/* <Button onClick={handleOpen}>Open modal</Button> */}
-        <Modal
-          open={open}
-          onClose={handleClose}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
-        >
-          <Box sx={style}>
-            <Typography id="modal-modal-title" variant="h6" component="h2">
-              PITER ZONA!!!
-            </Typography>
-            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-              Omer hazain.
-            </Typography>
-
+      {/* <div> */}
+      {/* <Button onClick={handleOpen}>Open modal</Button> */}
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: "1.5rem",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <TextField // TO BO CONTINIUED
               // id="outlined-controlled"
-              label="Controlled"
+              label="new quantity"
               value={name}
               onChange={(event) => {
                 console.log(event.target.value);
                 setName(event.target.value);
               }}
-              color="black"
+              InputProps={{
+                sx: { color: "black" },
+              }}
             />
 
-            <button
-              type="submit"
-              // className="Submit-button"
-              endIcon={<SendIcon />}
+            <Button
+              variant="contained"
+              onClick={async () => {
+                setOpen(false);
+                const response = await fetch(
+                  `http://localhost:5000/stocks/${id}`,
+                  {
+                    method: "PUT",
+                    body: JSON.stringify({ quantity: Number(name) }),
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                  }
+                );
+                const result = await response.json();
+                console.log(result);
+                setStockData(
+                  stockData.map((item) => {
+                    if (item.id === id) {
+                      return result;
+                    } else {
+                      return item;
+                    }
+                  })
+                );
+              }}
             >
-              Submit
-            </button>
+              submit
+            </Button>
           </Box>
-
-          {/* onSubmit={(e) => {
-              e.preventDefault();
-              console.log("delete");
-            }}
-            component="form"
-            sx={{
-              "& > :not(style)": { m: 1, width: "25ch" },
-            }}
-            noValidate
-            autoComplete="off" */}
-        </Modal>
-      </div>
+        </Box>
+      </Modal>
+      {/* </div> */}
     </div>
   );
 };

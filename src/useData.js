@@ -27,7 +27,7 @@ function useData(url) {
     // You may choose to handle the error in a way that makes sense for your application
   }
 
-  return data;
+  return [data, setData];
 }
 
 export default useData;
