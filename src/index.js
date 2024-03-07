@@ -10,11 +10,8 @@ import { ThemeProvider } from "@emotion/react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import PhoneLogIn from "./pages/PhoneLogIn";
 
-// import WorkOut from "./pages/Workout/WorkOut";
-// import About from "./pages/About/About";
-// import Home from "./pages/Home/Home";
-
 const root = ReactDOM.createRoot(document.getElementById("root"));
+// this is all our routes and navigation in the app
 root.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>

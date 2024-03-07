@@ -3,13 +3,14 @@ import routingItems from "../consts/consts.js";
 
 import { Button, Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { Box } from "@mui/material";
 function NavigationMenu(props) {
   const navigate = useNavigate();
   return (
     <>
       {routingItems.map((item) => {
         return (
-          <div key={item.id}>
+          <Box key={item.id}>
             <Tooltip
               // key={item.id}
               title={item.label}
@@ -28,7 +29,7 @@ function NavigationMenu(props) {
                 }}
               />
             </Tooltip>
-          </div>
+          </Box>
         );
       })}
     </>

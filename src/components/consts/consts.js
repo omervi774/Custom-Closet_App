@@ -1,3 +1,4 @@
+// consts file contain all the logic in the app
 const routingItems = [
   { id: 4, label: "ניהול מלאי", routing: "stock" },
   { id: 3, label: "בינה מאלכותית", routing: "ai" },
@@ -5,6 +6,7 @@ const routingItems = [
   { id: 1, label: "דף בית", routing: "/" },
 ];
 
+// login modal style
 export const loginModalStyle = {
   modalWrapper: {
     position: "absolute",
@@ -52,6 +54,7 @@ export const loginModalStyle = {
     "&:hover": { cursor: "pointer", textDecoration: "underline" },
   },
 };
+// phone login page style
 export const phoneLogInStyle = {
   contentWrapper: {},
   formStyle: {

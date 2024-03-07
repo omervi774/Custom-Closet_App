@@ -3,6 +3,7 @@ import { useTheme } from "@emotion/react";
 import Header from "./components/Header/Header";
 import { Outlet } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import { Box } from "@mui/material";
 
 function App() {
   const theme = useTheme();
@@ -13,22 +14,22 @@ function App() {
   const shouldHideHeader = pagesWithoutHeader.includes(location.pathname);
   return (
     <>
-      <div
+      {/* // container for all the pages in the app */}
+      <Box
         style={{
           backgroundColor: theme.palette.background.default,
-          //backgroundColor: theme.palette.info.light,
           height: "100vh",
           margin: 0,
           padding: 0,
           flex: 1,
-          // display: "flex",
-          // flexDirection: "column",
         }}
       >
+        {/* nav bar that appear at all of the pages except the phoneLogIn page */}
         {!shouldHideHeader && <Header />}
 
+        {/* this component make the nav-bar and the container appear at every page */}
         <Outlet />
-      </div>
+      </Box>
     </>
   );
 }

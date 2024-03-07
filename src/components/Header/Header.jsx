@@ -14,19 +14,21 @@ import NavigationMenu from "../NavigationMenu/NavigationMenu";
 
 export default function Header() {
   const theme = useTheme();
-  const navigate = useNavigate();
-  const [openLogInModal, setOpenLogInModal] = useState(false);
-  const handleOpen = () => setOpenLogInModal(true);
-  const handleClose = () => setOpenLogInModal(false);
-  const [openHamburgerMenu, setOpenHamburgerMenu] = useState(false);
+  const navigate = useNavigate(); // allow navigation to different pages
+  const [openLogInModal, setOpenLogInModal] = useState(false); // state that responssible when the modal is open/close
+  const handleOpen = () => setOpenLogInModal(true); // open the modal
+  const handleClose = () => setOpenLogInModal(false); // close the modal
+  const [openHamburgerMenu, setOpenHamburgerMenu] = useState(false); // state that responssible when the hamburgerMenu is open/close
 
+  // change the state of the hamburger menu
   const handleToggleDrawer = () => {
     setOpenHamburgerMenu(!openHamburgerMenu);
   };
 
-  const isDesktopScreen = useMediaQuery("(min-width:600px)");
+  const isDesktopScreen = useMediaQuery("(min-width:600px)"); // return true if the size compatible for desktop otherwise false
   return (
     <Box>
+      {/* nav bar styling */}
       <Box
         color="theme.secondary.light"
         sx={{
@@ -37,6 +39,7 @@ export default function Header() {
           justifyContent: isDesktopScreen ? "space-around" : "space-between",
         }}
       >
+        {/*   register and login buttons */}
         <Stack direction="row" spacing="1rem " color="success">
           {isDesktopScreen && (
             <Button color="success" variant="contained" sx={{ color: "white" }}>
@@ -62,6 +65,7 @@ export default function Header() {
             התחבר
           </Button>
         </Stack>
+        {/* on desktop screen display the navigation items otherwise display the hamburger menu */}
         {isDesktopScreen ? (
           <List sx={style.itemsWrapper}>
             <NavigationMenu color={theme.palette.text.primary} />
@@ -81,6 +85,7 @@ export default function Header() {
                 fontSize="large"
               />
             </IconButton>
+            {/* the menu that opens when the user click on the hamburger icon */}
             <Drawer
               anchor="top"
               open={openHamburgerMenu}
