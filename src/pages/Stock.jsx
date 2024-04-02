@@ -1,11 +1,23 @@
 import React from "react";
 import useData from "../useData";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { useState } from "react";
 import TextField from "@mui/material/TextField";
 import { Button } from "@mui/material";
+import StockCard from "../components/StockCard/StockCard";
+
+
+const TitleStyle = {
+  textAlign: "center",
+}
+
+const ConstiarCardStyle =  {
+  display: "flex",
+  justifyContent: "center",
+  flexWrap: "wrap",
+  paddingTop: "5%",
+}
 
 const style = {
   position: "absolute",
@@ -30,49 +42,49 @@ const StockManagementPage = () => {
     //setid("");
     id = "";
   };
+  
+  const handleOpen = (itemId) => {
+    setOpen(true);
+    //setid("");
+    id = itemId;
+  };
 
   return (
     <div className="stock-management-container">
-      <h1>Stock Management</h1>
+      <h1 style={TitleStyle}>ניהול מלאי</h1>
       {/* <button onClick={handleAddItem} className="add-button">
         Add Item
       </button> */}
-      <table className="stock-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Quantity</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
+        
+        <div style={ConstiarCardStyle} >
           {stockData &&
             stockData.map((item, index) => (
-              <tr key={index}>
-                <td>{item.name}</td>
-                <td>{item.quantity}</td>
-                <td>
-                  <button
-                    onClick={() => {
-                      setOpen(true);
-                      // setid(item.id);
-                      id = item.id;
-                    }}
-                    className="edit-button"
-                  >
-                    Edit
-                  </button>
-                  {/* <button
-                    onClick={() => handleDeleteItem(item.id)}
-                    className="delete-button"
-                  >
-                    Delete
-                  </button> */}
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
+              
+          
+                <StockCard key={index} name={item.name} quantity={item.quantity} id = {item.id} handleOpen = {handleOpen} />
+           
+       
+            
+                  // <button
+                  //   onClick={() => {
+                  //     setOpen(true);
+                  //     // setid(item.id);
+                  //     id = item.id;
+                  //   }}
+                  //   className="edit-button"
+                  // >
+                  //   Edit
+                  // </button>
+                  // {/* <button
+                  //   onClick={() => handleDeleteItem(item.id)}
+                  //   className="delete-button"
+                  // >
+                  //   Delete
+                  // </button> */}
+          
+            ))} 
+            </div>
+     
       {/* <div> */}
       {/* <Button onClick={handleOpen}>Open modal</Button> */}
       <Modal
@@ -90,18 +102,9 @@ const StockManagementPage = () => {
               justifyContent: "center",
             }}
           >
-            <TextField // TO BO CONTINIUED
-              // id="outlined-controlled"
-              label="new quantity"
-              value={name}
-              onChange={(event) => {
-                console.log(event.target.value);
-                setName(event.target.value);
-              }}
-              InputProps={{
-                sx: { color: "black" },
-              }}
-            />
+
+          
+          
 
             <Button
               variant="contained"
@@ -130,8 +133,22 @@ const StockManagementPage = () => {
                 );
               }}
             >
-              submit
+              לאשר
             </Button>
+            <TextField // TO BO CONTINIUED
+              // id="outlined-controlled"
+              label="הזן כמות חדשה" 
+              value={name}
+              variant="filled"
+              onChange={(event) => {
+                console.log(event.target.value);
+                setName(event.target.value);
+              }}
+              dir="rtl" // Set direction to right-to-left
+              InputProps={{
+                sx: { color: "black" },
+              }}
+            />
           </Box>
         </Box>
       </Modal>
