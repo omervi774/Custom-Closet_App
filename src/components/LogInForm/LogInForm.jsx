@@ -6,6 +6,8 @@ import { Button, TextField } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import { useMediaQuery } from "@mui/material";
+
+// the login form, functionallity and styling for the different screens size
 function LogInForm() {
   const [inputsValues, handleChange] = useLogIn();
   const isDeskTopSize = useMediaQuery("(min-width:600px)");

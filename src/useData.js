@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+// custom hook for fetching the data from the server when the components in mount process
 function useData(url) {
   const [data, setData] = useState("");
   const [error, setError] = useState(null);

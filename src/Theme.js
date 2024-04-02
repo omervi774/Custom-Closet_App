@@ -1,4 +1,5 @@
 import { createTheme } from "@mui/material/styles";
+// this file responssible to customize the MUI components
 const theme = createTheme({
   palette: {
     primary: {
