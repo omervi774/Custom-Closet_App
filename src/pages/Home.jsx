@@ -1,12 +1,14 @@
-import React, { Suspense, useState } from 'react'
+import React, { Suspense, useState, useRef } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { Preload, OrbitControls } from '@react-three/drei'
-import { Button } from '@mui/material'
+import { Preload, OrbitControls, Environment } from '@react-three/drei'
+import { MenuItem, Paper, MenuList, Box } from '@mui/material'
 import DraggingCube from '../components/DraggingCube/DraggingCube'
 import Cube from '../components/Cube/Cube'
 import Circle from '../components/Circle/Circle'
 import GlassShelf from '../components/glassShelf/GlassShelf'
-
+import CubeUi from '../components/CubeUi/CubeUi'
+import ShelfUi from '../components/ShelfUi/ShelfUi'
+//import * as THREE from 'three'
 //const lastConnections = []
 export default function Home() {
   // for the dragging cube
@@ -15,11 +17,22 @@ export default function Home() {
   const [cubes, setCubes] = useState({
     0: [{ position: [0, 0, 0], size: [1, 1], display: true }],
   })
+
   // this state responssible to check if the user try to drag new cube or not
   const [isDragging, setIsDragging] = useState(false)
 
   // this state responssible to check if the user try to add new drawer or not
   const [addDrawer, setAddDrawer] = useState(false)
+
+  const [isMenu, setIsMenu] = useState(true)
+
+  // this state responssible to open/close the main menu
+  const [isFirstOpen, setFirstOpen] = useState(true)
+
+  // this state responssible to open/close the secondary menu
+  const [isSecondaryOpen, setSecondaryOpen] = useState([false, undefined])
+
+  const [size, setSize] = useState([1, 1])
 
   // const [lastConnections, setLastConnections] = useState([])
 
@@ -95,6 +108,7 @@ export default function Home() {
         [layer]: updatingLayerArr,
       }
     })
+    setIsMenu(true)
   }
   // in case the cube is connecting from the top need to find its place in the sorted array of the layer + size
   const findCubeRoom = (layer, val) => {
@@ -185,6 +199,9 @@ export default function Home() {
       else if (Math.abs(newPosition[1] - (Number(layer) + size)) < epsilon + positionToAddYAxis) {
         // check if there is a cube to connect to
         const [containsButtomCube, x] = is_include([newPosition[0], Number(layer), 0], cubeSize[0], layer)
+        // cubes[Number(layer) + size].forEach((cube)=>{
+        //   if(x - cubeSize[0]/2 >= cube.position[0]-cube.size[0]/2 &&  x - cubeSize[0]/2 <=cube.position[0]+cube.size[0]/2 || )
+        // })
 
         if (containsButtomCube) {
           let i
@@ -242,9 +259,71 @@ export default function Home() {
       }
     })
   }
+  // after the user chose size of the dragging cube set its width and height and close the menu
+  const newDraggingCube = (width, height) => {
+    setSize([width, height])
+    setIsDragging(true)
+    setIsMenu(false)
+    setFirstOpen(true)
+    setSecondaryOpen([false, undefined])
+  }
+  const addNewShelf = (material) => {
+    console.log(material)
+    setIsMenu(false)
+    setFirstOpen(true)
+    setSecondaryOpen([false, undefined])
+    setAddDrawer(!addDrawer)
+  }
+
   return (
     <>
-      <Button
+      <div style={{ position: 'absolute', top: '10vh', zIndex: 1000 }}>
+        {/* menu container */}
+        <Paper sx={{ height: '90vh', width: '15vh', display: !isMenu && 'none' }}>
+          {/* first menu - let the use the option to add new cube or shelf */}
+          <MenuList>
+            <MenuItem
+              sx={{ color: 'black', display: !isFirstOpen && 'none' }}
+              onClick={() => {
+                setFirstOpen(false)
+                setSecondaryOpen([true, 'קוביות'])
+              }}
+            >
+              קוביות
+            </MenuItem>
+            <MenuItem
+              sx={{ color: 'black', display: !isFirstOpen && 'none' }}
+              onClick={() => {
+                setFirstOpen(false)
+                setSecondaryOpen([true, 'מגירות'])
+              }}
+            >
+              מגירות
+            </MenuItem>
+          </MenuList>
+          {/* second menu item - display the user the cubes size and let him choose the requiered size */}
+          <MenuItem
+            sx={{ color: 'black', display: isSecondaryOpen[0] && isSecondaryOpen[1] === 'קוביות' ? true : 'none' }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 1,
+              }}
+            >
+              <CubeUi title="קוביות" newDraggingCube={newDraggingCube} />
+            </Box>
+          </MenuItem>
+          {isSecondaryOpen[0] && isSecondaryOpen[1] === 'מגירות' && (
+            <ShelfUi title={'מגירות'} addNewShelf={addNewShelf} />
+          )}
+        </Paper>
+      </div>
+
+      {/* <Button
         color="success"
         variant="contained"
         onClick={() => {
@@ -253,8 +332,8 @@ export default function Home() {
         sx={{ color: 'white' }}
       >
         הוסף קובייה
-      </Button>
-      <Button
+      </Button> */}
+      {/* <Button
         color="success"
         variant="contained"
         onClick={() => {
@@ -301,21 +380,23 @@ export default function Home() {
         sx={{ color: 'white' }}
       >
         בטל פעולה{' '}
-      </Button>
-      <Button color="success" variant="contained" sx={{ color: 'white' }} onClick={() => setAddDrawer(!addDrawer)}>
+      </Button> */}
+      {/* <Button color="success" variant="contained" sx={{ color: 'white' }} onClick={() => setAddDrawer(!addDrawer)}>
         הוסף מגירה
-      </Button>
+      </Button> */}
       <Canvas
         shadows
         //frameloop="always"
         dpr={[1, 2]}
         gl={{ preserveDrawingBuffer: true }}
         camera={{
+          //position: [0, 0, 10],
           fov: 45,
           near: 0.1,
           far: 200,
         }}
       >
+        {/* <directionalLight color="white" intensity={0.5} /> */}
         <Suspense fallback={null}>
           {!isDragging && <OrbitControls enableZoom={false} maxPolarAngle={Math.PI / 2} minPolarAngle={Math.PI / 2} />}
           {Object.keys(cubes).map((key) =>
@@ -324,9 +405,9 @@ export default function Home() {
             )
           )}
 
-          {isDragging && <DraggingCube position={position} onDrag={handleDrag} size={[2, 2]} />}
+          {isDragging && <DraggingCube position={position} onDrag={handleDrag} size={size} />}
           {/* <GlassShelf /> */}
-
+          <Environment preset="city" />
           <Preload all />
         </Suspense>
       </Canvas>
