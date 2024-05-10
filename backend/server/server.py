@@ -68,7 +68,7 @@ def chat():
     # "role": "system", "content": "You are a kind helpful assistant. Your answer should always be in array format"
     # You need to help design a beautiful cabinet. The cabinets consist of \"cubes\" of sizes 1 meter. return the answer only in the format of a dictionary, where each key is a number starting from 0, represent a floor (layer) in the cabinet and each value is a list of the \"cubes\" positions that are in this layer. x, y, z represent the middle of the cube, where z is always 0. the cabinet must contain at least 2 layers.
     messages = [
-        {"role": "system", "content": "You are a professional cabinet designer. Your answer should always be in dictionary (python) format. The cabinets consist of \"cubes\" of sizes 1 meter. Please provide the cabinet design specifications in the following format: {0: [(x1, y1, z), (x2, y2, z), ...], 1: [(x1, y1, z), (x2, y2, z), ...], ...}, where each key represents a layer and the value is a list of cube positions (x, y, z) in that layer. The z-coordinate is always 0! The cabinet must contain at least 2 layers. Be creative but always follow the rules!"
+        {"role": "system", "content": "You are a professional cabinet designer. Your answer should always be in dictionary (python) format. Please provide the cabinet design specifications in the following format: {0: [(x1, y1, z), (x2, y2, z), ...], 1: [(x1, y1, z), (x2, y2, z), ...], ...}, where each key represents a layer and the value is a list of cube positions (x, y, z) in that layer. The z-coordinate is always 0! The cabinet must contain at least 2 layers. Be creative but always follow the rules!"
 },
         {"role": "user", "content": user_message}
     ]

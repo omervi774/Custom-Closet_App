@@ -1,9 +1,16 @@
 import React, { useState } from 'react'
+import Modal from '../components/Modal'
 
 function Ai(props) {
   const [chatMessages, setChatMessages] = useState([])
   const [userInput, setUserInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+
+  // Popup model
+  const [isModalOpen, setIsModalOpen] = useState(true)
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+  }
 
   const handleUserInput = (e) => {
     setUserInput(e.target.value)
@@ -52,7 +59,7 @@ function Ai(props) {
   if (chatMessages.length === 0) {
     setChatMessages([
       {
-        text: 'היי, אשמח לעזור לך בעיצוב הארון. אשמח אם תוכל לכתוב לי את המידע הבא: אורך הארון, רוחב הארון, גובה הארון צבע הארון ומספר המדפים אותו תרצה, תודה',
+        text: 'היי! אשמח לעזור לך בעיצוב הארון. אשמח אם תוכל לכתוב לי את המידע הבא: אורך הארון, רוחב הארון וגובה הארון תודה',
         sender: 'ai',
       },
     ])
@@ -73,6 +80,17 @@ function Ai(props) {
             direction: 'rtl',
           }}
         >
+          {/* popup model */}
+          {isModalOpen && (
+            <Modal isOpen={isModalOpen} handleClose={handleCloseModal}>
+              <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>AI Assistent</h2>
+              <p style={{ fontSize: '18px', lineHeight: '1.6' }}>
+                לפניכם מערכת AI שנועדה לעזור לכם לעצב ארון. כתבו בתיבת הטקסט את גדלי הארון הרצויים והמערכת תדאג לעצב לכם
+                ארון בגדלים שביקשתם!
+              </p>
+            </Modal>
+          )}
+
           {chatMessages.map((message, index) => (
             <div
               key={index}
