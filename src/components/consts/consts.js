@@ -1,10 +1,10 @@
 // consts file contain all the logic in the app
 const routingItems = [
-  { id: 5, label: 'דף נחיתה', routing: 'landing' },
-  { id: 4, label: 'ניהול מלאי', routing: 'stock' },
-  { id: 3, label: 'בינה מאלכותית', routing: 'ai' },
-  { id: 2, label: 'הזמנות', routing: 'orders' },
-  { id: 1, label: 'דף בית', routing: '/' },
+  { id: 5, label: 'ניהול מלאי', routing: 'stock' },
+  { id: 4, label: 'בינה מאלכותית', routing: 'ai' },
+  { id: 3, label: 'הזמנות', routing: 'orders' },
+  { id: 2, label: 'עיצוב ארון', routing: 'closetDesign' },
+  { id: 1, label: 'דף הבית', routing: '/' },
 ]
 
 // login modal style

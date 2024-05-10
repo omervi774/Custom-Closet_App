@@ -23,7 +23,7 @@ const DraggingCube = ({ position, onDrag, size }) => {
 
     console.log(position[0] + movementX * 0.02)
     console.log(position[1] - movementY * 0.02)
-    onDrag([position[0] + movementX * 0.015, position[1] - movementY * 0.015, 0], size)
+    onDrag([position[0] + movementX * 0.02, position[1] - movementY * 0.02, 0], size)
   }
 
   return (

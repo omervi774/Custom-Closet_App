@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom/client'
 import theme from './Theme'
 import App from './App'
 import Orders from './pages/Orders'
-import Home from './pages/Home'
+import ClosetDesign from './pages/ClosetDesign'
 import Ai from './pages/Ai'
 import Stock from './pages/Stock'
-import Landing from './pages/Landing'
+import Home from './pages/Home'
 import { ThemeProvider } from '@emotion/react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import PhoneLogIn from './pages/PhoneLogIn'
@@ -20,10 +20,10 @@ root.render(
         <Routes>
           <Route path="/" element={<App />}>
             <Route index element={<Home />} />
+            <Route path="closetDesign" element={<ClosetDesign />} />
             <Route path="ai" element={<Ai />} />
             <Route path="stock" element={<Stock />} />
             <Route path="orders" element={<Orders />} />
-            <Route path="landing" element={<Landing />} />
             <Route path="phoneLogIn" element={<PhoneLogIn />} />
           </Route>
         </Routes>
