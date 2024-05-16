@@ -6,7 +6,7 @@ function Ai(props) {
   const [userInput, setUserInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
 
-  // Popup model
+  // Popup modal
   const [isModalOpen, setIsModalOpen] = useState(true)
   const handleCloseModal = () => {
     setIsModalOpen(false)
@@ -59,7 +59,7 @@ function Ai(props) {
   if (chatMessages.length === 0) {
     setChatMessages([
       {
-        text: 'היי! אשמח לעזור לך בעיצוב הארון. אשמח אם תוכל לכתוב לי את המידע הבא: אורך הארון, רוחב הארון וגובה הארון תודה',
+        text: 'היי! אשמח לעזור לך בעיצוב הארון. כתוב לי את המידע הבא: אורך הארון, רוחב הארון וגובה הארון תודה',
         sender: 'ai',
       },
     ])

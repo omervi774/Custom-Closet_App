@@ -5,11 +5,11 @@ function Home(props) {
     <div style={{ fontFamily: 'Arial, sans-serif' }}>
       <div style={{ backgroundColor: '#f5f5f5', padding: '50px 0' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <h1 style={{ textAlign: 'center', fontSize: '36px', marginBottom: '20px' }}>Welcome to Our Business</h1>
+          <h1 style={{ textAlign: 'center', fontSize: '36px', marginBottom: '20px' }}>ברוכים הבאים לארונות שלנו</h1>
           <p style={{ textAlign: 'center', fontSize: '18px', color: '#666', marginBottom: '40px' }}>
-            Where quality meets innovation
+            ארונות בהתאמה אישית ובעיצוב מהיר ונוח
           </p>
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
+          {/* <div style={{ display: 'flex', justifyContent: 'center' }}>
             <button
               style={{
                 backgroundColor: '#007bff',
@@ -23,22 +23,22 @@ function Home(props) {
             >
               Learn More
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '50px 0' }}>
         <div style={{ display: 'flex', justifyContent: 'space-around' }}>
           <div style={{ flex: '1', padding: '0 20px' }}>
             <h2 style={{ fontSize: '24px', marginBottom: '20px' }}>בינה מלאכותית</h2>
-            <p style={{ fontSize: '16px', color: '#666' }}>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <p style={{ fontSize: '16px', color: '#666' }}>כן כן בינה מלאכותית זה ממש טוב</p>
           </div>
           <div style={{ flex: '1', padding: '0 20px' }}>
             <h2 style={{ fontSize: '24px', marginBottom: '20px' }}>התאמה אישית</h2>
-            <p style={{ fontSize: '16px', color: '#666' }}>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <p style={{ fontSize: '16px', color: '#666' }}>וואו כמה מרשים ומרהיב</p>
           </div>
           <div style={{ flex: '1', padding: '0 20px' }}>
             <h2 style={{ fontSize: '24px', marginBottom: '20px' }}>עיצוב ארון</h2>
-            <p style={{ fontSize: '16px', color: '#666' }}>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <p style={{ fontSize: '16px', color: '#666' }}>אפשר לעצב ארון פה?? זה מופלא</p>
           </div>
         </div>
       </div>
@@ -74,7 +74,8 @@ function Home(props) {
       <div style={{ backgroundColor: '#007bff', padding: '50px 0' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <h2 style={{ textAlign: 'center', fontSize: '30px', color: '#fff', marginBottom: '20px' }}>
-            Ready to get started?
+            {' '}
+            ?מוכנים להתחיל
           </h2>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <button
@@ -88,7 +89,7 @@ function Home(props) {
                 cursor: 'pointer',
               }}
             >
-              Contact Us
+              עיצוב ארון
             </button>
           </div>
         </div>
