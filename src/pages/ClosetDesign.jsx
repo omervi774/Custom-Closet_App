@@ -9,6 +9,7 @@ import GlassShelf from '../components/glassShelf/GlassShelf'
 import CubeUi from '../components/CubeUi/CubeUi'
 import ShelfUi from '../components/ShelfUi/ShelfUi'
 import ModalMessage from '../components/ModalMessage/ModalMessage'
+import Modal from '../components/Modal'
 //import * as THREE from 'three'
 //const lastConnections = []
 export default function ClosetDesign() {
@@ -18,6 +19,11 @@ export default function ClosetDesign() {
   const [cubes, setCubes] = useState({
     0: [{ position: [0, 0, 0], size: [1, 1], display: true }],
   })
+  // Popup modal when the use first enter the page for basic explanation about the essence of the page
+  const [isModalOpen, setIsModalOpen] = useState(true)
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+  }
 
   const [joins, setJoins] = useState({ join3Exists: 8, join4Exists: 0, join5Exists: 0 })
   // this state responssible to check if the user try to drag new cube or not
@@ -46,220 +52,49 @@ export default function ClosetDesign() {
       orbitControlsRef.current.reset() // Reset rotation
     }
   }
-  // checking if there is a cube in the side of the cube connecting to (for the join calculation)
-  const isThereCubeFromSide = (layerToAdd, side, xPosition, cubeSize) => {
-    if (layerToAdd > 0) {
-      if (side === 'left') {
-        if (cubes[layerToAdd - 1][0].position[0] - cubes[layerToAdd - 1][0].size[0] / 2 < xPosition - cubeSize[0] / 2) {
-          return true
-        }
-      } else {
-        if (
-          cubes[layerToAdd - 1][cubes[layerToAdd - 1].length - 1].position[0] +
-            cubes[layerToAdd - 1][cubes[layerToAdd - 1].length - 1].size[0] / 2 >
-          xPosition + cubeSize[0] / 2
-        ) {
-          return true
-        }
-      }
-    }
-    return false
-  }
-  const updatingJoinsWhenConnectingFromSideWithSameHeight = (layer, side, layerToAdd, cubeSize, xPosition) => {
-    const isCubeFromSide = isThereCubeFromSide(layerToAdd, side, xPosition, cubeSize)
-    //in case layer above the connecting layer exsists for checking if there is a cube above.
-    if (cubes[layer]) {
-      let edgeOfUpperLayer
-      let edgeOfButtomLayer
-      // calculate the edege of the layer and the layer above
-      if (side === 'left') {
-        edgeOfUpperLayer = cubes[layer][0].position[0] - cubes[layer][0].size[0] / 2
-        edgeOfButtomLayer = cubes[layer - 1][0].position[0] - cubes[layer - 1][0].size[0] / 2
-      } else {
-        edgeOfUpperLayer = cubes[layer][cubes[layer].length - 1].position[0] + cubes[layer][cubes[layer].length - 1].size[0] / 2
-        edgeOfButtomLayer =
-          cubes[layer - 1][cubes[layer - 1].length - 1].position[0] + cubes[layer - 1][cubes[layer - 1].length - 1].size[0] / 2
-      }
-
-      // checks if there is cube on the cube that the new cube connects from its left side
-      if (edgeOfUpperLayer === edgeOfButtomLayer) {
-        console.log('there is a cube above the connected ')
-        // in case there is a cube above and the layer to add is 0
-        if (layerToAdd === 0) {
-          setJoins((prev) => {
-            console.log({ ...prev, join3Exists: prev.join3Exists + 2, join5Exists: prev.join5Exists + 2 })
-            return { ...prev, join3Exists: prev.join3Exists + 2, join5Exists: prev.join5Exists + 2 }
-          })
-        }
-        // in case there is a cube above and the layer to add is diff from 0
-        else {
-          // in case there is a cube above and the layer to add is diff from 0 and also there is a cube from the side
-          if (isCubeFromSide) {
-            setJoins((prev) => {
-              console.log({
-                ...prev,
-                join4Exists: prev.join4Exists - 4,
-                join5Exists: prev.join5Exists + 4,
-                join3Exists: prev.join3Exists + 2,
-              })
-              return {
-                ...prev,
-                join4Exists: prev.join4Exists - 4,
-                join5Exists: prev.join5Exists + 4,
-                join3Exists: prev.join3Exists + 2,
-              }
-            })
-          }
-          // layer to add is diff from 0 and no cube from the side
-          else {
-            setJoins((prev) => {
-              console.log({ ...prev, join5Exists: prev.join5Exists + 2 })
-              return { ...prev, join5Exists: prev.join5Exists + 2 }
-            })
-          }
-        }
-      }
-      // no cube from above
-      else {
-        console.log('there is no cube above the connected ')
-        // in case there is no cube from above and the layer is 0
-        if (layerToAdd === 0) {
-          setJoins((prev) => {
-            console.log({ ...prev, join4Exists: prev.join4Exists + 4 })
-            return {
-              ...prev,
-              join4Exists: prev.join4Exists + 4,
-            }
-          })
-        }
-        // in case there is no cube from above and the layer is diff from 0
-        else {
-          // in case there is a cube from the side
-          if (isCubeFromSide) {
-            setJoins((prev) => {
-              console.log({ ...prev, join5Exists: prev.join5Exists + 2 })
-              return { ...prev, join5Exists: prev.join5Exists + 2 }
-            })
-          }
-          // no cube from the side
-          else {
-            setJoins((prev) => {
-              console.log({ ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists - 2 })
-              return { ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists - 2 }
-            })
-          }
-        }
-      }
-    }
-    // in case there is no layer so clearly there is no cube from above
-    else {
-      console.log('there is no cube above the connected ')
-      // in case the layer to add is 0
-      if (layerToAdd === 0) {
-        setJoins((prev) => {
-          console.log({ ...prev, join4Exists: prev.join4Exists + 4 })
-          return {
-            ...prev,
-            join4Exists: prev.join4Exists + 4,
-          }
-        })
-      } else {
-        // in case there is cube from the side
-        if (isCubeFromSide) {
-          setJoins((prev) => {
-            console.log({ ...prev, join5Exists: prev.join5Exists + 2 })
-            return { ...prev, join5Exists: prev.join5Exists + 2 }
-          })
-        }
-        // no cube from the side
-        else {
-          setJoins((prev) => {
-            console.log({ ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists - 2 })
-            return { ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists - 2 }
-          })
-        }
-      }
-    }
-  }
-
-  // const [lastConnections, setLastConnections] = useState([])
-
   const addingCubeToSide = (layer, positionToAddYAxis, cubeSize, xPosition, side) => {
     layer = Number(layer)
     const isLayer0 = layer === 0 ? true : false
-    if (isLayer0) {
-      if (side === 'left') {
-        if (cubeSize[1] === cubes[layer][0].size[1]) {
-          // in case the new cube height is in the same height of the cube its connected to
-          updatingJoinsWhenConnectingFromSideWithSameHeight(layer + cubeSize[1], 'left', layer, cubeSize, xPosition)
-        } else if (
-          // in case the new cube height is in the same height of the cube above and match its left edge
-          cubes[layer + 1] &&
-          cubes[layer + 1][0].size[1] + 1 === cubeSize[1] &&
-          cubes[layer + 1][0].position[0] - cubes[layer + 1][0].size[0] / 2 === xPosition + cubeSize[0] / 2
-        ) {
-          updatingJoinsWhenConnectingFromSideWithSameHeight(layer + cubeSize[1], 'left', layer, cubeSize, xPosition)
-        } else if (
-          // in case the new cube height is in the same height of the cube above and match its left edge
-          cubes[layer + 2] &&
-          cubes[layer + 2][0].size[1] + 2 === cubeSize[1] &&
-          cubes[layer + 2][0].position[0] - cubes[layer + 2][0].size[0] / 2 === xPosition + cubeSize[0] / 2
-        ) {
-          updatingJoinsWhenConnectingFromSideWithSameHeight(layer + cubeSize[1], 'left', layer, cubeSize, xPosition)
-        } else if (cubeSize[1] < cubes[layer][0].size[1]) {
-          setJoins((prev) => {
-            console.log('smaller')
-            console.log({ ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists + 2 })
-            return { ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists + 2 }
-          })
-        } else {
-          setJoins((prev) => {
-            console.log('bigger')
-            console.log({ ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists + 2 })
-            return { ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists + 2 }
-          })
-        }
-      }
-      // in case the connection is from the right
-      else {
-        const lenLayer0 = cubes[layer].length - 1
-        const lenLayer1 = cubes[layer + cubeSize[1]] ? cubes[layer + cubeSize[1]].length - 1 : undefined
-        const lenLayer2 = cubes[layer + 2] ? cubes[layer + 2].length - 1 : undefined
-        // const lenLayer3 = cubes[layer + 3] ? cubes[layer + 3].length - 1 : undefined
-        if (cubeSize[1] === cubes[layer][lenLayer0].size[1]) {
-          // in case the new cube height is in the same height of the cube its connected to
-          updatingJoinsWhenConnectingFromSideWithSameHeight(layer + cubeSize[1], 'right', layer, cubeSize, xPosition)
-        } else if (
-          // in case the new cube height is in the same height of the cube above and match its right edge
-          cubes[layer + 1] &&
-          cubes[layer + 1][lenLayer1].size[1] + 1 === cubeSize[1] &&
-          cubes[layer + 1][lenLayer1].position[0] + cubes[layer + 1][lenLayer1].size[0] / 2 === xPosition - cubeSize[0] / 2
-        ) {
-          updatingJoinsWhenConnectingFromSideWithSameHeight(layer + cubeSize[1], 'right', layer, cubeSize, xPosition)
-        } else if (
-          // in case the new cube height is in the same height of the cube above and match its right edge
-          cubes[layer + 2] &&
-          cubes[layer + 2][lenLayer2].size[1] + 2 === cubeSize[1] &&
-          cubes[layer + 2][lenLayer2].position[0] + cubes[2][lenLayer2].size[0] / 2 === xPosition - cubeSize[0] / 2
-        ) {
-          updatingJoinsWhenConnectingFromSideWithSameHeight(layer + cubeSize[1], 'right', layer, cubeSize, xPosition)
-        } else if (cubeSize[1] < cubes[layer][lenLayer0].size[1]) {
-          setJoins((prev) => {
-            console.log('smaller')
-            console.log({ ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists + 2 })
-            return { ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists + 2 }
-          })
-        } else {
-          setJoins((prev) => {
-            console.log('bigger')
-            console.log({ ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists + 2 })
-            return { ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists + 2 }
-          })
-        }
-      }
+    let oppositeSide
+    let edge
+    const leftSide = xPosition - cubeSize[0] / 2
+    const rightSide = xPosition + cubeSize[0] / 2
+    let isCubeFromSide // checks if in the layer bellow there is a cube that its edge oppsite edge match the new cube edge
+    if (side === 'left') {
+      edge = rightSide
+      oppositeSide = 'right'
+      isCubeFromSide = findCube(Number(layer) - 1, leftSide, 'right')
     } else {
-      // in case the from the side is above layer 0
-      layer = Number(layer)
+      edge = leftSide
+      oppositeSide = 'left'
+      isCubeFromSide = findCube(Number(layer) - 1, rightSide, 'left')
+    }
+    const newCube = { position: [xPosition, Number(layer) + positionToAddYAxis], size: cubeSize }
+    // checks the ratio between top edge of the new cube to the cube top edge connected cube
+    const answear = calculateCubeConnectionRatio(newCube, Number(layer) - 1, edge, oppositeSide)
+    console.log('answear is :', answear)
+    if (isLayer0) {
+      // in case top edges of the new cube and connected cube are equal
+      if (answear === 'equal') {
+        setJoins((prev) => {
+          console.log({ ...prev, join4Exists: prev.join4Exists + 4 })
+          return { ...prev, join4Exists: prev.join4Exists + 4 }
+        })
+      }
+      // in case top edges of the new cube and connected cube are equal and also there is a cube above the connected cube
+      else if (answear === 'equal and cube above') {
+        setJoins((prev) => {
+          console.log({ ...prev, join3Exists: prev.join3Exists + 2, join5Exists: prev.join5Exists + 2 })
+          return { ...prev, join3Exists: prev.join3Exists + 2, join5Exists: prev.join5Exists + 2 }
+        })
+      }
+      // in case the new cube higher or lower the update of joins is the same
+      else {
+        setJoins((prev) => {
+          console.log({ ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists + 2 })
+          return { ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists + 2 }
+        })
+      }
     }
 
     for (let i = 0; i < cubeSize[1]; i++) {
@@ -289,6 +124,7 @@ export default function ClosetDesign() {
     // })
 
     // console.log(lastConnections)
+    setIsMenu(true)
     setIsDragging(false)
     setPosition([-2, 2, 0])
   }
@@ -363,7 +199,7 @@ export default function ClosetDesign() {
   }
   const closeModalMessage = () => {
     setMessage(undefined)
-    setIsMenu(true)
+    //setIsMenu(true)
   }
   // return cube from the layer with the right/left edge as the edge param (if cube exsists)
   const findCube = (layer, edge, side) => {
@@ -439,7 +275,7 @@ export default function ClosetDesign() {
   const calculateCubeConnectionRatio = (newCube, numberLayer, edge, side) => {
     const oppositeSide = side === 'left' ? 'right' : 'left'
     const indexOfTopCube = findCube(numberLayer + newCube.size[1], edge, oppositeSide)
-    // in case there is a cube that its top edge match to new cube top edge and also the cube is next to new cube from left
+    // in case there is a cube that its top edge match to new cube top edge and also the cube is next to new cube its side
     if (indexOfTopCube !== -1) {
       const cubeForCompare = cubes[numberLayer + newCube.size[1]][indexOfTopCube]
       return topEdgeComparation(cubeForCompare, newCube, numberLayer + newCube.size[1], side)
@@ -845,6 +681,7 @@ export default function ClosetDesign() {
             // console.log(lastConnections)
             console.log('top')
           }
+          setIsMenu(true)
           setIsDragging(false)
           setPosition([-2, 2, 0])
           return
@@ -859,6 +696,7 @@ export default function ClosetDesign() {
     setIsMenu(false)
     setFirstOpen(true)
     setSecondaryOpen([false, undefined])
+    setMessage(undefined)
   }
   const addNewShelf = (material) => {
     console.log(material)
@@ -870,6 +708,15 @@ export default function ClosetDesign() {
 
   return (
     <>
+      {/* popup model */}
+      {isModalOpen && (
+        <Modal isOpen={isModalOpen} handleClose={handleCloseModal}>
+          <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>עיצוב ארון בהתאמה אישית</h2>
+          <p style={{ fontSize: '18px', lineHeight: '1.6' }}>
+            לפניכם עמוד בו תוכלו לגרור קוביות ולחברם לקוביות מהצד או מלמעלה ובכך לבנות ארון בהתאמה אישית
+          </p>
+        </Modal>
+      )}
       <div style={{ position: 'absolute', top: '10vh', zIndex: 1000 }}>
         {/* menu container */}
         <Paper sx={{ height: '90vh', width: '15vh', display: !isMenu && 'none' }}>
@@ -915,33 +762,35 @@ export default function ClosetDesign() {
       </div>
 
       {message && <ModalMessage typeOfMessage={message} onCloseModal={closeModalMessage} />}
-      <Canvas
-        shadows
-        //frameloop="always"
-        dpr={[1, 2]}
-        gl={{ preserveDrawingBuffer: true }}
-        camera={{
-          position: [0, 0, 10],
-          fov: 45,
-          near: 0.1,
-          far: 200,
-        }}
-      >
-        {/* <directionalLight color="white" intensity={0.5} /> */}
-        <Suspense fallback={null}>
-          {!isDragging && isSecondaryOpen[1] === undefined && (
-            <OrbitControls ref={orbitControlsRef} enableZoom={false} maxPolarAngle={Math.PI / 2} minPolarAngle={Math.PI / 2} />
-          )}
-          {Object.keys(cubes).map((key) =>
-            cubes[key].map((cube, index) => cube.display && <Cube key={index} position={cube.position} size={cube.size} />)
-          )}
+      {!isModalOpen && (
+        <Canvas
+          shadows
+          //frameloop="always"
+          dpr={[1, 2]}
+          gl={{ preserveDrawingBuffer: true }}
+          camera={{
+            position: [0, 0, 10],
+            fov: 45,
+            near: 0.1,
+            far: 200,
+          }}
+        >
+          {/* <directionalLight color="white" intensity={0.5} /> */}
+          <Suspense fallback={null}>
+            {!isDragging && isSecondaryOpen[1] === undefined && (
+              <OrbitControls ref={orbitControlsRef} enableZoom={false} maxPolarAngle={Math.PI / 2} minPolarAngle={Math.PI / 2} />
+            )}
+            {Object.keys(cubes).map((key) =>
+              cubes[key].map((cube, index) => cube.display && <Cube key={index} position={cube.position} size={cube.size} />)
+            )}
 
-          {isDragging && <DraggingCube position={position} onDrag={handleDrag} size={size} />}
-          {/* <GlassShelf /> */}
-          <Environment preset="city" />
-          <Preload all />
-        </Suspense>
-      </Canvas>
+            {isDragging && <DraggingCube position={position} onDrag={handleDrag} size={size} />}
+            {/* <GlassShelf /> */}
+            <Environment preset="city" />
+            <Preload all />
+          </Suspense>
+        </Canvas>
+      )}
       {Object.keys(cubes).map((key) =>
         cubes[key].map((cube, index) => cube.display && addDrawer && <Circle key={index} position={cube.position} cubeSize={cube.size} />)
       )}
