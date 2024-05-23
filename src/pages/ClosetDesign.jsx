@@ -10,11 +10,17 @@ import CubeUi from '../components/CubeUi/CubeUi'
 import ShelfUi from '../components/ShelfUi/ShelfUi'
 import ModalMessage from '../components/ModalMessage/ModalMessage'
 import Modal from '../components/Modal'
+// import RightCube from '../components/RightCube/RightCube'
+// import LeftCube from '../components/LeftCube/LeftCube'
+// import TopCube from '../components/TopCube/TopCube'
+// //import OnlyTopCube from '../components/OnlyTopCube/OnlyTopCube'
+// import NoButtomNoRigt from '../components/NoButtomNoRight/NoButtomNoRight'
+// import NoButtomNoLeft from '../components/NoButtomNoLeft/NoButtomNoLeft'
 //import * as THREE from 'three'
 //const lastConnections = []
 export default function ClosetDesign() {
   // for the dragging cube
-  const [position, setPosition] = useState([-2, 2, 0])
+  const [position, setPosition] = useState([-3, 2, 0])
   // this state responssible to store the possitions and sizes of all the cubes
   const [cubes, setCubes] = useState({
     0: [{ position: [0, 0, 0], size: [1, 1], display: true }],
@@ -126,7 +132,7 @@ export default function ClosetDesign() {
     // console.log(lastConnections)
     setIsMenu(true)
     setIsDragging(false)
-    setPosition([-2, 2, 0])
+    setPosition([-3, 2, 0])
   }
 
   // this function return true if there is enough room for the cube (x-axis)
@@ -683,7 +689,7 @@ export default function ClosetDesign() {
           }
           setIsMenu(true)
           setIsDragging(false)
-          setPosition([-2, 2, 0])
+          setPosition([-3, 2, 0])
           return
         }
       }
@@ -775,18 +781,20 @@ export default function ClosetDesign() {
             far: 200,
           }}
         >
-          {/* <directionalLight color="white" intensity={0.5} /> */}
+          <Environment preset="city" />
+
           <Suspense fallback={null}>
             {!isDragging && isSecondaryOpen[1] === undefined && (
-              <OrbitControls ref={orbitControlsRef} enableZoom={false} maxPolarAngle={Math.PI / 2} minPolarAngle={Math.PI / 2} />
+              <OrbitControls ref={orbitControlsRef} enableZoom={false} maxPolarAngle={Math.PI} minPolarAngle={Math.PI / 2} />
             )}
             {Object.keys(cubes).map((key) =>
               cubes[key].map((cube, index) => cube.display && <Cube key={index} position={cube.position} size={cube.size} />)
             )}
-
             {isDragging && <DraggingCube position={position} onDrag={handleDrag} size={size} />}
             {/* <GlassShelf /> */}
-            <Environment preset="city" />
+
+            {/* <Environment preset="city" /> */}
+
             <Preload all />
           </Suspense>
         </Canvas>
