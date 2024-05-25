@@ -1,7 +1,7 @@
 import React from 'react'
 import { useGLTF } from '@react-three/drei'
 
-export default function GlassShelf(props) {
+export default function GlassShelf({ position, xSize }, ...props) {
   const { nodes, materials } = useGLTF('/glassShelf1/sheltglas.glb')
 
   return (
@@ -14,8 +14,8 @@ export default function GlassShelf(props) {
           // receiveShadow
           geometry={nodes.Plane.geometry}
           material={materials['Material.001']}
-          scale={[0.4, 0.01, (1 / 2.9500019550323486) * 0.5]}
-          position={[-0.5, 1.5, 0]}
+          scale={[xSize / 5, 0.1, (1 / 2.9500019550323486) * 0.5]}
+          position={position}
         >
           {/* <Decal scale={[1, 1, 1]} position={[0, 0.45, 0]} /> */}
         </mesh>

@@ -10,6 +10,8 @@ import CubeUi from '../components/CubeUi/CubeUi'
 import ShelfUi from '../components/ShelfUi/ShelfUi'
 import ModalMessage from '../components/ModalMessage/ModalMessage'
 import Modal from '../components/Modal'
+import MetalShelf from '../components/MetalShelf/MetalShelf'
+import WoodShelf from '../components/WoodShelf/WoodShelf'
 // import RightCube from '../components/RightCube/RightCube'
 // import LeftCube from '../components/LeftCube/LeftCube'
 // import TopCube from '../components/TopCube/TopCube'
@@ -50,6 +52,8 @@ export default function ClosetDesign() {
 
   // this state responssible to notify the user whether he made valid or invalid cube connection
   const [message, setMessage] = useState(undefined)
+
+  const [shelfs, setShelfs] = useState([])
 
   const orbitControlsRef = useRef()
 
@@ -711,6 +715,41 @@ export default function ClosetDesign() {
     setSecondaryOpen([false, undefined])
     setAddDrawer(!addDrawer)
   }
+  // gets cube and layer and return if true if the cube consist shelf, and false otherwise
+  const isShelf = (layer, cube) => {
+    for (let i = 0; i < shelfs.length; i++) {
+      const cubeTopEdge = cube.position[1] + cube.size[1] / 2
+      const cubeXposition = cube.position[0]
+
+      //in case shelf position matchs top edge of the cube
+      if (shelfs[i].position[1] === cubeTopEdge && shelfs[i].position[0] === cubeXposition) {
+        // in case the cube in layer 0, checking if there a shelf in the buttom of the cube as well
+        if (layer === 0) {
+          const cubeButtomEdge = cube.position[1] - cube.size[1] / 2
+          for (let j = 0; j < shelfs.length; j++) {
+            // in case the cube is in layer 0 and there are shelfs that match to its top edge and buttom edge
+            if (shelfs[j].position[1] === cubeButtomEdge && shelfs[j].position[0] === cubeXposition) {
+              return [true, undefined]
+            }
+          }
+          return [false, 'buttom']
+        }
+        // in case the cube is not in layer 0 and the shelf match to its top edge
+        else {
+          return [true, undefined]
+        }
+      }
+    }
+
+    return [false, 'top']
+  }
+  const handleAddingShelf = (xPosition, yPosition, xSize) => {
+    setShelfs((prev) => {
+      return [...prev, { position: [xPosition, yPosition, 0], xSize: xSize }]
+    })
+    setAddDrawer(false)
+    setIsMenu(true)
+  }
 
   return (
     <>
@@ -784,14 +823,17 @@ export default function ClosetDesign() {
           <Environment preset="city" />
 
           <Suspense fallback={null}>
-            {!isDragging && isSecondaryOpen[1] === undefined && (
+            {!isDragging && !addDrawer && isSecondaryOpen[1] === undefined && (
               <OrbitControls ref={orbitControlsRef} enableZoom={false} maxPolarAngle={Math.PI} minPolarAngle={Math.PI / 2} />
             )}
             {Object.keys(cubes).map((key) =>
               cubes[key].map((cube, index) => cube.display && <Cube key={index} position={cube.position} size={cube.size} />)
             )}
             {isDragging && <DraggingCube position={position} onDrag={handleDrag} size={size} />}
+            {shelfs.length && shelfs.map((shelf, index) => <GlassShelf key={index} position={shelf.position} xSize={shelf.xSize} />)}
             {/* <GlassShelf /> */}
+            {/* <MetalShelf />
+            <WoodShelf /> */}
 
             {/* <Environment preset="city" /> */}
 
@@ -799,9 +841,38 @@ export default function ClosetDesign() {
           </Suspense>
         </Canvas>
       )}
-      {Object.keys(cubes).map((key) =>
-        cubes[key].map((cube, index) => cube.display && addDrawer && <Circle key={index} position={cube.position} cubeSize={cube.size} />)
-      )}
+      {addDrawer &&
+        (() => {
+          let indicator = 0
+
+          const circles = Object.keys(cubes).flatMap((key) =>
+            cubes[key].map((cube, index) => {
+              if (cube.display) {
+                const [isThereShelf, toPlace] = isShelf(Number(key), cube)
+                if (!isThereShelf) {
+                  indicator = 1
+                  return (
+                    <Circle
+                      key={index}
+                      position={cube.position}
+                      cubeSize={cube.size}
+                      place={toPlace}
+                      handleAddingShelf={handleAddingShelf}
+                    />
+                  )
+                }
+              }
+              return null
+            })
+          )
+
+          if (indicator === 0) {
+            setAddDrawer(false)
+            setIsMenu(true)
+          }
+
+          return circles
+        })()}
     </>
   )
 }
