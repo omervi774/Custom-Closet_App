@@ -59,7 +59,7 @@ export default function Circle({ position, cubeSize, place, handleAddingShelf })
   }
 
   return (
-    <div style={circleStyle} onClick={handleClick}>
+    <div style={circleStyle}>
       <div
         onClick={handleClick}
         style={{

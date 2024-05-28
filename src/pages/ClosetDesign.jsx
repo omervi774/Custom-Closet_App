@@ -12,6 +12,7 @@ import ModalMessage from '../components/ModalMessage/ModalMessage'
 import Modal from '../components/Modal'
 import MetalShelf from '../components/MetalShelf/MetalShelf'
 import WoodShelf from '../components/WoodShelf/WoodShelf'
+
 // import RightCube from '../components/RightCube/RightCube'
 // import LeftCube from '../components/LeftCube/LeftCube'
 // import TopCube from '../components/TopCube/TopCube'
@@ -762,7 +763,7 @@ export default function ClosetDesign() {
   }
   const handleAddingShelf = (xPosition, yPosition, xSize) => {
     setShelfs((prev) => {
-      return [...prev, { id: prev.length + 1, position: [xPosition, yPosition, 0], xSize: xSize }]
+      return [...prev, { position: [xPosition, yPosition, 0], xSize: xSize }]
     })
     setAddDrawer(false)
     setIsMenu(true)
@@ -803,6 +804,28 @@ export default function ClosetDesign() {
               }}
             >
               מגירות
+            </MenuItem>
+            <MenuItem
+              sx={{ color: 'black', display: !isFirstOpen && 'none' }}
+              onClick={async () => {
+                console.log('cubes', cubes)
+                console.log('shelfs', shelfs)
+                console.log('joins', joins)
+                await fetch(`http://localhost:5000/orders`, {
+                  method: 'post',
+                  body: JSON.stringify({ cubes: cubes, joins: joins, shelfs: shelfs }),
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                })
+                setCubes({
+                  0: [],
+                })
+                setJoins({ join3Exists: 0, join4Exists: 0, join5Exists: 0 })
+                setShelfs([])
+              }}
+            >
+              הזמן
             </MenuItem>
           </MenuList>
           {/* second menu item - display the user the cubes size and let him choose the required size */}
@@ -846,8 +869,8 @@ export default function ClosetDesign() {
               cubes[key].map((cube, index) => cube.display && <Cube key={index} position={cube.position} size={cube.size} />)
             )}
             {isDragging && <DraggingCube position={position} onDrag={handleDrag} size={size} />}
-            {shelfs.map((shelf) => {
-              return <GlassShelf key={shelf.id} position={shelf.position} xSize={shelf.xSize} />
+            {shelfs.map((shelf, index) => {
+              return <GlassShelf key={index} position={shelf.position} xSize={shelf.xSize} />
             })}
             <Preload all />
           </Suspense>
@@ -858,7 +881,7 @@ export default function ClosetDesign() {
           let indicator = 0
 
           const circles = Object.keys(cubes).flatMap((key) =>
-            cubes[key].map((cube, index) => {
+            cubes[key].map((cube) => {
               if (cube.display) {
                 const [isThereShelf, toPlace] = isShelf(Number(key), cube)
                 if (!isThereShelf) {
