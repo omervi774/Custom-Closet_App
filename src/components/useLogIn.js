@@ -1,14 +1,31 @@
-import { useState } from "react";
+import { useState } from 'react'
+// import { signInWithEmailAndPassword } from 'firebase/auth'
+// import { auth } from '../firebase'
 export default function useLogIn() {
   const [inputsValues, setInputsValues] = useState({
-    userName: "",
-    password: "",
-  });
+    email: '',
+    password: '',
+  })
+  // const [error, setError] = useState(false)
   function handleChange(e) {
-    const { value, name } = e.target;
+    const { value, name } = e.target
     setInputsValues((prev) => {
-      return { ...prev, [`${name}`]: value };
-    });
+      return { ...prev, [`${name}`]: value }
+    })
   }
-  return [inputsValues, handleChange];
+  // async function handleSubmit() {
+  //   try {
+  //     await signInWithEmailAndPassword(auth, inputsValues.email, inputsValues.password)
+  //     //const user = userCredential.user
+  //     // const token = await user.getIdToken()
+  //     console.log('succsesfully logged in')
+  //   } catch (error) {
+  //     setError(true)
+  //     setTimeout(() => {
+  //       setError(false)
+  //     }, 3000)
+  //     throw new Error(error)
+  //   }
+  // }
+  return [inputsValues, handleChange]
 }

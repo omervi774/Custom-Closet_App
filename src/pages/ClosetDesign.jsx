@@ -25,7 +25,7 @@ export default function ClosetDesign() {
   const [position, setPosition] = useState([-3, 2, 0])
   // this state responssible to store the possitions and sizes of all the cubes
   const [cubes, setCubes] = useState({
-    0: [{ position: [0, 0, 0], size: [1, 1], display: true }],
+    0: [],
   })
   // Popup modal when the use first enter the page for basic explanation about the essence of the page
   const [isModalOpen, setIsModalOpen] = useState(true)
@@ -33,7 +33,7 @@ export default function ClosetDesign() {
     setIsModalOpen(false)
   }
 
-  const [joins, setJoins] = useState({ join3Exists: 8, join4Exists: 0, join5Exists: 0 })
+  const [joins, setJoins] = useState({ join3Exists: 0, join4Exists: 0, join5Exists: 0 })
   // this state responssible to check if the user try to drag new cube or not
   const [isDragging, setIsDragging] = useState(false)
 
@@ -198,7 +198,6 @@ export default function ClosetDesign() {
   const handleAddingCube = (layer, updatingLayerArr) => {
     setCubes((prev) => {
       console.log({ ...prev, [layer]: updatingLayerArr })
-
       return {
         ...prev,
         [layer]: updatingLayerArr,
@@ -702,11 +701,29 @@ export default function ClosetDesign() {
   // after the user chose size of the dragging cube set its width and height and close the menu
   const newDraggingCube = (width, height) => {
     setSize([width, height])
-    setIsDragging(true)
-    setIsMenu(false)
+    setMessage(undefined)
     setFirstOpen(true)
     setSecondaryOpen([false, undefined])
-    setMessage(undefined)
+    if (cubes['0'].length === 0) {
+      let yOffset = 0
+      if (height === 3) {
+        yOffset = 1
+      } else if (height === 2) {
+        yOffset = 0.5
+      }
+      for (let i = 0; i < height; i++) {
+        const yPosition = i === 0 ? 0 + yOffset : i
+        const cubeAddingSize = i === 0 ? [width, height] : [width, 1]
+        const display = i === 0 ? true : false
+        // in case the layer in new
+        handleAddingCube(`${0 + i}`, [{ position: [0, yPosition, 0], size: cubeAddingSize, display: display }])
+      }
+      setJoins({ join3Exists: 8, join4Exists: 0, join5Exists: 0 })
+      return
+    } else {
+      setIsDragging(true)
+      setIsMenu(false)
+    }
   }
   const addNewShelf = (material) => {
     console.log(material)
@@ -745,7 +762,7 @@ export default function ClosetDesign() {
   }
   const handleAddingShelf = (xPosition, yPosition, xSize) => {
     setShelfs((prev) => {
-      return [...prev, { position: [xPosition, yPosition, 0], xSize: xSize }]
+      return [...prev, { id: prev.length + 1, position: [xPosition, yPosition, 0], xSize: xSize }]
     })
     setAddDrawer(false)
     setIsMenu(true)
@@ -753,7 +770,7 @@ export default function ClosetDesign() {
 
   return (
     <>
-      {/* popup model */}
+      {/* popup modal */}
       {isModalOpen && (
         <Modal isOpen={isModalOpen} handleClose={handleCloseModal}>
           <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>עיצוב ארון בהתאמה אישית</h2>
@@ -788,8 +805,8 @@ export default function ClosetDesign() {
               מגירות
             </MenuItem>
           </MenuList>
-          {/* second menu item - display the user the cubes size and let him choose the requiered size */}
-          <MenuItem sx={{ color: 'black', display: isSecondaryOpen[0] && isSecondaryOpen[1] === 'קוביות' ? true : 'none' }}>
+          {/* second menu item - display the user the cubes size and let him choose the required size */}
+          <MenuItem sx={{ color: 'black', display: isSecondaryOpen[0] && isSecondaryOpen[1] === 'קוביות' ? 'block' : 'none' }}>
             <Box
               sx={{
                 display: 'flex',
@@ -810,7 +827,6 @@ export default function ClosetDesign() {
       {!isModalOpen && (
         <Canvas
           shadows
-          //frameloop="always"
           dpr={[1, 2]}
           gl={{ preserveDrawingBuffer: true }}
           camera={{
@@ -830,13 +846,9 @@ export default function ClosetDesign() {
               cubes[key].map((cube, index) => cube.display && <Cube key={index} position={cube.position} size={cube.size} />)
             )}
             {isDragging && <DraggingCube position={position} onDrag={handleDrag} size={size} />}
-            {shelfs.length && shelfs.map((shelf, index) => <GlassShelf key={index} position={shelf.position} xSize={shelf.xSize} />)}
-            {/* <GlassShelf /> */}
-            {/* <MetalShelf />
-            <WoodShelf /> */}
-
-            {/* <Environment preset="city" /> */}
-
+            {shelfs.map((shelf) => {
+              return <GlassShelf key={shelf.id} position={shelf.position} xSize={shelf.xSize} />
+            })}
             <Preload all />
           </Suspense>
         </Canvas>
@@ -853,7 +865,7 @@ export default function ClosetDesign() {
                   indicator = 1
                   return (
                     <Circle
-                      key={index}
+                      key={cube.position}
                       position={cube.position}
                       cubeSize={cube.size}
                       place={toPlace}

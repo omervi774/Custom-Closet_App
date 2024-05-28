@@ -24,24 +24,24 @@ const CubeUi = ({ title, newDraggingCube }) => {
       <Typography variant="h5"> {title}</Typography>
       <Typography>:רוחב</Typography>
 
-      <Button variant={clicked['width'][0] && 'outlined'} onClick={() => handleClicked('width', 1)}>
+      <Button variant={clicked['width'][0] ? 'outlined' : 'text'} onClick={() => handleClicked('width', 1)}>
         1
       </Button>
-      <Button variant={clicked['width'][1] && 'outlined'} onClick={() => handleClicked('width', 2)}>
+      <Button variant={clicked['width'][1] ? 'outlined' : 'text'} onClick={() => handleClicked('width', 2)}>
         2
       </Button>
-      <Button variant={clicked['width'][2] && 'outlined'} onClick={() => handleClicked('width', 3)}>
+      <Button variant={clicked['width'][2] ? 'outlined' : 'text'} onClick={() => handleClicked('width', 3)}>
         3
       </Button>
 
       <Typography>:גובה</Typography>
-      <Button variant={clicked['height'][0] && 'outlined'} onClick={() => handleClicked('height', 1)}>
+      <Button variant={clicked['height'][0] ? 'outlined' : 'text'} onClick={() => handleClicked('height', 1)}>
         1
       </Button>
-      <Button variant={clicked['height'][1] && 'outlined'} onClick={() => handleClicked('height', 2)}>
+      <Button variant={clicked['height'][1] ? 'outlined' : 'text'} onClick={() => handleClicked('height', 2)}>
         2
       </Button>
-      <Button variant={clicked['height'][2] && 'outlined'} onClick={() => handleClicked('height', 3)}>
+      <Button variant={clicked['height'][2] ? 'outlined' : 'text'} onClick={() => handleClicked('height', 3)}>
         3
       </Button>
       <Button
