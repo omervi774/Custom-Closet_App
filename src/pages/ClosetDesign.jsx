@@ -10,15 +10,9 @@ import CubeUi from '../components/CubeUi/CubeUi'
 import ShelfUi from '../components/ShelfUi/ShelfUi'
 import ModalMessage from '../components/ModalMessage/ModalMessage'
 import Modal from '../components/Modal'
-import MetalShelf from '../components/MetalShelf/MetalShelf'
-import WoodShelf from '../components/WoodShelf/WoodShelf'
 
-// import RightCube from '../components/RightCube/RightCube'
-// import LeftCube from '../components/LeftCube/LeftCube'
-// import TopCube from '../components/TopCube/TopCube'
-// //import OnlyTopCube from '../components/OnlyTopCube/OnlyTopCube'
-// import NoButtomNoRigt from '../components/NoButtomNoRight/NoButtomNoRight'
-// import NoButtomNoLeft from '../components/NoButtomNoLeft/NoButtomNoLeft'
+// import MetalShelf from '../components/MetalShelf/MetalShelf'
+// import WoodShelf from '../components/WoodShelf/WoodShelf'
 //import * as THREE from 'three'
 //const lastConnections = []
 export default function ClosetDesign() {
@@ -84,6 +78,7 @@ export default function ClosetDesign() {
     // checks the ratio between top edge of the new cube to the cube top edge connected cube
     const answear = calculateCubeConnectionRatio(newCube, Number(layer) - 1, edge, oppositeSide)
     console.log('answear is :', answear)
+    // in case there it is layer 0
     if (isLayer0) {
       // in case top edges of the new cube and connected cube are equal
       if (answear === 'equal') {
@@ -104,6 +99,54 @@ export default function ClosetDesign() {
         setJoins((prev) => {
           console.log({ ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists + 2 })
           return { ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists + 2 }
+        })
+      }
+    }
+    // in case it is not layer 0 and there is a cube from the side in the layer bellow
+    else if (isCubeFromSide !== -1) {
+      // in case top edges of the new cube and connected cube are equal and also there is a cube above the connected cube
+      if (answear === 'equal and cube above') {
+        setJoins((prev) => {
+          console.log({ ...prev, join4Exists: prev.join4Exists - 4, join5Exists: prev.join5Exists + 4 })
+          return { ...prev, join4Exists: prev.join4Exists - 4, join5Exists: prev.join5Exists + 4 }
+        })
+      }
+      // in case the top edge of the new cube is lower than the cube its connected to
+      else if (answear === 'lower') {
+        setJoins((prev) => {
+          console.log({ ...prev, join5Exists: prev.join5Exists + 2 })
+          return { ...prev, join5Exists: prev.join5Exists + 2 }
+        })
+      }
+      // in case the new cube higher or equal the update of joins is the same
+      else {
+        setJoins((prev) => {
+          console.log({ ...prev, join5Exists: prev.join5Exists + 2, join3Exists: prev.join3Exists - 2 })
+          return { ...prev, join5Exists: prev.join5Exists + 2, join3Exists: prev.join3Exists - 2 }
+        })
+      }
+    }
+    // in case it is not layer 0 and there is no cube from the side in the layer bellow
+    else {
+      // in case top edges of the new cube and connected cube are equal
+      if (answear === 'equal') {
+        setJoins((prev) => {
+          console.log({ ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists - 2 })
+          return { ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists - 2 }
+        })
+      }
+      // in case top edges of the new cube and connected cube are equal and also there is a cube above the connected cube
+      else if (answear === 'equal and cube above') {
+        setJoins((prev) => {
+          console.log({ ...prev, join5Exists: prev.join5Exists + 2 })
+          return { ...prev, join5Exists: prev.join5Exists + 2 }
+        })
+      }
+      // in case the new cube higher or lower the update of joins is the same
+      else {
+        setJoins((prev) => {
+          console.log({ ...prev, join4Exists: prev.join4Exists + 4 })
+          return { ...prev, join4Exists: prev.join4Exists + 4 }
         })
       }
     }
@@ -575,60 +618,25 @@ export default function ClosetDesign() {
     setPosition(newPosition)
     const epsilon = 0.2
     const size = 1
-    //for each key of our layers check if the dragging cube connects to the layer from the left/right
-    Object.keys(cubes).forEach((layer) => {
-      const leftEdge = cubes[layer][0].position[0] - cubes[layer][0].size[0] / 2 // left edge of the layer
-      const rightEdge = cubes[layer][cubes[layer].length - 1].position[0] + cubes[layer][cubes[layer].length - 1].size[0] / 2 // right edge of the layer
-      let positionToAddYAxis = 0
-      if (cubeSize[1] === 2) {
-        positionToAddYAxis = 0.5
-      } else if (cubeSize[1] === 3) {
-        positionToAddYAxis = 1
-      }
+    const layer = Math.floor(newPosition[1])
 
-      // check if the dragging cube is in the same height of the layer
-      if (Math.abs(newPosition[1] - Number(layer)) < epsilon + positionToAddYAxis) {
-        const isLayer0 = Number(layer) === 0
-
-        // check if the dragging cube is connecting from the left
-        if (Math.abs(newPosition[0] + cubeSize[0] / 2 - leftEdge) < epsilon) {
-          if (isLayer0) {
-            addingCubeToSide(layer, positionToAddYAxis, cubeSize, leftEdge - cubeSize[0] / 2, 'left')
-            console.log('left')
-            return
-          } else {
-            // in case try adding cube to layers thats requires cube bellow
-            const [containsButtomCube] = is_include([leftEdge - cubeSize[0] / 2, Number(layer) - size, 0], cubeSize[0], layer - size)
-            if (containsButtomCube) {
-              addingCubeToSide(layer, positionToAddYAxis, cubeSize, leftEdge - cubeSize[0] / 2, 'left')
-              console.log('left')
-              return
-            }
-          }
-          // check if the dragging cube is connecting from the right
-        } else if (Math.abs(newPosition[0] - cubeSize[0] / 2 - rightEdge) < epsilon) {
-          if (isLayer0) {
-            addingCubeToSide(layer, positionToAddYAxis, cubeSize, rightEdge + cubeSize[0] / 2, 'right')
-            console.log('right')
-            return
-          } else {
-            // in case try adding cube to layers thats requires cube bellow
-            const [containsButtomCube] = is_include([rightEdge + size, Number(layer) - size, 0], cubeSize[0], layer - size)
-
-            if (containsButtomCube) {
-              addingCubeToSide(layer, positionToAddYAxis, cubeSize, rightEdge + cubeSize[0] / 2, 'right')
-              console.log('right')
-              return
-            }
-          }
-        }
-      }
+    if (layer < 0) {
+      return
+    }
+    let positionToAddYAxis = 0
+    if (cubeSize[1] === 2) {
+      positionToAddYAxis = 0.5
+    } else if (cubeSize[1] === 3) {
+      positionToAddYAxis = 1
+    }
+    const buttomLayer = layer - 1
+    if (buttomLayer >= 0 && cubes[buttomLayer]) {
       // check if the dragging cube connects from the top
-      else if (Math.abs(newPosition[1] - (Number(layer) + size)) < epsilon + positionToAddYAxis) {
+      if (Math.abs(newPosition[1] - (buttomLayer + size)) < epsilon + positionToAddYAxis) {
         // check if there is a cube to connect to
-        const [containsButtomCube, x] = is_include([newPosition[0], Number(layer), 0], cubeSize[0], layer)
+        const [containsButtomCube, x] = is_include([newPosition[0], buttomLayer, 0], cubeSize[0], buttomLayer)
         // check if the new cube position has enough room on the new layer
-        const isOverRide = isEnoughRoom(Number(layer) + 1, x, cubeSize)
+        const isOverRide = isEnoughRoom(layer, x, cubeSize)
         if (isOverRide && containsButtomCube) {
           setMessage('error')
           console.log('omer hamelech')
@@ -644,16 +652,17 @@ export default function ClosetDesign() {
         if (containsButtomCube && !isOverRide) {
           let i
           for (i = 0; i < cubeSize[1]; i++) {
-            const indexToInsert = findCubeRoom(`${Number(layer) + i + size}`, x)
-            const yPosition = i === 0 ? 1 + Number(layer) + positionToAddYAxis : 1 + i + Number(layer)
+            const indexToInsert = findCubeRoom(`${layer + i}`, x)
+            const yPosition = i === 0 ? layer + positionToAddYAxis : i + layer
             const cubeAddingSize = i === 0 ? cubeSize : [cubeSize[0], 1]
             const display = i === 0 ? true : false
             if (i === 0 && indexToInsert !== -2) {
-              calcJoinsTopConnection({ position: [x, 1 + Number(layer) + positionToAddYAxis], size: cubeSize }, Number(layer))
+              console.log('ttt')
+              calcJoinsTopConnection({ position: [x, layer + positionToAddYAxis], size: cubeSize }, buttomLayer)
             }
             if (indexToInsert === -1) {
               // in case the layer in new
-              handleAddingCube(`${Number(layer) + i + size}`, [{ position: [x, yPosition, 0], size: cubeAddingSize, display: display }])
+              handleAddingCube(`${layer + i}`, [{ position: [x, yPosition, 0], size: cubeAddingSize, display: display }])
             } else if (indexToInsert === -2) {
               console.log(i)
               console.log(Number(layer))
@@ -663,23 +672,23 @@ export default function ClosetDesign() {
               //return
             } else {
               // in case the new cube is should be at the end of the layer
-              if (indexToInsert >= cubes[`${Number(layer) + i + size}`].length) {
-                handleAddingCube(`${Number(layer) + i + size}`, [
-                  ...cubes[`${Number(layer) + i + size}`],
+              if (indexToInsert >= cubes[`${layer + i}`].length) {
+                handleAddingCube(`${layer + i}`, [
+                  ...cubes[`${layer + i}`],
                   { position: [x, yPosition, 0], size: cubeAddingSize, display: display },
                 ])
                 // in case the new cube should be place at the start of the new layer
               } else if (indexToInsert <= 0) {
-                handleAddingCube(`${Number(layer) + i + size}`, [
+                handleAddingCube(`${layer + i}`, [
                   { position: [x, yPosition, 0], size: cubeAddingSize, display: display },
-                  ...cubes[`${Number(layer) + i + size}`],
+                  ...cubes[`${layer + i}`],
                 ])
               } else {
                 // in case the cube should be place somewhere at the midelle of the layer
-                handleAddingCube(`${Number(layer) + i + size}`, [
-                  ...cubes[`${Number(layer) + i + size}`].slice(0, indexToInsert),
+                handleAddingCube(`${layer + i}`, [
+                  ...cubes[`${layer + i}`].slice(0, indexToInsert),
                   { position: [x, yPosition, 0], size: cubeAddingSize, display: display },
-                  ...cubes[`${Number(layer) + i + size}`].slice(indexToInsert, cubes[`${Number(layer) + i + size}`].length),
+                  ...cubes[`${layer + i}`].slice(indexToInsert, cubes[`${layer + i}`].length),
                 ])
               }
             }
@@ -697,7 +706,56 @@ export default function ClosetDesign() {
           return
         }
       }
-    })
+    }
+    if (!cubes[layer]) {
+      return
+    }
+    //for each key of our layers check if the dragging cube connects to the layer from the left/right
+
+    const leftEdge = cubes[layer.toString()][0].position[0] - cubes[layer.toString()][0].size[0] / 2 // left edge of the layer
+    const rightEdge =
+      cubes[layer.toString()][cubes[layer.toString()].length - 1].position[0] +
+      cubes[layer.toString()][cubes[layer.toString()].length - 1].size[0] / 2 // right edge of the layer
+
+    // check if the dragging cube is in the same height of the layer
+    if (Math.abs(newPosition[1] - layer) < epsilon + positionToAddYAxis) {
+      const isLayer0 = layer === 0
+
+      // check if the dragging cube is connecting from the left
+      if (Math.abs(newPosition[0] + cubeSize[0] / 2 - leftEdge) < epsilon) {
+        if (isLayer0) {
+          addingCubeToSide(layer.toString(), positionToAddYAxis, cubeSize, leftEdge - cubeSize[0] / 2, 'left')
+          console.log('left')
+          return
+        } else {
+          // in case try adding cube to layers thats requires cube bellow
+          const [containsButtomCube] = is_include([leftEdge - cubeSize[0] / 2, layer - size, 0], cubeSize[0], layer - size)
+          const isOverRide = isEnoughRoom(layer, leftEdge - cubeSize[0] / 2, cubeSize)
+          if (containsButtomCube && isOverRide) {
+            addingCubeToSide(layer, positionToAddYAxis, cubeSize, leftEdge - cubeSize[0] / 2, 'left')
+            console.log('left')
+            return
+          }
+        }
+        // check if the dragging cube is connecting from the right
+      } else if (Math.abs(newPosition[0] - cubeSize[0] / 2 - rightEdge) < epsilon) {
+        if (isLayer0) {
+          addingCubeToSide(layer.toString(), positionToAddYAxis, cubeSize, rightEdge + cubeSize[0] / 2, 'right')
+          console.log('right')
+          return
+        } else {
+          // in case try adding cube to layers thats requires cube bellow
+          const [containsButtomCube] = is_include([rightEdge + cubeSize[0] / 2, layer - size, 0], cubeSize[0], layer - size)
+          const isOverRide = isEnoughRoom(layer, rightEdge + cubeSize[0] / 2, cubeSize)
+
+          if (containsButtomCube && !isOverRide) {
+            addingCubeToSide(layer.toString(), positionToAddYAxis, cubeSize, rightEdge + cubeSize[0] / 2, 'right')
+            console.log('right')
+            return
+          }
+        }
+      }
+    }
   }
   // after the user chose size of the dragging cube set its width and height and close the menu
   const newDraggingCube = (width, height) => {
@@ -872,6 +930,7 @@ export default function ClosetDesign() {
             {shelfs.map((shelf, index) => {
               return <GlassShelf key={index} position={shelf.position} xSize={shelf.xSize} />
             })}
+
             <Preload all />
           </Suspense>
         </Canvas>
