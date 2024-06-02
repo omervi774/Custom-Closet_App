@@ -16,38 +16,32 @@
 		{
 			"mesh":0,
 			"name":"Cube",
-			"rotation":[
-				-1,
-				0,
-				0,
-				4.371138828673793e-08
-			],
 			"scale":[
-				1,
-				1,
-				0.5600004196166992
+				0.5,
+				1.5,
+				0.5
 			]
 		}
 	],
 	"materials":[
 		{
 			"doubleSided":true,
-			"name":"Material.001",
+			"name":"Material",
 			"pbrMetallicRoughness":{
 				"baseColorFactor":[
-					0.01066572405397892,
-					0.01066572405397892,
-					0.01066572405397892,
+					0,
+					0,
+					0,
 					1
 				],
 				"metallicFactor":0,
-				"roughnessFactor":0.4000000059604645
+				"roughnessFactor":0.5
 			}
 		}
 	],
 	"meshes":[
 		{
-			"name":"Cube.002",
+			"name":"Cube",
 			"primitives":[
 				{
 					"attributes":{
@@ -65,68 +59,68 @@
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":409,
+			"count":160,
 			"max":[
-				2.5,
-				2.7985639572143555,
-				2.5
+				1,
+				1,
+				1
 			],
 			"min":[
-				-2.5234577655792236,
-				-2.5,
-				-2.5
+				-1,
+				-1,
+				-1
 			],
 			"type":"VEC3"
 		},
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":409,
+			"count":160,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":409,
+			"count":160,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5123,
-			"count":744,
+			"count":480,
 			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":4908,
+			"byteLength":1920,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":4908,
-			"byteOffset":4908,
+			"byteLength":1920,
+			"byteOffset":1920,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":3272,
-			"byteOffset":9816,
+			"byteLength":1280,
+			"byteOffset":3840,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":1488,
-			"byteOffset":13088,
+			"byteLength":960,
+			"byteOffset":5120,
 			"target":34963
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":14576,
-			"uri":"cabbinet_no_buttom_no_left_new.bin"
+			"byteLength":6080,
+			"uri":"1X3.bin"
 		}
 	]
 }

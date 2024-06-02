@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { useGLTF } from '@react-three/drei'
 
-const xOriginal = 5
-const yOriginal = 5.2985639572143555
+// const xOriginal = 5
+// const yOriginal = 5.2985639572143555
 // this component display 3D dragging cube on the screen
-const DraggingCube = ({ position, onDrag, size }) => {
-  const { scene } = useGLTF('nolegCube/cabbinetnolegs.gltf')
+const DraggingCube = ({ position, onDrag, url, size }) => {
+  const { scene } = useGLTF(`cubes/${url}.gltf`)
   const [isDragging, setIsdragging] = useState(false)
 
   const startDrag = () => {
@@ -21,9 +21,9 @@ const DraggingCube = ({ position, onDrag, size }) => {
 
     const { movementX, movementY } = e
 
-    console.log(position[0] + movementX * 0.02)
-    console.log(position[1] - movementY * 0.02)
-    onDrag([position[0] + movementX * 0.02, position[1] - movementY * 0.02, 0], size)
+    console.log(position[0] + movementX * 0.03)
+    console.log(position[1] - movementY * 0.03)
+    onDrag([position[0] + movementX * 0.03, position[1] - movementY * 0.03, 0], size)
   }
 
   return (
@@ -32,7 +32,7 @@ const DraggingCube = ({ position, onDrag, size }) => {
       onPointerMissed={stopDrag}
       onPointerMove={movement}
       object={scene.clone(true)}
-      scale={[size[0] / xOriginal, size[1] / yOriginal, 0.3]}
+      scale={[1, 1, 0.84]}
       position={position}
       rotation-y={0}
     />

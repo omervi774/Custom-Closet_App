@@ -14,7 +14,7 @@ export default function GlassShelf({ position, xSize }, ...props) {
           // receiveShadow
           geometry={nodes.Plane.geometry}
           material={materials['Material.001']}
-          scale={[xSize / 5, 0.1, (1 / 2.9500019550323486) * 0.5]}
+          scale={[xSize / 5, 0.01, (1 / 2.9500019550323486) * 0.5]}
           position={position}
         >
           {/* <Decal scale={[1, 1, 1]} position={[0, 0.45, 0]} /> */}
