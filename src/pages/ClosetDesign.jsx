@@ -791,7 +791,7 @@ export default function ClosetDesign() {
     setSecondaryOpen([false, undefined])
     setAddDrawer(!addDrawer)
   }
-  // gets cube and layer and return if true if the cube consist shelf, and false otherwise
+  // gets cube and layer and return true if the cube consist shelf, and false otherwise
   const isShelf = (layer, cube) => {
     for (let i = 0; i < shelfs.length; i++) {
       const cubeTopEdge = cube.position[1] + cube.size[1] / 2
@@ -924,13 +924,14 @@ export default function ClosetDesign() {
               <OrbitControls ref={orbitControlsRef} enableZoom={false} maxPolarAngle={Math.PI} minPolarAngle={Math.PI / 2} />
             )}
             {Object.keys(cubes).map((key) =>
-              cubes[key].map((cube, index) => cube.display && <Cube key={index} position={cube.position} size={cube.size} />)
+              cubes[key].map(
+                (cube, index) => cube.display && <Cube key={index} position={cube.position} url={`${cube.size[0]}X${cube.size[1]}`} />
+              )
             )}
-            {isDragging && <DraggingCube position={position} onDrag={handleDrag} size={size} />}
+            {isDragging && <DraggingCube position={position} onDrag={handleDrag} url={`${size[0]}X${size[1]}`} size={size} />}
             {shelfs.map((shelf, index) => {
               return <GlassShelf key={index} position={shelf.position} xSize={shelf.xSize} />
             })}
-
             <Preload all />
           </Suspense>
         </Canvas>

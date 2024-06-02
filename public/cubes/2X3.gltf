@@ -16,38 +16,32 @@
 		{
 			"mesh":0,
 			"name":"Cube",
-			"rotation":[
-				0,
-				0,
-				1,
-				4.371138828673793e-08
-			],
 			"scale":[
 				1,
-				1,
-				0.5600004196166992
+				1.5,
+				0.5
 			]
 		}
 	],
 	"materials":[
 		{
 			"doubleSided":true,
-			"name":"Material.001",
+			"name":"Material",
 			"pbrMetallicRoughness":{
 				"baseColorFactor":[
-					0.01066572405397892,
-					0.01066572405397892,
-					0.01066572405397892,
+					0,
+					0,
+					0,
 					1
 				],
 				"metallicFactor":0,
-				"roughnessFactor":0.4000000059604645
+				"roughnessFactor":0.5
 			}
 		}
 	],
 	"meshes":[
 		{
-			"name":"Cube.002",
+			"name":"Cube",
 			"primitives":[
 				{
 					"attributes":{
@@ -65,68 +59,68 @@
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":436,
+			"count":192,
 			"max":[
-				2.5,
-				2.7985639572143555,
-				2.5
+				1,
+				1,
+				1
 			],
 			"min":[
-				-2.5234577655792236,
-				-2.5,
-				-2.5
+				-1,
+				-1,
+				-1
 			],
 			"type":"VEC3"
 		},
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":436,
+			"count":192,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":436,
+			"count":192,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5123,
-			"count":786,
+			"count":576,
 			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":5232,
+			"byteLength":2304,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":5232,
-			"byteOffset":5232,
+			"byteLength":2304,
+			"byteOffset":2304,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":3488,
-			"byteOffset":10464,
+			"byteLength":1536,
+			"byteOffset":4608,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":1572,
-			"byteOffset":13952,
+			"byteLength":1152,
+			"byteOffset":6144,
 			"target":34963
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":15524,
-			"uri":"cabbinet_from_top.bin"
+			"byteLength":7296,
+			"uri":"2X3.bin"
 		}
 	]
 }
