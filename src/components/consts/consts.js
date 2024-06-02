@@ -1,7 +1,6 @@
 // consts file contain all the logic in the app
 const routingItems = [
-  { id: 4, label: 'בינה מאלכותית', routing: 'ai' },
-
+  { id: 4, label: 'בינה מלאכותית', routing: 'ai' },
   { id: 2, label: 'עיצוב ארון', routing: 'closetDesign' },
   { id: 1, label: 'דף הבית', routing: '/' },
 ]

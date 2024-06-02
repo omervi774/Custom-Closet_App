@@ -59,7 +59,7 @@ function Ai(props) {
   if (chatMessages.length === 0) {
     setChatMessages([
       {
-        text: 'היי! אשמח לעזור לך בעיצוב הארון. כתוב לי את המידע הבא: אורך הארון, רוחב הארון וגובה הארון תודה',
+        text: 'היי! אשמח לעזור לך בעיצוב הארון. כתוב לי את המידע הבא: רוחב הארון וגובה הארון, תודה',
         sender: 'ai',
       },
     ])
@@ -85,8 +85,8 @@ function Ai(props) {
             <Modal isOpen={isModalOpen} handleClose={handleCloseModal}>
               <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>AI Assistent</h2>
               <p style={{ fontSize: '18px', lineHeight: '1.6' }}>
-                לפניכם מערכת AI שנועדה לעזור לכם לעצב ארון. כתבו בתיבת הטקסט את גדלי הארון הרצויים והמערכת תדאג לעצב לכם
-                ארון בגדלים שביקשתם!
+                לפניכם מערכת AI שנועדה לעזור לכם לעצב ארון. כתבו בתיבת הטקסט את גדלי הארון הרצויים והמערכת תדאג לעצב לכם ארון בגדלים
+                שביקשתם!
               </p>
             </Modal>
           )}
