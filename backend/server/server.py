@@ -117,18 +117,35 @@ def chat():
         {"role": "user", "content": f"{user_message} , I want you to be unique, don't just give me a boring closet design!"}
     ]
     
-    def is_valid_response(response):
+    """
+        Checks if the given response represents a creative design.
+        Args:
+            response (str): The response to evaluate.
+        Returns:
+            bool: True if the response represents a creative design, False otherwise.
+    """
+    def is_creative_response(response):
+        import ast
         try:
-            design = eval(response)
-            for layer in design.values():
-                seen_positions = set()
-                for cube in layer:
-                    if cube[2] != 0 or tuple(cube) in seen_positions:
-                        return False
-                    seen_positions.add(tuple(cube))
-            return True
+            design = ast.literal_eval(response)
         except:
             return False
+        layer_count = len(design)
+        if layer_count < 2:
+            return False  # Not enough layers
+
+        # Get the number of cells in each layer
+        cell_counts = [len(design[layer]) for layer in range(layer_count)]
+
+        # Check if the number of cells in each layer is the same
+        if len(set(cell_counts)) == 1:
+            # Check x-positions
+            for i in range(cell_counts[0]):
+                x_positions = [design[layer][i]['position'][0] for layer in range(layer_count)]
+                if len(set(x_positions)) == 1:
+                    return False  # Non-creative as x-positions match
+
+        return True  # Design is creative
 
     # while True:
     chat = client.chat.completions.create(
@@ -137,19 +154,16 @@ def chat():
     reply = chat.choices[0].message.content
     print(f"ChatGPT: {reply}")
 
-    # TODO: Add check for creativity
-    # TODO: loop and fix positions by the calculation formula
-
-        # if is_valid_response(reply):
-        #     break
-        # else:
-        #     messages.append({
-        #         "role": "assistant", 
-        #         "content": "There was an issue with your response. Please ensure that the z-coordinate is 0 for all cubes and that all cube positions are unique."
-        #     })
+    if not is_creative_response(reply):
+        messages.append({
+            "role": "assistant", 
+            "content": "There was an issue with your response. Please ensure that the design is creative. The number of cells in each layer should not be the same and the x-positions of cells should be different across layers."
+        })
+        return jsonify({"text": "The response was not creative enough. Please try again."})
 
     messages.append({"role": "assistant", "content": reply})
     return jsonify({"text": reply})
+
 
 
 

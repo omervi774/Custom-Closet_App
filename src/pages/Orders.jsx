@@ -61,7 +61,7 @@ function Orders() {
           {ordersData.length > 0 &&
             Object.keys(ordersData[orderIndex].cubes).map((key) =>
               ordersData[orderIndex].cubes[key].map(
-                (cube, index) => cube.display && <Cube key={index} position={cube.position} size={cube.size} />
+                (cube, index) => cube.display && <Cube key={index} position={cube.position} url={`${cube.size[0]}X${cube.size[1]}`} />
               )
             )}
           {ordersData.length > 0 &&
