@@ -15,6 +15,7 @@ import Modal from '../components/Modal'
 // import WoodShelf from '../components/WoodShelf/WoodShelf'
 //import * as THREE from 'three'
 //const lastConnections = []
+const globalOffset = 0.04
 export default function ClosetDesign() {
   // for the dragging cube
   const [position, setPosition] = useState([-3, 2, 0])
@@ -62,6 +63,7 @@ export default function ClosetDesign() {
     const isLayer0 = layer === 0 ? true : false
     let oppositeSide
     let edge
+    let offset = [0, 0]
     const leftSide = xPosition - cubeSize[0] / 2
     const rightSide = xPosition + cubeSize[0] / 2
     let isCubeFromSide // checks if in the layer bellow there is a cube that its edge oppsite edge match the new cube edge
@@ -150,34 +152,61 @@ export default function ClosetDesign() {
         })
       }
     }
+    // this block of code responsible to calc the offset
+    if (isLayer0) {
+      // in case it is layer 0 and  connect from the left
+      if (side === 'left') {
+        const conectedCube = cubes[0][0] // in case the layer is 0 calc the offset to right for the cube
+        offset[0] = conectedCube.offset[0]
+        offset[1] = conectedCube.offset[1]
+        offset[0] += globalOffset
+        //in case the connected cube is 2 add another offset(because it represent as 2 cobe connected togther hance the left cube has offset itself)
+        if (conectedCube.size[0] === 2) {
+          offset[0] += globalOffset
+        }
+        // same princeble as the if above
+        if (conectedCube.size[0] === 3) {
+          offset[0] += globalOffset * 2
+        }
+        // if it is layer0 and connected from right the calc of the offset happen after the func is over
+      }
+    }
+    // in case the connection is not on layer 0 calc the offset as it is so conneceted fron top
+    else {
+      offset = calcOffsetWhenIsTopConnection(Number(layer), Number(layer) - 1, cubeSize, xPosition)
+    }
 
     for (let i = 0; i < cubeSize[1]; i++) {
       const yPosition = i === 0 ? Number(layer) + positionToAddYAxis : i + Number(layer)
       const cubeAddingSize = i === 0 ? cubeSize : [cubeSize[0], 1]
       const display = i === 0 ? true : false
+      // const offsetToAdd = Number(layer) === 0 ? offset : [0, 0]
 
       let updatingLayerArr
       // in case the layer exists add the cube to the start or the end of the layer (depending on if the connection is from the left or right)
       if (cubes[Number(layer) + i]) {
         // in case the connection is from the left adding the new cube to the start of the layer
         if (side === 'left') {
-          updatingLayerArr = [{ position: [xPosition, yPosition, 0], size: cubeAddingSize, display: display }, ...cubes[Number(layer) + i]]
+          // in case it is not layer 0 dont add offset
+
+          updatingLayerArr = [
+            { position: [xPosition, yPosition, 0], size: cubeAddingSize, display: display, offset: offset },
+            ...cubes[Number(layer) + i],
+          ]
+
           // in case the connection is from the right adding the cube to the right of the layer
         } else {
-          updatingLayerArr = [...cubes[Number(layer) + i], { position: [xPosition, yPosition, 0], size: cubeAddingSize, display: display }]
+          updatingLayerArr = [
+            ...cubes[Number(layer) + i],
+            { position: [xPosition, yPosition, 0], size: cubeAddingSize, display: display, offset: offset },
+          ]
         }
         // in case there is no layer open new one
       } else {
-        updatingLayerArr = [{ position: [xPosition, yPosition, 0], size: cubeAddingSize, display: display }]
+        updatingLayerArr = [{ position: [xPosition, yPosition, 0], size: cubeAddingSize, display: display, offset: offset }]
       }
       handleAddingCube(Number(layer) + i, updatingLayerArr)
     }
-
-    // setLastConnections((prev) => {
-    //   return [...prev, { position: [xPosition, Number(layer) + positionToAddYAxis, 0], size: cubeSize }]
-    // })
-
-    // console.log(lastConnections)
     setIsMenu(true)
     setIsDragging(false)
     setPosition([-3, 2, 0])
@@ -193,7 +222,7 @@ export default function ClosetDesign() {
     for (let index = 0; index < cubes[layer].length; index++) {
       const val = cubes[layer][index]
       //checks if the left edge of the upper cube is equal to the left edge of the cube bellow
-      if (Math.abs(val.position[0] - val.size[0] / 2 - (cube[0] - xSize / 2)) < epsilon) {
+      if (Math.abs(val.position[0] - val.size[0] / 2 + val.offset[0] - (cube[0] - xSize / 2)) < epsilon) {
         let sum = 0
         for (let i = index; i < cubes[layer].length; i++) {
           sum += cubes[layer][i].size[0]
@@ -206,7 +235,7 @@ export default function ClosetDesign() {
         return [false, -3]
       }
       //checks if the right edge of the upper cube is equal to the right edge of the cube bellow
-      if (Math.abs(val.position[0] + val.size[0] / 2 - (cube[0] + xSize / 2)) < epsilon) {
+      if (Math.abs(val.position[0] + val.size[0] / 2 + val.offset[0] - (cube[0] + xSize / 2)) < epsilon) {
         if (sizeSum + val.size[0] >= xSize) {
           include = true
           xPosition = val.position[0] + val.size[0] / 2 - xSize / 2
@@ -614,6 +643,44 @@ export default function ClosetDesign() {
 
     return start // the position that needs to place the new cube
   }
+  const calcOffsetWhenIsTopConnection = (layer, buttomLayer, cubeSize, xPosition) => {
+    const offset = [0, layer * globalOffset]
+    // try find cube in the layer bellow with the same right edge as the new cube
+    const indexOFButoomCubeFromRight = findCube(buttomLayer, xPosition + cubeSize[0] / 2, 'right')
+    console.log('indexx right = : ', indexOFButoomCubeFromRight)
+    // in case there is a cube bellow with the same right edge calc the offset of the new cube acording to the bellow cube
+    if (indexOFButoomCubeFromRight !== -1) {
+      const buttomRightCubeOffset = cubes[buttomLayer][indexOFButoomCubeFromRight].offset[0]
+      offset[0] = buttomRightCubeOffset
+    }
+    // in case there is no cube in the layer bellow with right edge as the new cube
+    else {
+      // finde cube with in the layer bellow with the same left edge as new cube
+      const indexOFButoomCubeFromLeft = findCube(buttomLayer, xPosition - cubeSize[0] / 2, 'left')
+      console.log('indexx left = : ', indexOFButoomCubeFromRight)
+      const buttomLeftCubeOffset = cubes[buttomLayer][indexOFButoomCubeFromLeft].offset[0]
+      const buttomLeftCubeSize = cubes[buttomLayer][indexOFButoomCubeFromLeft].size[0]
+
+      if (buttomLeftCubeSize === 1) {
+        if (cubeSize[0] === buttomLeftCubeSize) {
+          offset[0] = buttomLeftCubeOffset
+        } else {
+          offset[0] = buttomLeftCubeOffset - (cubeSize[0] - buttomLeftCubeSize) * globalOffset
+        }
+      } else if (buttomLeftCubeSize === 2) {
+        if (cubeSize[0] < buttomLeftCubeSize) {
+          offset[0] = buttomLeftCubeOffset + globalOffset
+        } else if (cubeSize[0] === buttomLeftCubeSize) {
+          offset[0] = buttomLeftCubeOffset
+        } else {
+          offset[0] = buttomLeftCubeOffset - globalOffset
+        }
+      } else {
+        offset[0] = buttomLeftCubeOffset + (buttomLeftCubeSize - cubeSize[0]) * globalOffset
+      }
+    }
+    return offset
+  }
   const handleDrag = (newPosition, cubeSize) => {
     setPosition(newPosition)
     const epsilon = 0.2
@@ -639,17 +706,11 @@ export default function ClosetDesign() {
         const isOverRide = isEnoughRoom(layer, x, cubeSize)
         if (isOverRide && containsButtomCube) {
           setMessage('error')
-          console.log('omer hamelech')
         }
-        // if (findCubeRoom(`${Number(layer) + 1}`, x) === -2) {
-        //   console.log('omer')
-        //   setMessage('error')
-        //   setIsDragging(false)
-        //   setPosition([-2, 2, 0])
-        //   return
-        // }
 
         if (containsButtomCube && !isOverRide) {
+          const offset = calcOffsetWhenIsTopConnection(layer, buttomLayer, cubeSize, x)
+
           let i
           for (i = 0; i < cubeSize[1]; i++) {
             const indexToInsert = findCubeRoom(`${layer + i}`, x)
@@ -657,12 +718,11 @@ export default function ClosetDesign() {
             const cubeAddingSize = i === 0 ? cubeSize : [cubeSize[0], 1]
             const display = i === 0 ? true : false
             if (i === 0 && indexToInsert !== -2) {
-              console.log('ttt')
               calcJoinsTopConnection({ position: [x, layer + positionToAddYAxis], size: cubeSize }, buttomLayer)
             }
             if (indexToInsert === -1) {
               // in case the layer in new
-              handleAddingCube(`${layer + i}`, [{ position: [x, yPosition, 0], size: cubeAddingSize, display: display }])
+              handleAddingCube(`${layer + i}`, [{ position: [x, yPosition, 0], size: cubeAddingSize, display: display, offset: offset }])
             } else if (indexToInsert === -2) {
               console.log(i)
               console.log(Number(layer))
@@ -675,31 +735,25 @@ export default function ClosetDesign() {
               if (indexToInsert >= cubes[`${layer + i}`].length) {
                 handleAddingCube(`${layer + i}`, [
                   ...cubes[`${layer + i}`],
-                  { position: [x, yPosition, 0], size: cubeAddingSize, display: display },
+                  { position: [x, yPosition, 0], size: cubeAddingSize, display: display, offset: offset },
                 ])
                 // in case the new cube should be place at the start of the new layer
               } else if (indexToInsert <= 0) {
                 handleAddingCube(`${layer + i}`, [
-                  { position: [x, yPosition, 0], size: cubeAddingSize, display: display },
+                  { position: [x, yPosition, 0], size: cubeAddingSize, display: display, offset: offset },
                   ...cubes[`${layer + i}`],
                 ])
               } else {
                 // in case the cube should be place somewhere at the midelle of the layer
                 handleAddingCube(`${layer + i}`, [
                   ...cubes[`${layer + i}`].slice(0, indexToInsert),
-                  { position: [x, yPosition, 0], size: cubeAddingSize, display: display },
+                  { position: [x, yPosition, 0], size: cubeAddingSize, display: display, offset: offset },
                   ...cubes[`${layer + i}`].slice(indexToInsert, cubes[`${layer + i}`].length),
                 ])
               }
             }
           }
-          if (i > 0) {
-            // setLastConnections((prev) => {
-            //   return [...prev, { position: [x, 1 + Number(layer) + positionToAddYAxis, 0], size: cubeSize }]
-            // })
-            // console.log(lastConnections)
-            console.log('top')
-          }
+          i > 0 && console.log('top')
           setIsMenu(true)
           setIsDragging(false)
           setPosition([-3, 2, 0])
@@ -726,6 +780,7 @@ export default function ClosetDesign() {
         if (isLayer0) {
           addingCubeToSide(layer.toString(), positionToAddYAxis, cubeSize, leftEdge - cubeSize[0] / 2, 'left')
           console.log('left')
+
           return
         } else {
           // in case try adding cube to layers thats requires cube bellow
@@ -742,6 +797,37 @@ export default function ClosetDesign() {
         if (isLayer0) {
           addingCubeToSide(layer.toString(), positionToAddYAxis, cubeSize, rightEdge + cubeSize[0] / 2, 'right')
           console.log('right')
+          setCubes((prev) => {
+            const cubesCopy = JSON.parse(JSON.stringify(prev))
+            const offsetToAdd = globalOffset * cubeSize[0]
+
+            for (const key in cubesCopy) {
+              cubesCopy[key] = cubesCopy[key].map((item) => {
+                if (item.position[0] === rightEdge + cubeSize[0] / 2) {
+                  // Return the item unchanged if the condition is met
+                  return item
+                } else {
+                  // Update the offset
+                  return {
+                    ...item,
+                    offset: [item.offset[0] + offsetToAdd, item.offset[1]],
+                  }
+                }
+              })
+            }
+            console.log('copyCube ', cubesCopy)
+            return cubesCopy
+          })
+          setShelfs((prev) => {
+            const offsetToAdd = globalOffset * cubeSize[0]
+            return prev.map((shelf) => {
+              return {
+                ...shelf,
+                position: [shelf.position[0] + offsetToAdd, shelf.position[1], shelf.position[2]],
+              }
+            })
+          })
+
           return
         } else {
           // in case try adding cube to layers thats requires cube bellow
@@ -773,9 +859,10 @@ export default function ClosetDesign() {
       for (let i = 0; i < height; i++) {
         const yPosition = i === 0 ? 0 + yOffset : i
         const cubeAddingSize = i === 0 ? [width, height] : [width, 1]
+
         const display = i === 0 ? true : false
         // in case the layer in new
-        handleAddingCube(`${0 + i}`, [{ position: [0, yPosition, 0], size: cubeAddingSize, display: display }])
+        handleAddingCube(`${0 + i}`, [{ position: [0, yPosition, 0], size: cubeAddingSize, display: display, offset: [0, 0] }])
       }
       setJoins({ join3Exists: 8, join4Exists: 0, join5Exists: 0 })
       return
@@ -794,8 +881,13 @@ export default function ClosetDesign() {
   // gets cube and layer and return true if the cube consist shelf, and false otherwise
   const isShelf = (layer, cube) => {
     for (let i = 0; i < shelfs.length; i++) {
-      const cubeTopEdge = cube.position[1] + cube.size[1] / 2
-      const cubeXposition = cube.position[0]
+      let cubeTopEdge = cube.position[1] + cube.size[1] / 2 - cube.offset[1]
+      if (cube.size[1] === 2) {
+        cubeTopEdge -= globalOffset
+      } else if (cube.size[1] === 3) {
+        cubeTopEdge -= 2 * globalOffset
+      }
+      const cubeXposition = cube.position[0] + cube.offset[0]
 
       //in case shelf position matchs top edge of the cube
       if (shelfs[i].position[1] === cubeTopEdge && shelfs[i].position[0] === cubeXposition) {
@@ -820,6 +912,7 @@ export default function ClosetDesign() {
     return [false, 'top']
   }
   const handleAddingShelf = (xPosition, yPosition, xSize) => {
+    console.log('checking')
     setShelfs((prev) => {
       return [...prev, { position: [xPosition, yPosition, 0], xSize: xSize }]
     })
@@ -925,7 +1018,14 @@ export default function ClosetDesign() {
             )}
             {Object.keys(cubes).map((key) =>
               cubes[key].map(
-                (cube, index) => cube.display && <Cube key={index} position={cube.position} url={`${cube.size[0]}X${cube.size[1]}`} />
+                (cube, index) =>
+                  cube.display && (
+                    <Cube
+                      key={index}
+                      position={[cube.position[0] + cube.offset[0], cube.position[1] - cube.offset[1], 0]}
+                      url={`${cube.size[0]}X${cube.size[1]}`}
+                    />
+                  )
               )
             )}
             {isDragging && <DraggingCube position={position} onDrag={handleDrag} url={`${size[0]}X${size[1]}`} size={size} />}
@@ -951,6 +1051,7 @@ export default function ClosetDesign() {
                       key={cube.position}
                       position={cube.position}
                       cubeSize={cube.size}
+                      offset={cube.offset}
                       place={toPlace}
                       handleAddingShelf={handleAddingShelf}
                     />

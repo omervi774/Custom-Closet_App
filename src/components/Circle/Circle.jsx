@@ -1,7 +1,7 @@
 import { useTheme } from '@emotion/react'
 import React, { useEffect, useState } from 'react'
-
-export default function Circle({ position, cubeSize, place, handleAddingShelf }) {
+const globalOffset = 0.04
+export default function Circle({ position, cubeSize, offset, place, handleAddingShelf }) {
   const [screenSize, setScreenSize] = useState({ width: window.innerWidth, height: window.innerHeight })
   const theme = useTheme()
 
@@ -53,9 +53,16 @@ export default function Circle({ position, cubeSize, place, handleAddingShelf })
     transform: 'translate(-50%, -50%)', // Center the circle
   }
   const handleClick = () => {
-    const edge = place === 'top' ? position[1] + cubeSize[1] / 2 : position[1] - cubeSize[1] / 2
-
-    handleAddingShelf(position[0], edge, cubeSize[0])
+    let additionalOffset = 0
+    if (cubeSize[1] === 2) {
+      additionalOffset = 0.04
+    }
+    if (cubeSize[1] === 3) {
+      additionalOffset = 0.04 * 2
+    }
+    const edge = place === 'top' ? position[1] + cubeSize[1] / 2 - offset[1] - additionalOffset : position[1] - cubeSize[1] / 2
+    console.log([position[0], offset[0], edge])
+    handleAddingShelf(position[0] + offset[0], edge, cubeSize[0])
   }
 
   return (
