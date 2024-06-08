@@ -55,10 +55,10 @@ export default function Circle({ position, cubeSize, offset, place, handleAdding
   const handleClick = () => {
     let additionalOffset = 0
     if (cubeSize[1] === 2) {
-      additionalOffset = 0.04
+      additionalOffset = globalOffset
     }
     if (cubeSize[1] === 3) {
-      additionalOffset = 0.04 * 2
+      additionalOffset = globalOffset * 2
     }
     const edge = place === 'top' ? position[1] + cubeSize[1] / 2 - offset[1] - additionalOffset : position[1] - cubeSize[1] / 2
     console.log([position[0], offset[0], edge])

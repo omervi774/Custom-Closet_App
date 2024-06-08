@@ -27,6 +27,7 @@ export default function ClosetDesign() {
   const [isModalOpen, setIsModalOpen] = useState(true)
   const handleCloseModal = () => {
     setIsModalOpen(false)
+    setMessage({ messageType: 'success', title: 'התחל לבנות ארון', content: '', topPosition: '20%', leftPosition: '40%', arrow: true })
   }
 
   const [joins, setJoins] = useState({ join3Exists: 0, join4Exists: 0, join5Exists: 0 })
@@ -47,7 +48,14 @@ export default function ClosetDesign() {
   const [size, setSize] = useState([1, 1])
 
   // this state responssible to notify the user whether he made valid or invalid cube connection
-  const [message, setMessage] = useState(undefined)
+  const [message, setMessage] = useState({
+    messageType: undefined,
+    title: '',
+    content: '',
+    topPosition: '',
+    leftPosition: '',
+    arrow: false,
+  })
 
   const [shelfs, setShelfs] = useState([])
 
@@ -276,11 +284,18 @@ export default function ClosetDesign() {
         [layer]: updatingLayerArr,
       }
     })
-    setMessage('success')
+    setMessage({
+      messageType: 'success',
+      title: '! חיבור קוביות חוקי',
+      content: 'המשך לחבר קוביות כרצונך',
+      topPosition: '20%',
+      leftPosition: '50%',
+      arrow: false,
+    })
     // setIsMenu(true)
   }
   const closeModalMessage = () => {
-    setMessage(undefined)
+    setMessage({ messageType: undefined, title: '', content: '', topPosition: '', leftPosition: '', arrow: false })
     //setIsMenu(true)
   }
   // return cube from the layer with the right/left edge as the edge param (if cube exsists)
@@ -705,7 +720,14 @@ export default function ClosetDesign() {
         // check if the new cube position has enough room on the new layer
         const isOverRide = isEnoughRoom(layer, x, cubeSize)
         if (isOverRide && containsButtomCube) {
-          setMessage('error')
+          setMessage({
+            messageType: 'error',
+            title: 'חיבור קוביות לא חוקי',
+            content: 'החיבור לא הצליח כי הקובייה המתחברת עלתה על קובייה קיימת, נסה מחדש',
+            topPosition: '20%',
+            leftPosition: '50%',
+            arrow: false,
+          })
         }
 
         if (containsButtomCube && !isOverRide) {
@@ -726,7 +748,14 @@ export default function ClosetDesign() {
             } else if (indexToInsert === -2) {
               console.log(i)
               console.log(Number(layer))
-              setMessage('error')
+              setMessage({
+                messageType: 'error',
+                title: 'חיבור קוביות לא חוקי',
+                content: 'החיבור לא הצליח כי הקובייה המתחברת עלתה על קובייה קיימת, נסה מחדש',
+                topPosition: '20%',
+                leftPosition: '50%',
+                arrow: false,
+              })
               // in case there is already cube in the requierd position
               break
               //return
@@ -846,7 +875,7 @@ export default function ClosetDesign() {
   // after the user chose size of the dragging cube set its width and height and close the menu
   const newDraggingCube = (width, height) => {
     setSize([width, height])
-    setMessage(undefined)
+    setMessage({ messageType: undefined, title: '', content: '', topPosition: '', leftPosition: '', arrow: false })
     setFirstOpen(true)
     setSecondaryOpen([false, undefined])
     if (cubes['0'].length === 0) {
@@ -912,9 +941,16 @@ export default function ClosetDesign() {
     return [false, 'top']
   }
   const handleAddingShelf = (xPosition, yPosition, xSize) => {
-    console.log('checking')
     setShelfs((prev) => {
       return [...prev, { position: [xPosition, yPosition, 0], xSize: xSize }]
+    })
+    setMessage({
+      messageType: 'success',
+      title: 'המדף נוסף בהצלחה',
+      content: 'המשך להוסיף מדפים כרצונך',
+      topPosition: '20%',
+      leftPosition: '50%',
+      arrow: false,
     })
     setAddDrawer(false)
     setIsMenu(true)
@@ -950,11 +986,11 @@ export default function ClosetDesign() {
               sx={{ color: 'black', display: !isFirstOpen && 'none' }}
               onClick={() => {
                 setFirstOpen(false)
-                setSecondaryOpen([true, 'מגירות'])
+                setSecondaryOpen([true, 'מדפים'])
                 handleResetRotation()
               }}
             >
-              מגירות
+              מדפים
             </MenuItem>
             <MenuItem
               sx={{ color: 'black', display: !isFirstOpen && 'none' }}
@@ -993,11 +1029,21 @@ export default function ClosetDesign() {
               <CubeUi title="קוביות" newDraggingCube={newDraggingCube} />
             </Box>
           </MenuItem>
-          {isSecondaryOpen[0] && isSecondaryOpen[1] === 'מגירות' && <ShelfUi title={'מגירות'} addNewShelf={addNewShelf} />}
+          {isSecondaryOpen[0] && isSecondaryOpen[1] === 'מדפים' && <ShelfUi title={'מדפים'} addNewShelf={addNewShelf} />}
         </Paper>
       </div>
 
-      {message && <ModalMessage typeOfMessage={message} onCloseModal={closeModalMessage} />}
+      {message.messageType !== undefined && (
+        <ModalMessage
+          typeOfMessage={message.messageType}
+          title={message.title}
+          content={message.content}
+          topPosition={message.topPosition}
+          leftPosition={message.leftPosition}
+          arrow={message.arrow}
+          onCloseModal={closeModalMessage}
+        />
+      )}
       {!isModalOpen && (
         <Canvas
           shadows
