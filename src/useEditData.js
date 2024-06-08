@@ -12,22 +12,26 @@ const style = {
   boxShadow: 24,
   p: 4,
 }
-export default function useEditData(url, setData, data, atributeToUpdate) {
+export default function useEditData(url, setData, data) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
-
+  const [attributeName, setAttributeName] = useState('')
   const handleClose = () => {
     setOpen(false)
     //setid("");
     id = ''
+    setAttributeName('')
   }
 
-  const handleOpen = (itemId) => {
+  const handleOpen = (itemId, itemName) => {
     // console.log(itemId)
     setOpen(true)
     //setid("");
     id = itemId
+    setAttributeName(itemName)
+
     console.log(id)
+    console.log(itemName)
   }
   const Jsx = () => {
     return (
@@ -46,8 +50,9 @@ export default function useEditData(url, setData, data, atributeToUpdate) {
               onClick={async () => {
                 console.log(`${url}/${id}`)
                 setOpen(false)
-                let attributeName = atributeToUpdate ? 'subTitle' : 'quantity'
+
                 const body = JSON.stringify({ [attributeName]: name })
+                console.log(body)
                 const response = await fetch(`${url}/${id}`, {
                   method: 'PUT',
                   body: body,

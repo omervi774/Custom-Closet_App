@@ -6,7 +6,7 @@ import useEditData from '../useEditData'
 
 function Home() {
   const [data, setData] = useData('http://localhost:5000/homePage')
-  const [jsx, handleOpen] = useEditData('http://localhost:5000/homePage', setData, data, 'subTitle')
+  const [jsx, handleOpen] = useEditData('http://localhost:5000/homePage', setData, data)
   const user = useUser()
 
   return (
@@ -21,7 +21,7 @@ function Home() {
                   variant="contained"
                   sx={{ textAlign: 'center', fontSize: '18px', marginBottom: '20px' }}
                   onClick={() => {
-                    handleOpen(data[3].id)
+                    handleOpen(data[3].id, 'subTitle')
                   }}
                 >
                   ערוך כותרת
@@ -33,7 +33,7 @@ function Home() {
                   variant="contained"
                   sx={{ textAlign: 'center', fontSize: '18px', marginBottom: '20px' }}
                   onClick={() => {
-                    handleOpen(data[1].id)
+                    handleOpen(data[1].id, 'subTitle')
                   }}
                 >
                   ערוך טקסט
@@ -66,7 +66,7 @@ function Home() {
                     variant="contained"
                     sx={{ textAlign: 'center', fontSize: '18px', marginBottom: '20px' }}
                     onClick={() => {
-                      handleOpen(data[0].id)
+                      handleOpen(data[0].id, 'subTitle')
                     }}
                   >
                     ערוך טקסט
@@ -81,7 +81,7 @@ function Home() {
                     variant="contained"
                     sx={{ textAlign: 'center', fontSize: '18px', marginBottom: '20px' }}
                     onClick={() => {
-                      handleOpen(data[4].id)
+                      handleOpen(data[4].id, 'subTitle')
                     }}
                   >
                     ערוך טקסט
@@ -96,7 +96,7 @@ function Home() {
                     variant="contained"
                     sx={{ textAlign: 'center', fontSize: '18px', marginBottom: '20px' }}
                     onClick={() => {
-                      handleOpen(data[2].id)
+                      handleOpen(data[2].id, 'subTitle')
                     }}
                   >
                     ערוך טקסט

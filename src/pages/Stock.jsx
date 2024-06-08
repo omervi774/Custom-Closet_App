@@ -29,24 +29,7 @@ const StockManagementPage = () => {
       <div style={ConstiarCardStyle}>
         {stockData &&
           stockData.map((item, index) => (
-            <StockCard key={index} name={item.name} quantity={item.quantity} id={item.id} handleOpen={handleOpen} />
-
-            // <button
-            //   onClick={() => {
-            //     setOpen(true);
-            //     // setid(item.id);
-            //     id = item.id;
-            //   }}
-            //   className="edit-button"
-            // >
-            //   Edit
-            // </button>
-            // {/* <button
-            //   onClick={() => handleDeleteItem(item.id)}
-            //   className="delete-button"
-            // >
-            //   Delete
-            // </button> */}
+            <StockCard key={index} name={item.name} quantity={item.quantity} price={item.price} id={item.id} handleOpen={handleOpen} />
           ))}
       </div>
       {jsx()}
