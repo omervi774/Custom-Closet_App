@@ -10,12 +10,9 @@ import CubeUi from '../components/CubeUi/CubeUi'
 import ShelfUi from '../components/ShelfUi/ShelfUi'
 import ModalMessage from '../components/ModalMessage/ModalMessage'
 import Modal from '../components/Modal'
-
-// import MetalShelf from '../components/MetalShelf/MetalShelf'
-// import WoodShelf from '../components/WoodShelf/WoodShelf'
-//import * as THREE from 'three'
-//const lastConnections = []
 const globalOffset = 0.04
+let bars = { 1: 0, 2: 0, 3: 0 }
+let joins = { join3Exists: 0, join4Exists: 0, join5Exists: 0 }
 export default function ClosetDesign() {
   // for the dragging cube
   const [position, setPosition] = useState([-3, 2, 0])
@@ -30,7 +27,6 @@ export default function ClosetDesign() {
     setMessage({ messageType: 'success', title: 'התחל לבנות ארון', content: '', topPosition: '20%', leftPosition: '40%', arrow: true })
   }
 
-  const [joins, setJoins] = useState({ join3Exists: 0, join4Exists: 0, join5Exists: 0 })
   // this state responssible to check if the user try to drag new cube or not
   const [isDragging, setIsDragging] = useState(false)
 
@@ -66,6 +62,38 @@ export default function ClosetDesign() {
       orbitControlsRef.current.reset() // Reset rotation
     }
   }
+  // gets the initial value of bars with length 1, how many bars to add for the height of the cube
+  // and how many bars to add for the width of the cube, and the cube size
+  // and in case the new cube is heigher than the connected cube gets the heightRatio
+  const calclutationOfBars = (initialValOfOnes, heightAdding, widthAdding, cubeSize, heightRatio) => {
+    let bars1 = initialValOfOnes
+    let bars2 = 0
+    let bars3 = 0
+    bars1 += cubeSize[0] === 1 && widthAdding
+    bars1 += cubeSize[1] === 1 && heightAdding
+    bars2 += cubeSize[0] === 2 && widthAdding
+    bars2 += cubeSize[1] === 2 && heightAdding
+    bars3 += cubeSize[0] === 3 && widthAdding
+    bars3 += cubeSize[1] === 3 && heightAdding
+    // in case the new cube is higher add 2 bars with length of the heightRatio
+    if (heightRatio) {
+      if (heightRatio === 1) {
+        bars1 += 2
+      } else {
+        bars2 += 2
+      }
+    }
+    bars[1] = bars[1] + bars1
+    bars[2] = bars[2] + bars2
+    bars[3] = bars[3] + bars3
+    console.log(bars)
+  }
+  const updateJoins = (join3, join4, join5) => {
+    joins.join3Exists = joins.join3Exists + join3
+    joins.join4Exists = joins.join4Exists + join4
+    joins.join5Exists = joins.join5Exists + join5
+    console.log(joins)
+  }
   const addingCubeToSide = (layer, positionToAddYAxis, cubeSize, xPosition, side) => {
     layer = Number(layer)
     const isLayer0 = layer === 0 ? true : false
@@ -86,78 +114,59 @@ export default function ClosetDesign() {
     }
     const newCube = { position: [xPosition, Number(layer) + positionToAddYAxis], size: cubeSize }
     // checks the ratio between top edge of the new cube to the cube top edge connected cube
-    const answear = calculateCubeConnectionRatio(newCube, Number(layer) - 1, edge, oppositeSide)
+    const [answear, heightRatio] = calculateCubeConnectionRatio(newCube, Number(layer) - 1, edge, oppositeSide)
     console.log('answear is :', answear)
     // in case there it is layer 0
     if (isLayer0) {
       // in case top edges of the new cube and connected cube are equal
       if (answear === 'equal') {
-        setJoins((prev) => {
-          console.log({ ...prev, join4Exists: prev.join4Exists + 4 })
-          return { ...prev, join4Exists: prev.join4Exists + 4 }
-        })
+        updateJoins(0, 4, 0)
+        calclutationOfBars(2, 2, 4, cubeSize)
       }
       // in case top edges of the new cube and connected cube are equal and also there is a cube above the connected cube
       else if (answear === 'equal and cube above') {
-        setJoins((prev) => {
-          console.log({ ...prev, join3Exists: prev.join3Exists + 2, join5Exists: prev.join5Exists + 2 })
-          return { ...prev, join3Exists: prev.join3Exists + 2, join5Exists: prev.join5Exists + 2 }
-        })
+        updateJoins(2, 0, 2)
+        calclutationOfBars(2, 2, 4, cubeSize)
       }
-      // in case the new cube higher or lower the update of joins is the same
+      // in case the new cube higher fron the connected cube
+      else if (answear === 'higher') {
+        updateJoins(2, 4, 0)
+        calclutationOfBars(3, 2, 4, cubeSize, heightRatio)
+      }
+      // in case the new cube is lower than the connected cube
       else {
-        setJoins((prev) => {
-          console.log({ ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists + 2 })
-          return { ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists + 2 }
-        })
+        updateJoins(2, 4, 0)
+        calclutationOfBars(3, 2, 4, cubeSize)
       }
     }
     // in case it is not layer 0 and there is a cube from the side in the layer bellow
     else if (isCubeFromSide !== -1) {
       // in case top edges of the new cube and connected cube are equal and also there is a cube above the connected cube
       if (answear === 'equal and cube above') {
-        setJoins((prev) => {
-          console.log({ ...prev, join4Exists: prev.join4Exists - 4, join5Exists: prev.join5Exists + 4 })
-          return { ...prev, join4Exists: prev.join4Exists - 4, join5Exists: prev.join5Exists + 4 }
-        })
+        updateJoins(0, -4, 4)
       }
       // in case the top edge of the new cube is lower than the cube its connected to
       else if (answear === 'lower') {
-        setJoins((prev) => {
-          console.log({ ...prev, join5Exists: prev.join5Exists + 2 })
-          return { ...prev, join5Exists: prev.join5Exists + 2 }
-        })
+        updateJoins(0, 0, 2)
       }
       // in case the new cube higher or equal the update of joins is the same
       else {
-        setJoins((prev) => {
-          console.log({ ...prev, join5Exists: prev.join5Exists + 2, join3Exists: prev.join3Exists - 2 })
-          return { ...prev, join5Exists: prev.join5Exists + 2, join3Exists: prev.join3Exists - 2 }
-        })
+        updateJoins(-2, 0, 2)
       }
     }
     // in case it is not layer 0 and there is no cube from the side in the layer bellow
     else {
       // in case top edges of the new cube and connected cube are equal
       if (answear === 'equal') {
-        setJoins((prev) => {
-          console.log({ ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists - 2 })
-          return { ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists - 2 }
-        })
+        updateJoins(-2, 4, 0)
       }
       // in case top edges of the new cube and connected cube are equal and also there is a cube above the connected cube
       else if (answear === 'equal and cube above') {
-        setJoins((prev) => {
-          console.log({ ...prev, join5Exists: prev.join5Exists + 2 })
-          return { ...prev, join5Exists: prev.join5Exists + 2 }
-        })
+        updateJoins(0, 0, 2)
       }
       // in case the new cube higher or lower the update of joins is the same
       else {
-        setJoins((prev) => {
-          console.log({ ...prev, join4Exists: prev.join4Exists + 4 })
-          return { ...prev, join4Exists: prev.join4Exists + 4 }
-        })
+        updateJoins(0, 4, 0)
       }
     }
     // this block of code responsible to calc the offset
@@ -180,8 +189,19 @@ export default function ClosetDesign() {
       }
     }
     // in case the connection is not on layer 0 calc the offset as it is so conneceted fron top
+    // also calculate the adding bars
     else {
       offset = calcOffsetWhenIsTopConnection(Number(layer), Number(layer) - 1, cubeSize, xPosition)
+      // calculate the adding bars acording to the height of the new cube compare to the height of the connected cube
+      if (answear === ' lower') {
+        calclutationOfBars(2, 2, 2, cubeSize)
+      } else if (answear === 'higher') {
+        calclutationOfBars(2, 2, 2, cubeSize, heightRatio)
+      }
+      // in case the cube top edge is equal to the connected cube (or cube above) to edge
+      else {
+        calclutationOfBars(1, 2, 2, cubeSize)
+      }
     }
 
     for (let i = 0; i < cubeSize[1]; i++) {
@@ -224,34 +244,63 @@ export default function ClosetDesign() {
   // and also return the position of the x to the new cube
   const is_include = (cube, xSize, layer) => {
     let include = false
-    let sizeSum = 0
     let xPosition = 0 // if there is connection' this val store the position on the x axis of the new cube
     const epsilon = 0.1
     for (let index = 0; index < cubes[layer].length; index++) {
       const val = cubes[layer][index]
       //checks if the left edge of the upper cube is equal to the left edge of the cube bellow
       if (Math.abs(val.position[0] - val.size[0] / 2 + val.offset[0] - (cube[0] - xSize / 2)) < epsilon) {
+        let rightEdge = val.position[0] + val.size[0] / 2
         let sum = 0
         for (let i = index; i < cubes[layer].length; i++) {
-          sum += cubes[layer][i].size[0]
+          const leftEdge = cubes[layer][i].position[0] - cubes[layer][i].size[0] / 2
+          if (sum === 0) {
+            sum += cubes[layer][i].size[0]
+          }
+          // in case it is the second cube (or futher) that i encounter, checks if its right next to the cube before
+          else {
+            if (leftEdge === rightEdge) {
+              sum += cubes[layer][i].size[0]
+            }
+            // if there is gap between the cube and the previous cube return false
+            else {
+              return [false, -3]
+            }
+          }
+
           if (sum >= xSize) {
             include = true
             xPosition = val.position[0] - val.size[0] / 2 + xSize / 2
             return [include, xPosition]
           }
+          rightEdge = cubes[layer][i].position[0] + cubes[layer][i].size[0] / 2
         }
         return [false, -3]
       }
       //checks if the right edge of the upper cube is equal to the right edge of the cube bellow
       if (Math.abs(val.position[0] + val.size[0] / 2 + val.offset[0] - (cube[0] + xSize / 2)) < epsilon) {
-        if (sizeSum + val.size[0] >= xSize) {
-          include = true
-          xPosition = val.position[0] + val.size[0] / 2 - xSize / 2
-          return [include, xPosition]
+        let sum = 0
+        let leftEdge = val.position[0] - val.size[0] / 2
+        for (let i = index; i >= 0; i--) {
+          const rightEdge = cubes[layer][i].position[0] + cubes[layer][i].size[0] / 2
+          if (sum === 0) {
+            sum += cubes[layer][i].size[0]
+          }
+          // in case it is the second cube (or futher) that i encounter, checks if its right next to the cube before left
+          else {
+            if (rightEdge === leftEdge) {
+              sum += cubes[layer][i].size[0]
+            } else {
+              return [false, -3]
+            }
+          }
+          if (sum >= xSize) {
+            include = true
+            xPosition = val.position[0] + val.size[0] / 2 + xSize / 2
+            return [include, xPosition]
+          }
+          leftEdge = cubes[layer][i].position[0] + cubes[layer][i].size[0] / 2
         }
-        return [false, -3]
-      } else {
-        sizeSum += val.size[0]
       }
     }
     return [false, xPosition]
@@ -266,7 +315,9 @@ export default function ClosetDesign() {
         // checks if the new cube edges is between one of the cubes in the layer, in other words override the cube position
         if (
           (cubeLeftEdge > cube.position[0] - cube.size[0] / 2 && cubeLeftEdge < cube.position[0] + cube.size[0] / 2) ||
-          (cubeRightEdge > cube.position[0] - cube.size[0] / 2 && cubeRightEdge < cube.position[0] + cube.size[0] / 2)
+          (cubeRightEdge > cube.position[0] - cube.size[0] / 2 && cubeRightEdge < cube.position[0] + cube.size[0] / 2) ||
+          (cubeRightEdge === cube.position[0] + cube.size[0] / 2 && cubeLeftEdge < cube.position[0] - cube.size[0] / 2) ||
+          (cubeLeftEdge === cube.position[0] - cube.size[0] / 2 && cubeRightEdge > cube.position[0] + cube.size[0] / 2)
         ) {
           overRide = true
           //return
@@ -375,16 +426,20 @@ export default function ClosetDesign() {
     // in case there is a cube that its top edge match to new cube top edge and also the cube is next to new cube its side
     if (indexOfTopCube !== -1) {
       const cubeForCompare = cubes[numberLayer + newCube.size[1]][indexOfTopCube]
-      return topEdgeComparation(cubeForCompare, newCube, numberLayer + newCube.size[1], side)
+      return [topEdgeComparation(cubeForCompare, newCube, numberLayer + newCube.size[1], side)]
     }
     // in case there is a cube next to new cube side but its top edge is smaller than new cube top edge
     else {
-      return 'higher'
+      if (findCube(numberLayer + newCube.size[1] - 1, edge, oppositeSide) === -1) {
+        return ['higher', 2]
+      }
+      return ['higher', 1]
     }
   }
   const calcJoinsTopConnection = (newCube, numberLayer) => {
     console.log('new cube is :', newCube)
     console.log('layer bellow is:', numberLayer)
+    const cubeSize = newCube.size
     const leftEdge = newCube.position[0] - newCube.size[0] / 2
     const rightEdge = newCube.position[0] + newCube.size[0] / 2
     let isCubeFromRightSideBellow = findCube(numberLayer, rightEdge, 'left') // flag responsible for checking if the there ia cube from the right to edge of the cube layer bellow
@@ -395,242 +450,189 @@ export default function ClosetDesign() {
     console.log('index of cube from right side layer bellow:', isCubeFromRightSideBellow)
     console.log('index of cube from left side layer bellow:', isCubeFromLeftSideBellow)
     if (isCubeFromLeftSideBellow === -1 && isCubeFromRightSideBellow === -1) {
-      setJoins((prev) => {
-        console.log({ ...prev, join4Exists: prev.join4Exists + 4 })
-        return { ...prev, join4Exists: prev.join4Exists + 4 }
-      })
+      calclutationOfBars(2, 4, 2, cubeSize)
+      updateJoins(0, 4, 0)
       return
     }
     // in case there are cube from right and left edges of the new cube in the layer bellow
     else if (isCubeFromLeftSideBellow !== -1 && isCubeFromRightSideBellow !== -1) {
       // in case there are cube from right and left edges of the new cube
       if (isCubeFromLeftSide !== -1 && isCubeFromRightSide !== -1) {
-        const leftAnswear = calculateCubeConnectionRatio(newCube, numberLayer, leftEdge, 'left')
-        const rightAnswear = calculateCubeConnectionRatio(newCube, numberLayer, rightEdge, 'right')
+        const [leftAnswear, leftHeightRatio] = calculateCubeConnectionRatio(newCube, numberLayer, leftEdge, 'left')
+        const [rightAnswear, rightHeightRatio] = calculateCubeConnectionRatio(newCube, numberLayer, rightEdge, 'right')
         const combinedValue = `${leftAnswear}-${rightAnswear}`
         switch (combinedValue) {
           case 'equal-equal':
-            setJoins((prev) => {
-              console.log({ ...prev, join3Exists: prev.join3Exists - 4, join4Exists: prev.join4Exists + 4 })
-              return { ...prev, join3Exists: prev.join3Exists - 4, join4Exists: prev.join4Exists + 4 }
-            })
+            calclutationOfBars(0, 0, 2, cubeSize)
+            updateJoins(-4, 4, 0)
             return
           case 'equal-equal and cube above':
-            setJoins((prev) => {
-              console.log({ ...prev, join3Exists: prev.join3Exists - 2, join5Exists: prev.join5Exists + 2 })
-              return { ...prev, join3Exists: prev.join3Exists - 2, join5Exists: prev.join5Exists + 2 }
-            })
+            calclutationOfBars(0, 0, 2, cubeSize)
+            updateJoins(-2, 0, 2)
             return
           case 'equal-lower':
-            setJoins((prev) => {
-              console.log({ ...prev, join3Exists: prev.join3Exists - 2, join4Exists: prev.join4Exists + 4 })
-              return { ...prev, join3Exists: prev.join3Exists - 2, join4Exists: prev.join4Exists + 4 }
-            })
+            calclutationOfBars(1, 0, 2, cubeSize)
+            updateJoins(-2, 4, 0)
             return
           case 'equal-higher':
-            setJoins((prev) => {
-              console.log({ ...prev, join3Exists: prev.join3Exists - 4, join4Exists: prev.join4Exists + 4 })
-              return { ...prev, join3Exists: prev.join3Exists - 4, join4Exists: prev.join4Exists + 4 }
-            })
+            calclutationOfBars(1, 0, 2, cubeSize, rightHeightRatio)
+            updateJoins(-4, 4, 0)
             return
           case 'equal and cube above-equal':
-            setJoins((prev) => {
-              console.log({ ...prev, join3Exists: prev.join3Exists - 2, join5Exists: prev.join5Exists + 2 })
-              return { ...prev, join3Exists: prev.join3Exists - 2, join5Exists: prev.join5Exists + 2 }
-            })
+            calclutationOfBars(0, 0, 2, cubeSize)
+            updateJoins(-2, 0, 2)
             return
           case 'equal and cube above-equal and cube above':
-            setJoins((prev) => {
-              console.log({ ...prev, join4Exists: prev.join4Exists - 4, join5Exists: prev.join5Exists + 4 })
-              return { ...prev, join4Exists: prev.join4Exists - 4, join5Exists: prev.join5Exists + 4 }
-            })
+            calclutationOfBars(0, 0, 2, cubeSize)
+            updateJoins(0, -4, 4)
             return
           case 'equal and cube above-lower':
-            setJoins((prev) => {
-              console.log({ ...prev, join5Exists: prev.join5Exists + 2 })
-              return { ...prev, join5Exists: prev.join5Exists + 2 }
-            })
+            calclutationOfBars(1, 0, 2, cubeSize)
+            updateJoins(0, 0, 2)
             return
           case 'equal and cube above-higher':
-            setJoins((prev) => {
-              console.log({ ...prev, join5Exists: prev.join5Exists + 2 })
-              return { ...prev, join5Exists: prev.join5Exists + 2 }
-            })
+            calclutationOfBars(1, 0, 2, cubeSize, rightHeightRatio)
+            updateJoins(0, 0, 2)
             return
           case 'lower-equal':
-            setJoins((prev) => {
-              console.log({ ...prev, join3Exists: prev.join3Exists - 2, join4Exists: prev.join4Exists + 4 })
-              return { ...prev, join3Exists: prev.join3Exists - 2, join4Exists: prev.join4Exists + 4 }
-            })
+            calclutationOfBars(1, 0, 2, cubeSize)
+            updateJoins(-2, 4, 0)
             return
           case 'lower-equal and cube above':
-            setJoins((prev) => {
-              console.log({ ...prev, join5Exists: prev.join5Exists + 2 })
-              return { ...prev, join5Exists: prev.join5Exists + 2 }
-            })
+            calclutationOfBars(1, 0, 2, cubeSize)
+            updateJoins(0, 0, 2)
             return
           case 'lower-lower':
-            setJoins((prev) => {
-              console.log({ ...prev, join4Exists: prev.join4Exists + 4 })
-              return { ...prev, join4Exists: prev.join4Exists + 4 }
-            })
+            calclutationOfBars(2, 0, 2, cubeSize)
+            updateJoins(0, 4, 0)
             return
           case 'lower-higher':
-            setJoins((prev) => {
-              console.log({ ...prev, join4Exists: prev.join4Exists + 4 })
-              return { ...prev, join4Exists: prev.join4Exists + 4 }
-            })
+            calclutationOfBars(1, 0, 2, cubeSize, rightHeightRatio)
+            updateJoins(0, 4, 0)
             return
           case 'higher-equal':
-            setJoins((prev) => {
-              console.log({ ...prev, join3Exists: prev.join3Exists - 4, join4Exists: prev.join4Exists + 4 })
-              return { ...prev, join3Exists: prev.join3Exists - 4, join4Exists: prev.join4Exists + 4 }
-            })
+            calclutationOfBars(1, 0, 2, cubeSize, leftHeightRatio)
+            updateJoins(-2, 4, 0)
             return
           case 'higher-equal and cube above':
-            setJoins((prev) => {
-              console.log({ ...prev, join5Exists: prev.join5Exists + 2 })
-              return { ...prev, join5Exists: prev.join5Exists + 2 }
-            })
+            calclutationOfBars(1, 0, 2, cubeSize, leftHeightRatio)
+            updateJoins(0, 0, 2)
             return
           case 'higher-lower':
-            setJoins((prev) => {
-              console.log({ ...prev, join4Exists: prev.join4Exists + 4 })
-              return { ...prev, join4Exists: prev.join4Exists + 4 }
-            })
+            calclutationOfBars(1, 0, 2, cubeSize, leftHeightRatio)
+            updateJoins(0, 4, 0)
             return
           case 'higher-higher':
-            setJoins((prev) => {
-              console.log({ ...prev, join4Exists: prev.join4Exists + 4 })
-              return { ...prev, join4Exists: prev.join4Exists + 4 }
-            })
+            calclutationOfBars(1, 0, 2, cubeSize, leftHeightRatio)
+            calclutationOfBars(1, 0, 0, cubeSize, rightHeightRatio)
+            updateJoins(0, 4, 0)
             return
         }
       }
       // in case there is a cube from left edge and not from right edge of the new cube
       else if (isCubeFromLeftSide !== -1 && isCubeFromRightSide === -1) {
-        const answear = calculateCubeConnectionRatio(newCube, numberLayer, leftEdge, 'left')
+        const [answear, heightRatio] = calculateCubeConnectionRatio(newCube, numberLayer, leftEdge, 'left')
         if (answear === 'equal') {
-          setJoins((prev) => {
-            console.log({ ...prev, join5Exists: prev.join5Exists + 2 })
-            return { ...prev, join5Exists: prev.join5Exists + 2 }
-          })
+          calclutationOfBars(1, 2, 2, cubeSize)
+          updateJoins(0, 0, 2)
         } else if (answear === 'equal and cube above') {
-          setJoins((prev) => {
-            console.log({
-              ...prev,
-              join5Exists: prev.join5Exists + 4,
-              join4Exists: prev.join4Exists - 4,
-              join3Exists: prev.join3Exists + 2,
-            })
-            return { ...prev, join5Exists: prev.join5Exists + 4, join4Exists: prev.join4Exists - 4, join3Exists: prev.join3Exists + 2 }
-          })
+          calclutationOfBars(1, 2, 2, cubeSize)
+          updateJoins(2, -4, 4)
         }
-        // in case the cube is higher or lower than the cube next to its left
+        // in case the cube is  lower than the cube next to its left
+        else if (answear === 'lower') {
+          calclutationOfBars(2, 2, 2, cubeSize)
+          updateJoins(2, 0, 2)
+        }
+        // in case the new cube is higher than the cube next to its left
         else {
-          setJoins((prev) => {
-            console.log({ ...prev, join5Exists: prev.join5Exists + 2, join3Exists: prev.join3Exists + 2 })
-            return { ...prev, join5Exists: prev.join5Exists + 2, join3Exists: prev.join3Exists + 2 }
-          })
+          calclutationOfBars(2, 2, 2, cubeSize, heightRatio)
+          updateJoins(2, 0, 2)
         }
         return
       }
       // in case there is a cube from right edge and not from left edge of the new cube
       else if (isCubeFromRightSide !== -1 && isCubeFromLeftSide === -1) {
-        const answear = calculateCubeConnectionRatio(newCube, numberLayer, rightEdge, 'right')
+        const [answear, heightRatio] = calculateCubeConnectionRatio(newCube, numberLayer, rightEdge, 'right')
         if (answear === 'equal') {
-          setJoins((prev) => {
-            console.log({ ...prev, join5Exists: prev.join5Exists + 2 })
-            return { ...prev, join5Exists: prev.join5Exists + 2 }
-          })
+          calclutationOfBars(1, 2, 2, cubeSize)
+          updateJoins(0, 0, 2)
         } else if (answear === 'equal and cube above') {
-          setJoins((prev) => {
-            console.log({
-              ...prev,
-              join5Exists: prev.join5Exists + 4,
-              join4Exists: prev.join4Exists - 4,
-              join3Exists: prev.join3Exists + 2,
-            })
-            return { ...prev, join5Exists: prev.join5Exists + 4, join4Exists: prev.join4Exists - 4, join3Exists: prev.join3Exists + 2 }
-          })
+          calclutationOfBars(1, 2, 2, cubeSize)
+          updateJoins(2, -4, 4)
         }
         // in case the cube is higher or lower than the cube next to its right
+        else if (answear === 'lower') {
+          calclutationOfBars(2, 2, 2, cubeSize)
+          updateJoins(2, 0, 2)
+        }
+        // in case the cube is higher than the cube next to its right
         else {
-          setJoins((prev) => {
-            console.log({ ...prev, join5Exists: prev.join5Exists + 2, join3Exists: prev.join3Exists + 2 })
-            return { ...prev, join5Exists: prev.join5Exists + 2, join3Exists: prev.join3Exists + 2 }
-          })
+          calclutationOfBars(2, 2, 2, cubeSize, heightRatio)
+          updateJoins(2, 0, 2)
         }
         return
       }
       // in case there are no cubes from the new cube edges
       else {
-        setJoins((prev) => {
-          console.log({ ...prev, join4Exists: prev.join4Exists - 4, join5Exists: prev.join5Exists + 4, join3Exists: prev.join3Exists + 4 })
-          return { ...prev, join4Exists: prev.join4Exists - 4, join5Exists: prev.join5Exists + 4, join3Exists: prev.join3Exists + 4 }
-        })
+        calclutationOfBars(2, 4, 2, cubeSize)
+        updateJoins(4, -4, 4)
       }
     }
     // in case there is a cube from the left edge of the new cube in layer bellow and no cube from the right
     else if (isCubeFromLeftSideBellow !== -1 && isCubeFromRightSideBellow === -1) {
       if (isCubeFromLeftSide !== -1) {
-        const answear = calculateCubeConnectionRatio(newCube, numberLayer, leftEdge, 'left')
+        const [answear, heightRatio] = calculateCubeConnectionRatio(newCube, numberLayer, leftEdge, 'left')
         if (answear === 'equal') {
-          setJoins((prev) => {
-            console.log({ ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists - 2 })
-            return { ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists - 2 }
-          })
+          calclutationOfBars(1, 2, 2, cubeSize)
+          updateJoins(-2, 4, 0)
         } else if (answear === 'equal and cube above') {
-          setJoins((prev) => {
-            console.log({ ...prev, join5Exists: prev.join5Exists + 2 })
-            return { ...prev, join5Exists: prev.join5Exists + 2 }
-          })
+          calclutationOfBars(1, 2, 2, cubeSize)
+          updateJoins(0, 0, 2)
         }
         // in case the cube is higher or lower than the cube next to its left
+        else if (answear === 'lower') {
+          calclutationOfBars(2, 2, 2, cubeSize)
+          updateJoins(0, 4, 0)
+        }
+        // in case the new cube is higher than the cube next to its left
         else {
-          setJoins((prev) => {
-            console.log({ ...prev, join4Exists: prev.join4Exists + 4 })
-            return { ...prev, join4Exists: prev.join4Exists + 4 }
-          })
+          calclutationOfBars(2, 2, 2, cubeSize, heightRatio)
+          updateJoins(0, 4, 0)
         }
       }
       // in case no cube from new cube left side but there is a cube from left side in the layer bellow
       else {
-        setJoins((prev) => {
-          console.log({ ...prev, join5Exists: prev.join5Exists + 2, join3Exists: prev.join3Exists + 2 })
-          return { ...prev, join5Exists: prev.join5Exists + 2, join3Exists: prev.join3Exists + 2 }
-        })
+        calclutationOfBars(2, 4, 2, cubeSize)
+        updateJoins(2, 0, 2)
       }
     }
-    // in case there is a cube from the right edge of the new cube in layer bellow and no cube from the right
+    // in case there is a cube from the right edge of the new cube in layer bellow and no cube from the left
     else if (isCubeFromRightSideBellow !== -1 && isCubeFromLeftSideBellow === -1) {
       if (isCubeFromRightSide !== -1) {
-        const answear = calculateCubeConnectionRatio(newCube, numberLayer, rightEdge, 'right')
+        const [answear, heightRatio] = calculateCubeConnectionRatio(newCube, numberLayer, rightEdge, 'right')
         if (answear === 'equal') {
-          setJoins((prev) => {
-            console.log({ ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists - 2 })
-            return { ...prev, join4Exists: prev.join4Exists + 4, join3Exists: prev.join3Exists - 2 }
-          })
+          calclutationOfBars(1, 2, 2, cubeSize)
+          updateJoins(-2, 4, 0)
         } else if (answear === 'equal and cube above') {
-          setJoins((prev) => {
-            console.log({ ...prev, join5Exists: prev.join5Exists + 2 })
-            return { ...prev, join5Exists: prev.join5Exists + 2 }
-          })
+          calclutationOfBars(1, 2, 2, cubeSize)
+          updateJoins(0, 0, 2)
         }
-        // in case the cube is higher or lower than the cube next to its right
+        // in case the cube is lower than the cube next to its right
+        else if (answear === 'lower') {
+          calclutationOfBars(2, 2, 2, cubeSize)
+          updateJoins(0, 4, 0)
+        }
+        // in case the cube is higher than the cube next to its right
         else {
-          setJoins((prev) => {
-            console.log({ ...prev, join4Exists: prev.join4Exists + 4 })
-            return { ...prev, join4Exists: prev.join4Exists + 4 }
-          })
+          calclutationOfBars(2, 2, 2, cubeSize, heightRatio)
+          updateJoins(0, 4, 0)
         }
       }
       // in case no cube from new cube right side but there is a cube from right side in the layer bellow
       else {
-        setJoins((prev) => {
-          console.log({ ...prev, join5Exists: prev.join5Exists + 2, join3Exists: prev.join3Exists + 2 })
-          return { ...prev, join5Exists: prev.join5Exists + 2, join3Exists: prev.join3Exists + 2 }
-        })
+        calclutationOfBars(2, 4, 2, cubeSize)
+        updateJoins(2, 0, 2)
       }
     }
   }
@@ -893,7 +895,8 @@ export default function ClosetDesign() {
         // in case the layer in new
         handleAddingCube(`${0 + i}`, [{ position: [0, yPosition, 0], size: cubeAddingSize, display: display, offset: [0, 0] }])
       }
-      setJoins({ join3Exists: 8, join4Exists: 0, join5Exists: 0 })
+      calclutationOfBars(4, 4, 4, [width, height])
+      updateJoins(8, 0, 0)
       return
     } else {
       setIsDragging(true)
@@ -1008,7 +1011,12 @@ export default function ClosetDesign() {
                 setCubes({
                   0: [],
                 })
-                setJoins({ join3Exists: 0, join4Exists: 0, join5Exists: 0 })
+                joins.join3Exists = 0
+                joins.join4Exists = 0
+                joins.join5Exists = 0
+                bars[1] = 0
+                bars[2] = 0
+                bars[3] = 0
                 setShelfs([])
               }}
             >
