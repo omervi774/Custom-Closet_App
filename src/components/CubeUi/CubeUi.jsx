@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button, Typography } from '@mui/material'
 // let the use choose the size of the new cube he is gonna drag
-const CubeUi = ({ title, newDraggingCube }) => {
+const CubeUi = ({ title, newDraggingCube, closeSecondaryMenu }) => {
   const [clicked, setClicked] = useState({ width: [true, false, false], height: [true, false, false] })
   const handleClicked = (indicator, id) => {
     setClicked((prev) => {
@@ -64,6 +64,7 @@ const CubeUi = ({ title, newDraggingCube }) => {
       >
         אישור
       </Button>
+      <Button onClick={closeSecondaryMenu}>חזור</Button>
     </>
   )
 }

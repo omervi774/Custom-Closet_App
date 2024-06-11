@@ -1,7 +1,7 @@
 import { Typography, Box, Button } from '@mui/material'
 import { useState } from 'react'
 
-const ShelfUi = ({ title, addNewShelf }) => {
+const ShelfUi = ({ title, addNewShelf, closeSecondaryMenu }) => {
   const [clicked, setClicked] = useState('glass')
 
   return (
@@ -58,6 +58,7 @@ const ShelfUi = ({ title, addNewShelf }) => {
       >
         אישור
       </Button>
+      <Button onClick={closeSecondaryMenu}>חזור</Button>
     </Box>
   )
 }

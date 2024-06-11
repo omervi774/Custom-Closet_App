@@ -10,9 +10,11 @@ import CubeUi from '../components/CubeUi/CubeUi'
 import ShelfUi from '../components/ShelfUi/ShelfUi'
 import ModalMessage from '../components/ModalMessage/ModalMessage'
 import Modal from '../components/Modal'
+import Undo from '../components/Undo/Undo'
 const globalOffset = 0.04
 let bars = { 1: 0, 2: 0, 3: 0 }
 let joins = { join3Exists: 0, join4Exists: 0, join5Exists: 0 }
+const lastActions = []
 export default function ClosetDesign() {
   // for the dragging cube
   const [position, setPosition] = useState([-3, 2, 0])
@@ -65,10 +67,10 @@ export default function ClosetDesign() {
   // gets the initial value of bars with length 1, how many bars to add for the height of the cube
   // and how many bars to add for the width of the cube, and the cube size
   // and in case the new cube is heigher than the connected cube gets the heightRatio
-  const calclutationOfBars = (initialValOfOnes, heightAdding, widthAdding, cubeSize, heightRatio) => {
-    let bars1 = initialValOfOnes
-    let bars2 = 0
-    let bars3 = 0
+  const calclutationOfBars = (initialValOf1, initialValOf2, initialValOf3, heightAdding, widthAdding, cubeSize, heightRatio) => {
+    let bars1 = initialValOf1
+    let bars2 = initialValOf2
+    let bars3 = initialValOf3
     bars1 += cubeSize[0] === 1 && widthAdding
     bars1 += cubeSize[1] === 1 && heightAdding
     bars2 += cubeSize[0] === 2 && widthAdding
@@ -87,12 +89,27 @@ export default function ClosetDesign() {
     bars[2] = bars[2] + bars2
     bars[3] = bars[3] + bars3
     console.log(bars)
+    // console.log(JSON.parse(JSON.stringify(bars)))
+  }
+  const calcBarsWhenNewCubeIsLower = (heightRatio) => {
+    console.log('height differences: ', heightRatio)
+    if (heightRatio === 2) {
+      // bars[3] -= 2
+      // bars[2] += 2
+      // bars[1] += 2
+      return [2, 2, -2]
+    } else {
+      // bars[2] -= 2
+      // bars[1] += 4
+      return [4, -2, 0]
+    }
   }
   const updateJoins = (join3, join4, join5) => {
     joins.join3Exists = joins.join3Exists + join3
     joins.join4Exists = joins.join4Exists + join4
     joins.join5Exists = joins.join5Exists + join5
     console.log(joins)
+    // console.log(JSON.parse(JSON.stringify(joins)))
   }
   const addingCubeToSide = (layer, positionToAddYAxis, cubeSize, xPosition, side) => {
     layer = Number(layer)
@@ -121,22 +138,23 @@ export default function ClosetDesign() {
       // in case top edges of the new cube and connected cube are equal
       if (answear === 'equal') {
         updateJoins(0, 4, 0)
-        calclutationOfBars(2, 2, 4, cubeSize)
+        calclutationOfBars(2, 0, 0, 2, 4, cubeSize)
       }
       // in case top edges of the new cube and connected cube are equal and also there is a cube above the connected cube
       else if (answear === 'equal and cube above') {
         updateJoins(2, 0, 2)
-        calclutationOfBars(2, 2, 4, cubeSize)
+        calclutationOfBars(2, 0, 0, 2, 4, cubeSize)
       }
       // in case the new cube higher fron the connected cube
       else if (answear === 'higher') {
         updateJoins(2, 4, 0)
-        calclutationOfBars(3, 2, 4, cubeSize, heightRatio)
+        calclutationOfBars(3, 0, 0, 2, 4, cubeSize, heightRatio)
       }
       // in case the new cube is lower than the connected cube
       else {
         updateJoins(2, 4, 0)
-        calclutationOfBars(3, 2, 4, cubeSize)
+        const [bar1, bar2, bar3] = calcBarsWhenNewCubeIsLower(heightRatio)
+        calclutationOfBars(3 + bar1, bar2, bar3, 2, 4, cubeSize)
       }
     }
     // in case it is not layer 0 and there is a cube from the side in the layer bellow
@@ -191,16 +209,18 @@ export default function ClosetDesign() {
     // in case the connection is not on layer 0 calc the offset as it is so conneceted fron top
     // also calculate the adding bars
     else {
+      console.log(side)
       offset = calcOffsetWhenIsTopConnection(Number(layer), Number(layer) - 1, cubeSize, xPosition)
       // calculate the adding bars acording to the height of the new cube compare to the height of the connected cube
       if (answear === ' lower') {
-        calclutationOfBars(2, 2, 2, cubeSize)
+        const [bar1, bar2, bar3] = calcBarsWhenNewCubeIsLower(heightRatio)
+        calclutationOfBars(2 + bar1, bar2, bar3, 2, 2, cubeSize)
       } else if (answear === 'higher') {
-        calclutationOfBars(2, 2, 2, cubeSize, heightRatio)
+        calclutationOfBars(2, 0, 0, 2, 2, cubeSize, heightRatio)
       }
       // in case the cube top edge is equal to the connected cube (or cube above) to edge
       else {
-        calclutationOfBars(1, 2, 2, cubeSize)
+        calclutationOfBars(1, 0, 0, 2, 2, cubeSize)
       }
     }
 
@@ -296,7 +316,7 @@ export default function ClosetDesign() {
           }
           if (sum >= xSize) {
             include = true
-            xPosition = val.position[0] + val.size[0] / 2 + xSize / 2
+            xPosition = val.position[0] + val.size[0] / 2 - xSize / 2
             return [include, xPosition]
           }
           leftEdge = cubes[layer][i].position[0] + cubes[layer][i].size[0] / 2
@@ -400,7 +420,8 @@ export default function ClosetDesign() {
       if (cubeForCompare.display === false) {
         if (cubes[layer + 1][index].display === false) {
           console.log(`there is a cube ${side} to new cube with higher edge `)
-          return 'lower'
+          const heightRatio = cubes[layer + 1][index].position[1] + cubes[layer + 1][index].size[1] - newCubeTopEdge
+          return ['lower', heightRatio]
         } else if (cubes[layer + 1][index].display === true) {
           console.log('the cubes top edge is equal with also a cube above ')
           return 'equal and cube above'
@@ -415,7 +436,8 @@ export default function ClosetDesign() {
     // in case the top edges are different the new cube top edge must be lower
     else {
       console.log(`there is a cube ${side} to new cube with higher edge `)
-      return 'lower'
+      const heightRatio = cubeForCompareTopEdge - newCubeTopEdge
+      return ['lower', heightRatio]
     }
   }
   // when the new cube connecting from top has a cube from one of the sides:
@@ -426,7 +448,11 @@ export default function ClosetDesign() {
     // in case there is a cube that its top edge match to new cube top edge and also the cube is next to new cube its side
     if (indexOfTopCube !== -1) {
       const cubeForCompare = cubes[numberLayer + newCube.size[1]][indexOfTopCube]
-      return [topEdgeComparation(cubeForCompare, newCube, numberLayer + newCube.size[1], side)]
+      const comparation = topEdgeComparation(cubeForCompare, newCube, numberLayer + newCube.size[1], side)
+      if (typeof comparation === 'string') {
+        return [comparation]
+      }
+      return comparation
     }
     // in case there is a cube next to new cube side but its top edge is smaller than new cube top edge
     else {
@@ -450,7 +476,7 @@ export default function ClosetDesign() {
     console.log('index of cube from right side layer bellow:', isCubeFromRightSideBellow)
     console.log('index of cube from left side layer bellow:', isCubeFromLeftSideBellow)
     if (isCubeFromLeftSideBellow === -1 && isCubeFromRightSideBellow === -1) {
-      calclutationOfBars(2, 4, 2, cubeSize)
+      calclutationOfBars(2, 0, 0, 4, 2, cubeSize)
       updateJoins(0, 4, 0)
       return
     }
@@ -461,70 +487,90 @@ export default function ClosetDesign() {
         const [leftAnswear, leftHeightRatio] = calculateCubeConnectionRatio(newCube, numberLayer, leftEdge, 'left')
         const [rightAnswear, rightHeightRatio] = calculateCubeConnectionRatio(newCube, numberLayer, rightEdge, 'right')
         const combinedValue = `${leftAnswear}-${rightAnswear}`
+        let leftBar1 = 0
+        let leftBar2 = 0
+        let leftBar3 = 0
+        let rightBar1 = 0
+        let rightBar2 = 0
+        let rightBar3 = 0
+        if (leftAnswear === 'lower') {
+          const bars = calcBarsWhenNewCubeIsLower(leftHeightRatio)
+          leftBar1 = bars[0]
+          leftBar2 = bars[1]
+          leftBar3 = bars[2]
+        }
+        if (rightAnswear === 'lower') {
+          const bars = calcBarsWhenNewCubeIsLower(rightHeightRatio)
+          rightBar1 = bars[0]
+          rightBar2 = bars[1]
+          rightBar3 = bars[2]
+        }
         switch (combinedValue) {
           case 'equal-equal':
-            calclutationOfBars(0, 0, 2, cubeSize)
+            calclutationOfBars(0, 0, 0, 0, 2, cubeSize)
             updateJoins(-4, 4, 0)
             return
           case 'equal-equal and cube above':
-            calclutationOfBars(0, 0, 2, cubeSize)
+            calclutationOfBars(0, 0, 0, 0, 2, cubeSize)
             updateJoins(-2, 0, 2)
             return
           case 'equal-lower':
-            calclutationOfBars(1, 0, 2, cubeSize)
+            calclutationOfBars(1 + rightBar1, rightBar2, rightBar3, 0, 2, cubeSize)
             updateJoins(-2, 4, 0)
             return
           case 'equal-higher':
-            calclutationOfBars(1, 0, 2, cubeSize, rightHeightRatio)
+            calclutationOfBars(1, 0, 0, 0, 2, cubeSize, rightHeightRatio)
             updateJoins(-4, 4, 0)
             return
           case 'equal and cube above-equal':
-            calclutationOfBars(0, 0, 2, cubeSize)
+            calclutationOfBars(0, 0, 0, 0, 2, cubeSize)
             updateJoins(-2, 0, 2)
             return
           case 'equal and cube above-equal and cube above':
-            calclutationOfBars(0, 0, 2, cubeSize)
+            calclutationOfBars(0, 0, 0, 0, 2, cubeSize)
             updateJoins(0, -4, 4)
             return
           case 'equal and cube above-lower':
-            calclutationOfBars(1, 0, 2, cubeSize)
+            calclutationOfBars(1 + rightBar1, rightBar2, rightBar3, 0, 2, cubeSize)
             updateJoins(0, 0, 2)
             return
           case 'equal and cube above-higher':
-            calclutationOfBars(1, 0, 2, cubeSize, rightHeightRatio)
+            calclutationOfBars(1, 0, 0, 0, 2, cubeSize, rightHeightRatio)
             updateJoins(0, 0, 2)
             return
           case 'lower-equal':
-            calclutationOfBars(1, 0, 2, cubeSize)
+            calclutationOfBars(1 + leftBar1, leftBar2, leftBar3, 0, 2, cubeSize)
             updateJoins(-2, 4, 0)
             return
           case 'lower-equal and cube above':
-            calclutationOfBars(1, 0, 2, cubeSize)
+            calclutationOfBars(1 + leftBar1, leftBar2, leftBar3, 0, 2, cubeSize)
             updateJoins(0, 0, 2)
             return
           case 'lower-lower':
-            calclutationOfBars(2, 0, 2, cubeSize)
+            calclutationOfBars(2 + leftBar1, leftBar2, leftBar3, 0, 2, cubeSize)
+            calclutationOfBars(rightBar1, rightBar2, rightBar3, 0, 0, cubeSize)
             updateJoins(0, 4, 0)
             return
           case 'lower-higher':
-            calclutationOfBars(1, 0, 2, cubeSize, rightHeightRatio)
+            calclutationOfBars(1 + leftBar1, leftBar2, leftBar3, 0, 2, cubeSize, rightHeightRatio)
+            calcBarsWhenNewCubeIsLower(leftHeightRatio)
             updateJoins(0, 4, 0)
             return
           case 'higher-equal':
-            calclutationOfBars(1, 0, 2, cubeSize, leftHeightRatio)
+            calclutationOfBars(1, 0, 0, 0, 2, cubeSize, leftHeightRatio)
             updateJoins(-2, 4, 0)
             return
           case 'higher-equal and cube above':
-            calclutationOfBars(1, 0, 2, cubeSize, leftHeightRatio)
+            calclutationOfBars(1, 0, 0, 0, 2, cubeSize, leftHeightRatio)
             updateJoins(0, 0, 2)
             return
           case 'higher-lower':
-            calclutationOfBars(1, 0, 2, cubeSize, leftHeightRatio)
+            calclutationOfBars(1 + rightBar1, rightBar2, rightBar3, 0, 2, cubeSize, leftHeightRatio)
             updateJoins(0, 4, 0)
             return
           case 'higher-higher':
-            calclutationOfBars(1, 0, 2, cubeSize, leftHeightRatio)
-            calclutationOfBars(1, 0, 0, cubeSize, rightHeightRatio)
+            calclutationOfBars(1, 0, 0, 0, 2, cubeSize, leftHeightRatio)
+            calclutationOfBars(1, 0, 0, 0, 0, cubeSize, rightHeightRatio)
             updateJoins(0, 4, 0)
             return
         }
@@ -533,20 +579,21 @@ export default function ClosetDesign() {
       else if (isCubeFromLeftSide !== -1 && isCubeFromRightSide === -1) {
         const [answear, heightRatio] = calculateCubeConnectionRatio(newCube, numberLayer, leftEdge, 'left')
         if (answear === 'equal') {
-          calclutationOfBars(1, 2, 2, cubeSize)
+          calclutationOfBars(1, 0, 0, 2, 2, cubeSize)
           updateJoins(0, 0, 2)
         } else if (answear === 'equal and cube above') {
-          calclutationOfBars(1, 2, 2, cubeSize)
+          calclutationOfBars(1, 0, 0, 2, 2, cubeSize)
           updateJoins(2, -4, 4)
         }
         // in case the cube is  lower than the cube next to its left
         else if (answear === 'lower') {
-          calclutationOfBars(2, 2, 2, cubeSize)
+          const [bar1, bar2, bar3] = calcBarsWhenNewCubeIsLower(heightRatio)
+          calclutationOfBars(2 + bar1, bar2, bar3, 2, 2, cubeSize)
           updateJoins(2, 0, 2)
         }
         // in case the new cube is higher than the cube next to its left
         else {
-          calclutationOfBars(2, 2, 2, cubeSize, heightRatio)
+          calclutationOfBars(2, 0, 0, 2, 2, cubeSize, heightRatio)
           updateJoins(2, 0, 2)
         }
         return
@@ -555,27 +602,28 @@ export default function ClosetDesign() {
       else if (isCubeFromRightSide !== -1 && isCubeFromLeftSide === -1) {
         const [answear, heightRatio] = calculateCubeConnectionRatio(newCube, numberLayer, rightEdge, 'right')
         if (answear === 'equal') {
-          calclutationOfBars(1, 2, 2, cubeSize)
+          calclutationOfBars(1, 0, 0, 2, 2, cubeSize)
           updateJoins(0, 0, 2)
         } else if (answear === 'equal and cube above') {
-          calclutationOfBars(1, 2, 2, cubeSize)
+          calclutationOfBars(1, 0, 0, 2, 2, cubeSize)
           updateJoins(2, -4, 4)
         }
         // in case the cube is higher or lower than the cube next to its right
         else if (answear === 'lower') {
-          calclutationOfBars(2, 2, 2, cubeSize)
+          const [bar1, bar2, bar3] = calcBarsWhenNewCubeIsLower(heightRatio)
+          calclutationOfBars(2 + bar1, bar2, bar3, 2, 2, cubeSize)
           updateJoins(2, 0, 2)
         }
         // in case the cube is higher than the cube next to its right
         else {
-          calclutationOfBars(2, 2, 2, cubeSize, heightRatio)
+          calclutationOfBars(2, 0, 0, 2, 2, cubeSize, heightRatio)
           updateJoins(2, 0, 2)
         }
         return
       }
       // in case there are no cubes from the new cube edges
       else {
-        calclutationOfBars(2, 4, 2, cubeSize)
+        calclutationOfBars(2, 0, 0, 4, 2, cubeSize)
         updateJoins(4, -4, 4)
       }
     }
@@ -584,26 +632,27 @@ export default function ClosetDesign() {
       if (isCubeFromLeftSide !== -1) {
         const [answear, heightRatio] = calculateCubeConnectionRatio(newCube, numberLayer, leftEdge, 'left')
         if (answear === 'equal') {
-          calclutationOfBars(1, 2, 2, cubeSize)
+          calclutationOfBars(1, 0, 0, 2, 2, cubeSize)
           updateJoins(-2, 4, 0)
         } else if (answear === 'equal and cube above') {
-          calclutationOfBars(1, 2, 2, cubeSize)
+          calclutationOfBars(1, 0, 0, 2, 2, cubeSize)
           updateJoins(0, 0, 2)
         }
         // in case the cube is higher or lower than the cube next to its left
         else if (answear === 'lower') {
-          calclutationOfBars(2, 2, 2, cubeSize)
+          const [bar1, bar2, bar3] = calcBarsWhenNewCubeIsLower(heightRatio)
+          calclutationOfBars(2 + bar1, bar2, bar3, 2, 2, cubeSize)
           updateJoins(0, 4, 0)
         }
         // in case the new cube is higher than the cube next to its left
         else {
-          calclutationOfBars(2, 2, 2, cubeSize, heightRatio)
+          calclutationOfBars(2, 0, 0, 2, 2, cubeSize, heightRatio)
           updateJoins(0, 4, 0)
         }
       }
       // in case no cube from new cube left side but there is a cube from left side in the layer bellow
       else {
-        calclutationOfBars(2, 4, 2, cubeSize)
+        calclutationOfBars(2, 0, 0, 4, 2, cubeSize)
         updateJoins(2, 0, 2)
       }
     }
@@ -612,26 +661,27 @@ export default function ClosetDesign() {
       if (isCubeFromRightSide !== -1) {
         const [answear, heightRatio] = calculateCubeConnectionRatio(newCube, numberLayer, rightEdge, 'right')
         if (answear === 'equal') {
-          calclutationOfBars(1, 2, 2, cubeSize)
+          calclutationOfBars(1, 0, 0, 2, 2, cubeSize)
           updateJoins(-2, 4, 0)
         } else if (answear === 'equal and cube above') {
-          calclutationOfBars(1, 2, 2, cubeSize)
+          calclutationOfBars(1, 0, 0, 2, 2, cubeSize)
           updateJoins(0, 0, 2)
         }
         // in case the cube is lower than the cube next to its right
         else if (answear === 'lower') {
-          calclutationOfBars(2, 2, 2, cubeSize)
+          const [bar1, bar2, bar3] = calcBarsWhenNewCubeIsLower(heightRatio)
+          calclutationOfBars(2 + bar1, bar2, bar3, 2, 2, cubeSize)
           updateJoins(0, 4, 0)
         }
         // in case the cube is higher than the cube next to its right
         else {
-          calclutationOfBars(2, 2, 2, cubeSize, heightRatio)
+          calclutationOfBars(2, 0, 0, 2, 2, cubeSize, heightRatio)
           updateJoins(0, 4, 0)
         }
       }
       // in case no cube from new cube right side but there is a cube from right side in the layer bellow
       else {
-        calclutationOfBars(2, 4, 2, cubeSize)
+        calclutationOfBars(2, 0, 0, 4, 2, cubeSize)
         updateJoins(2, 0, 2)
       }
     }
@@ -661,6 +711,8 @@ export default function ClosetDesign() {
     return start // the position that needs to place the new cube
   }
   const calcOffsetWhenIsTopConnection = (layer, buttomLayer, cubeSize, xPosition) => {
+    console.log('buttom layer', buttomLayer)
+    console.log('layer', layer)
     const offset = [0, layer * globalOffset]
     // try find cube in the layer bellow with the same right edge as the new cube
     const indexOFButoomCubeFromRight = findCube(buttomLayer, xPosition + cubeSize[0] / 2, 'right')
@@ -675,25 +727,26 @@ export default function ClosetDesign() {
       // finde cube with in the layer bellow with the same left edge as new cube
       const indexOFButoomCubeFromLeft = findCube(buttomLayer, xPosition - cubeSize[0] / 2, 'left')
       console.log('indexx left = : ', indexOFButoomCubeFromRight)
-      const buttomLeftCubeOffset = cubes[buttomLayer][indexOFButoomCubeFromLeft].offset[0]
-      const buttomLeftCubeSize = cubes[buttomLayer][indexOFButoomCubeFromLeft].size[0]
-
-      if (buttomLeftCubeSize === 1) {
-        if (cubeSize[0] === buttomLeftCubeSize) {
-          offset[0] = buttomLeftCubeOffset
+      if (indexOFButoomCubeFromLeft !== -1) {
+        const buttomLeftCubeOffset = cubes[buttomLayer][indexOFButoomCubeFromLeft].offset[0]
+        const buttomLeftCubeSize = cubes[buttomLayer][indexOFButoomCubeFromLeft].size[0]
+        if (buttomLeftCubeSize === 1) {
+          if (cubeSize[0] === buttomLeftCubeSize) {
+            offset[0] = buttomLeftCubeOffset
+          } else {
+            offset[0] = buttomLeftCubeOffset - (cubeSize[0] - buttomLeftCubeSize) * globalOffset
+          }
+        } else if (buttomLeftCubeSize === 2) {
+          if (cubeSize[0] < buttomLeftCubeSize) {
+            offset[0] = buttomLeftCubeOffset + globalOffset
+          } else if (cubeSize[0] === buttomLeftCubeSize) {
+            offset[0] = buttomLeftCubeOffset
+          } else {
+            offset[0] = buttomLeftCubeOffset - globalOffset
+          }
         } else {
-          offset[0] = buttomLeftCubeOffset - (cubeSize[0] - buttomLeftCubeSize) * globalOffset
+          offset[0] = buttomLeftCubeOffset + (buttomLeftCubeSize - cubeSize[0]) * globalOffset
         }
-      } else if (buttomLeftCubeSize === 2) {
-        if (cubeSize[0] < buttomLeftCubeSize) {
-          offset[0] = buttomLeftCubeOffset + globalOffset
-        } else if (cubeSize[0] === buttomLeftCubeSize) {
-          offset[0] = buttomLeftCubeOffset
-        } else {
-          offset[0] = buttomLeftCubeOffset - globalOffset
-        }
-      } else {
-        offset[0] = buttomLeftCubeOffset + (buttomLeftCubeSize - cubeSize[0]) * globalOffset
       }
     }
     return offset
@@ -733,6 +786,8 @@ export default function ClosetDesign() {
         }
 
         if (containsButtomCube && !isOverRide) {
+          console.log('top')
+          console.log('x:', x)
           const offset = calcOffsetWhenIsTopConnection(layer, buttomLayer, cubeSize, x)
 
           let i
@@ -784,7 +839,10 @@ export default function ClosetDesign() {
               }
             }
           }
-          i > 0 && console.log('top')
+          if (i > 0) {
+            console.log('top')
+            lastActions.push({ type: 'cube', layer: layer, position: [x, layer + positionToAddYAxis], size: cubeSize })
+          }
           setIsMenu(true)
           setIsDragging(false)
           setPosition([-3, 2, 0])
@@ -811,7 +869,7 @@ export default function ClosetDesign() {
         if (isLayer0) {
           addingCubeToSide(layer.toString(), positionToAddYAxis, cubeSize, leftEdge - cubeSize[0] / 2, 'left')
           console.log('left')
-
+          lastActions.push({ type: 'cube', layer: 0, position: [leftEdge - cubeSize[0] / 2, positionToAddYAxis], size: cubeSize })
           return
         } else {
           // in case try adding cube to layers thats requires cube bellow
@@ -820,6 +878,12 @@ export default function ClosetDesign() {
           if (containsButtomCube && isOverRide) {
             addingCubeToSide(layer, positionToAddYAxis, cubeSize, leftEdge - cubeSize[0] / 2, 'left')
             console.log('left')
+            lastActions.push({
+              type: 'cube',
+              layer: layer,
+              position: [leftEdge - cubeSize[0] / 2, layer + positionToAddYAxis],
+              size: cubeSize,
+            })
             return
           }
         }
@@ -828,6 +892,7 @@ export default function ClosetDesign() {
         if (isLayer0) {
           addingCubeToSide(layer.toString(), positionToAddYAxis, cubeSize, rightEdge + cubeSize[0] / 2, 'right')
           console.log('right')
+          lastActions.push({ type: 'cube', layer: 0, position: [rightEdge + cubeSize[0] / 2, positionToAddYAxis], size: cubeSize })
           setCubes((prev) => {
             const cubesCopy = JSON.parse(JSON.stringify(prev))
             const offsetToAdd = globalOffset * cubeSize[0]
@@ -868,11 +933,21 @@ export default function ClosetDesign() {
           if (containsButtomCube && !isOverRide) {
             addingCubeToSide(layer.toString(), positionToAddYAxis, cubeSize, rightEdge + cubeSize[0] / 2, 'right')
             console.log('right')
+            lastActions.push({
+              type: 'cube',
+              layer: 0,
+              position: [rightEdge + cubeSize[0] / 2, layer + positionToAddYAxis],
+              size: cubeSize,
+            })
             return
           }
         }
       }
     }
+  }
+  const closeSecondaryMenu = () => {
+    setSecondaryOpen([false, undefined])
+    setFirstOpen(true)
   }
   // after the user chose size of the dragging cube set its width and height and close the menu
   const newDraggingCube = (width, height) => {
@@ -895,7 +970,7 @@ export default function ClosetDesign() {
         // in case the layer in new
         handleAddingCube(`${0 + i}`, [{ position: [0, yPosition, 0], size: cubeAddingSize, display: display, offset: [0, 0] }])
       }
-      calclutationOfBars(4, 4, 4, [width, height])
+      calclutationOfBars(4, 0, 0, 4, 4, [width, height])
       updateJoins(8, 0, 0)
       return
     } else {
@@ -944,6 +1019,7 @@ export default function ClosetDesign() {
     return [false, 'top']
   }
   const handleAddingShelf = (xPosition, yPosition, xSize) => {
+    lastActions.push({ type: 'shelf', position: [xPosition, yPosition, 0], xSize: xSize })
     setShelfs((prev) => {
       return [...prev, { position: [xPosition, yPosition, 0], xSize: xSize }]
     })
@@ -957,6 +1033,54 @@ export default function ClosetDesign() {
     })
     setAddDrawer(false)
     setIsMenu(true)
+  }
+  const cancelDragging = () => {
+    setIsDragging(false)
+    setPosition([-3, 2, 0])
+    setIsMenu(true)
+  }
+  const CancelAddingDrawer = () => {
+    setAddDrawer(false)
+    setIsMenu(true)
+  }
+  const removeLastAction = () => {
+    if (lastActions.length === 0) {
+      return
+    }
+    const lastAction = lastActions.pop()
+    if (lastAction.type === 'shelf') {
+      setShelfs((prev) => {
+        return prev.slice(0, prev.length - 1)
+      })
+      setMessage({ messageType: 'success', title: 'המדף הוסר בהצלחה', content: '', arrow: false, topPosition: '20%', leftPosition: '50%' })
+      return
+    } else {
+      const xPosition = lastAction.position[0]
+      for (let i = lastAction.layer; i < lastAction.size[1] + lastAction.layer; i++) {
+        const filteredArray = cubes[i].filter((cube) => {
+          return cube.position[0] !== xPosition
+        })
+        setCubes((prev) => {
+          const newCubes = { ...prev }
+
+          if (filteredArray.length > 0) {
+            newCubes[i] = filteredArray
+          } else {
+            delete newCubes[i]
+          }
+          console.log(newCubes)
+          return newCubes
+        })
+      }
+      setMessage({
+        messageType: 'success',
+        title: 'הקובייה הוסרה בהצלחה',
+        content: '',
+        arrow: false,
+        topPosition: '20%',
+        leftPosition: '50%',
+      })
+    }
   }
 
   return (
@@ -976,7 +1100,7 @@ export default function ClosetDesign() {
           {/* first menu - let the use the option to add new cube or shelf */}
           <MenuList>
             <MenuItem
-              sx={{ color: 'black', display: !isFirstOpen && 'none' }}
+              sx={{ color: 'black', display: !isFirstOpen && 'none', marginBottom: 1 }}
               onClick={() => {
                 setFirstOpen(false)
                 setSecondaryOpen([true, 'קוביות'])
@@ -986,7 +1110,7 @@ export default function ClosetDesign() {
               קוביות
             </MenuItem>
             <MenuItem
-              sx={{ color: 'black', display: !isFirstOpen && 'none' }}
+              sx={{ color: 'black', display: !isFirstOpen && 'none', marginBottom: 1 }}
               onClick={() => {
                 setFirstOpen(false)
                 setSecondaryOpen([true, 'מדפים'])
@@ -994,6 +1118,9 @@ export default function ClosetDesign() {
               }}
             >
               מדפים
+            </MenuItem>
+            <MenuItem onClick={removeLastAction} sx={{ color: 'black', display: !isFirstOpen && 'none', marginBottom: 1 }}>
+              בטל פעולה
             </MenuItem>
             <MenuItem
               sx={{ color: 'black', display: !isFirstOpen && 'none' }}
@@ -1034,10 +1161,12 @@ export default function ClosetDesign() {
                 gap: 1,
               }}
             >
-              <CubeUi title="קוביות" newDraggingCube={newDraggingCube} />
+              <CubeUi title="קוביות" newDraggingCube={newDraggingCube} closeSecondaryMenu={closeSecondaryMenu} />
             </Box>
           </MenuItem>
-          {isSecondaryOpen[0] && isSecondaryOpen[1] === 'מדפים' && <ShelfUi title={'מדפים'} addNewShelf={addNewShelf} />}
+          {isSecondaryOpen[0] && isSecondaryOpen[1] === 'מדפים' && (
+            <ShelfUi title={'מדפים'} addNewShelf={addNewShelf} closeSecondaryMenu={closeSecondaryMenu} />
+          )}
         </Paper>
       </div>
 
@@ -1083,6 +1212,7 @@ export default function ClosetDesign() {
               )
             )}
             {isDragging && <DraggingCube position={position} onDrag={handleDrag} url={`${size[0]}X${size[1]}`} size={size} />}
+
             {shelfs.map((shelf, index) => {
               return <GlassShelf key={index} position={shelf.position} xSize={shelf.xSize} />
             })}
@@ -1123,6 +1253,8 @@ export default function ClosetDesign() {
 
           return circles
         })()}
+      {isDragging && <Undo cancelLastAction={cancelDragging} />}
+      {addDrawer && <Undo cancelLastAction={CancelAddingDrawer} />}
     </>
   )
 }
