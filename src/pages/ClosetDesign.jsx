@@ -11,6 +11,8 @@ import ShelfUi from '../components/ShelfUi/ShelfUi'
 import ModalMessage from '../components/ModalMessage/ModalMessage'
 import Modal from '../components/Modal'
 import Undo from '../components/Undo/Undo'
+import FileUpload from '../components/FileUpload/FileUpload'
+
 const globalOffset = 0.04
 let bars = { 1: 0, 2: 0, 3: 0 }
 let joins = { join3Exists: 0, join4Exists: 0, join5Exists: 0 }
@@ -27,6 +29,16 @@ export default function ClosetDesign() {
   const handleCloseModal = () => {
     setIsModalOpen(false)
     setMessage({ messageType: 'success', title: 'התחל לבנות ארון', content: '', topPosition: '20%', leftPosition: '40%', arrow: true })
+  }
+  const [preview, setPreview] = useState('')
+  const handleFileChange = (file) => {
+    // Create a preview URL
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setPreview(reader.result)
+      handleCloseModal()
+    }
+    reader.readAsDataURL(file)
   }
 
   // this state responssible to check if the user try to drag new cube or not
@@ -1137,6 +1149,7 @@ export default function ClosetDesign() {
       }
       calclutationOfBars(4, 0, 0, 4, 4, [width, height])
       updateJoins(8, 0, 0)
+      lastActions.push({ type: 'cube', layer: 0, position: [0, yOffset], size: [width, height] })
       return
     } else {
       setIsDragging(true)
@@ -1213,40 +1226,52 @@ export default function ClosetDesign() {
     if (lastActions.length === 0) {
       return
     }
-    const lastAction = lastActions.pop()
-    if (lastAction.type === 'shelf') {
-      setShelfs((prev) => {
-        return prev.slice(0, prev.length - 1)
-      })
-      setMessage({ messageType: 'success', title: 'המדף הוסר בהצלחה', content: '', arrow: false, topPosition: '20%', leftPosition: '50%' })
-      return
-    } else {
-      console.log(lastAction)
-      const xPosition = lastAction.position[0]
-      for (let i = lastAction.layer; i < lastAction.size[1] + lastAction.layer; i++) {
-        const filteredArray = cubes[i].filter((cube) => {
-          return cube.position[0] !== xPosition
+    if (lastActions.length > 0) {
+      const lastAction = lastActions.pop()
+      if (lastAction.type === 'shelf') {
+        setShelfs((prev) => {
+          return prev.slice(0, prev.length - 1)
         })
-        setCubes((prev) => {
-          const newCubes = { ...prev }
+        setMessage({
+          messageType: 'success',
+          title: 'המדף הוסר בהצלחה',
+          content: '',
+          arrow: false,
+          topPosition: '20%',
+          leftPosition: '50%',
+        })
+        return
+      } else {
+        console.log(lastAction)
+        const xPosition = lastAction.position[0]
+        for (let i = lastAction.layer; i < lastAction.size[1] + lastAction.layer; i++) {
+          const filteredArray = cubes[i].filter((cube) => {
+            return cube.position[0] !== xPosition
+          })
+          setCubes((prev) => {
+            const newCubes = { ...prev }
 
-          if (filteredArray.length > 0) {
-            newCubes[i] = filteredArray
-          } else {
-            delete newCubes[i]
-          }
-          console.log(newCubes)
-          return newCubes
+            if (filteredArray.length > 0) {
+              newCubes[i] = filteredArray
+            } else {
+              delete newCubes[i]
+            }
+            if (newCubes[0] === undefined) {
+              return { 0: [] }
+            }
+
+            return newCubes
+          })
+        }
+        setMessage({
+          messageType: 'success',
+          title: 'הקובייה הוסרה בהצלחה',
+          content: '',
+          arrow: false,
+          topPosition: '20%',
+          leftPosition: '50%',
         })
       }
-      setMessage({
-        messageType: 'success',
-        title: 'הקובייה הוסרה בהצלחה',
-        content: '',
-        arrow: false,
-        topPosition: '20%',
-        leftPosition: '50%',
-      })
     }
   }
 
@@ -1256,11 +1281,21 @@ export default function ClosetDesign() {
       {isModalOpen && (
         <Modal isOpen={isModalOpen} handleClose={handleCloseModal}>
           <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>עיצוב ארון בהתאמה אישית</h2>
-          <p style={{ fontSize: '18px', lineHeight: '1.6' }}>
-            לפניכם עמוד בו תוכלו לגרור קוביות ולחברם לקוביות מהצד או מלמעלה ובכך לבנות ארון בהתאמה אישית
-          </p>
+          <div style={{ textAlign: 'right' }}>
+            <p style={{ fontSize: '18px', lineHeight: '1.6' }}>
+              לפניכם עמוד בו תוכלו לגרור קוביות ולחברם לקוביות מהצד או מלמעלה ובכך לבנות ארון בהתאמה אישית
+            </p>
+            <p style={{ fontSize: '18px', lineHeight: '1.6' }}>: קודם כל ניתן לבחור תמונת רקע או להמשיך עם הרקע הדיפולטיבי</p>
+          </div>
+          <FileUpload handleFileChange={handleFileChange} handleClose={handleCloseModal} />
         </Modal>
       )}
+      {preview && (
+        <div style={{ position: 'absolute' }}>
+          <img src={preview} alt="Selected" style={{ maxWidth: '100%', height: 'auto' }} />
+        </div>
+      )}
+
       <div style={{ position: 'absolute', top: '10vh', zIndex: 1000 }}>
         {/* menu container */}
         <Paper sx={{ height: '90vh', width: '15vh', display: !isMenu && 'none' }}>
