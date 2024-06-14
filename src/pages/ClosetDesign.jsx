@@ -88,19 +88,17 @@ export default function ClosetDesign() {
     bars[1] = bars[1] + bars1
     bars[2] = bars[2] + bars2
     bars[3] = bars[3] + bars3
-    console.log(bars)
-    // console.log(JSON.parse(JSON.stringify(bars)))
+    //console.log(bars)
+    console.log(JSON.parse(JSON.stringify(bars)))
   }
   const calcBarsWhenNewCubeIsLower = (heightRatio) => {
     console.log('height differences: ', heightRatio)
+    if (heightRatio === 0) {
+      return [0, 0, 0]
+    }
     if (heightRatio === 2) {
-      // bars[3] -= 2
-      // bars[2] += 2
-      // bars[1] += 2
       return [2, 2, -2]
     } else {
-      // bars[2] -= 2
-      // bars[1] += 4
       return [4, -2, 0]
     }
   }
@@ -108,8 +106,8 @@ export default function ClosetDesign() {
     joins.join3Exists = joins.join3Exists + join3
     joins.join4Exists = joins.join4Exists + join4
     joins.join5Exists = joins.join5Exists + join5
-    console.log(joins)
-    // console.log(JSON.parse(JSON.stringify(joins)))
+    //console.log(joins)
+    console.log(JSON.parse(JSON.stringify(joins)))
   }
   const addingCubeToSide = (layer, positionToAddYAxis, cubeSize, xPosition, side) => {
     layer = Number(layer)
@@ -120,14 +118,33 @@ export default function ClosetDesign() {
     const leftSide = xPosition - cubeSize[0] / 2
     const rightSide = xPosition + cubeSize[0] / 2
     let isCubeFromSide // checks if in the layer bellow there is a cube that its edge oppsite edge match the new cube edge
+    let isShorterConnectionSide // checks is the new cube edge does not match to any cube edge in the layer bellow
+    let isShorterOtherSide
+    let widthRatio = 0
     if (side === 'left') {
       edge = rightSide
       oppositeSide = 'right'
       isCubeFromSide = findCube(Number(layer) - 1, leftSide, 'right')
+      isShorterConnectionSide = findCube(Number(layer) - 1, leftSide, 'left')
+      if (isShorterConnectionSide === -1) {
+        isShorterOtherSide = findCube(Number(layer) - 1, rightSide, 'right')
+        if (isShorterOtherSide !== -1) {
+          const cubeLayerBellow = cubes[Number(layer) - 1][isShorterOtherSide]
+          widthRatio = Math.abs(cubeLayerBellow.position[0] - cubeLayerBellow.size[0] / 2 - leftSide)
+        }
+      }
     } else {
       edge = leftSide
       oppositeSide = 'left'
       isCubeFromSide = findCube(Number(layer) - 1, rightSide, 'left')
+      isShorterConnectionSide = findCube(Number(layer) - 1, rightSide, 'right')
+      if (isShorterConnectionSide === -1) {
+        isShorterOtherSide = findCube(Number(layer) - 1, leftSide, 'left')
+        if (isShorterOtherSide !== -1) {
+          const cubeLayerBellow = cubes[Number(layer) - 1][isShorterOtherSide]
+          widthRatio = Math.abs(cubeLayerBellow.position[0] + cubeLayerBellow.size[0] / 2 - rightSide)
+        }
+      }
     }
     const newCube = { position: [xPosition, Number(layer) + positionToAddYAxis], size: cubeSize }
     // checks the ratio between top edge of the new cube to the cube top edge connected cube
@@ -176,15 +193,27 @@ export default function ClosetDesign() {
     else {
       // in case top edges of the new cube and connected cube are equal
       if (answear === 'equal') {
-        updateJoins(-2, 4, 0)
+        if (isShorterConnectionSide !== -1) {
+          updateJoins(-2, 4, 0)
+        } else {
+          updateJoins(0, 4, 0)
+        }
       }
       // in case top edges of the new cube and connected cube are equal and also there is a cube above the connected cube
       else if (answear === 'equal and cube above') {
-        updateJoins(0, 0, 2)
+        if (isShorterConnectionSide !== -1) {
+          updateJoins(0, 0, 2)
+        } else {
+          updateJoins(2, 0, 2)
+        }
       }
       // in case the new cube higher or lower the update of joins is the same
       else {
-        updateJoins(0, 4, 0)
+        if (isShorterConnectionSide !== -1) {
+          updateJoins(0, 4, 0)
+        } else {
+          updateJoins(2, 4, 0)
+        }
       }
     }
     // this block of code responsible to calc the offset
@@ -209,18 +238,18 @@ export default function ClosetDesign() {
     // in case the connection is not on layer 0 calc the offset as it is so conneceted fron top
     // also calculate the adding bars
     else {
-      console.log(side)
       offset = calcOffsetWhenIsTopConnection(Number(layer), Number(layer) - 1, cubeSize, xPosition)
       // calculate the adding bars acording to the height of the new cube compare to the height of the connected cube
+      const [widthBar1, widthBar2, widthBar3] = calcBarsWhenNewCubeIsLower(widthRatio)
       if (answear === ' lower') {
         const [bar1, bar2, bar3] = calcBarsWhenNewCubeIsLower(heightRatio)
-        calclutationOfBars(2 + bar1, bar2, bar3, 2, 2, cubeSize)
+        calclutationOfBars(2 + bar1 + widthBar1, bar2 + widthBar2, bar3 + widthBar3, 2, 2, cubeSize)
       } else if (answear === 'higher') {
-        calclutationOfBars(2, 0, 0, 2, 2, cubeSize, heightRatio)
+        calclutationOfBars(2 + widthBar1, widthBar2, widthBar3, 2, 2, cubeSize, heightRatio)
       }
       // in case the cube top edge is equal to the connected cube (or cube above) to edge
       else {
-        calclutationOfBars(1, 0, 0, 2, 2, cubeSize)
+        calclutationOfBars(1 + widthBar1, widthBar2, widthBar3, 2, 2, cubeSize)
       }
     }
 
@@ -319,7 +348,7 @@ export default function ClosetDesign() {
             xPosition = val.position[0] + val.size[0] / 2 - xSize / 2
             return [include, xPosition]
           }
-          leftEdge = cubes[layer][i].position[0] + cubes[layer][i].size[0] / 2
+          leftEdge = cubes[layer][i].position[0] - cubes[layer][i].size[0] / 2
         }
       }
     }
@@ -462,9 +491,201 @@ export default function ClosetDesign() {
       return ['higher', 1]
     }
   }
+  const calcJoinsAndBarsWhenCubeHorizontalEdgeShorter = (
+    side,
+    oppositeSide,
+    numberLayer,
+    isCubeWithEqualEdgeLayerBellow, // this param is the index of the cube layer bellow that match the edge of new cube
+    cubeEdge, // the edge of the cube that has a match in the layer bellow
+    isCubeFromSide, // index of the cube that connects from the side of the new cube that has a match in the edge of the layer bellow
+    isCubeFromSideBellow, // index of the cube in the layer bellow that connects to the cube that the new cube sits on
+    isCubeFromOtherSide, // index of the cube that connect to the cube from the side that its edge does not match to any cube in the layer bellow
+    cubeSize,
+    newCube,
+    cubeSecondEdge // the edge that does not match to any cube in the layer bellow
+  ) => {
+    // this section is responsible for calculate the width differences of the new cube and the cube in the layer bellow
+    const cubeLayerBellow = cubes[numberLayer][isCubeWithEqualEdgeLayerBellow]
+    let edgeOfCubeBellow
+    if (side === 'left') {
+      edgeOfCubeBellow = cubeLayerBellow.position[0] + cubeLayerBellow.size[0] / 2
+    } else {
+      edgeOfCubeBellow = cubeLayerBellow.position[0] - cubeLayerBellow.size[0] / 2
+    }
+    const widthRatio = Math.abs(edgeOfCubeBellow - cubeSecondEdge)
+    const [bar1, bar2, bar3] = calcBarsWhenNewCubeIsLower(widthRatio)
+
+    // in case the new cube has cubes from left and right
+    if (isCubeFromSide !== -1 && isCubeFromOtherSide !== -1) {
+      if (side === 'left') {
+        calcJoinsAndBarsWhenCubesFromBothSides(newCube, numberLayer, cubeEdge, cubeSecondEdge)
+      } else {
+        calcJoinsAndBarsWhenCubesFromBothSides(newCube, numberLayer, cubeSecondEdge, cubeEdge)
+      }
+    }
+    // in case the new cube has cube from left side
+    else if (isCubeFromSide !== -1) {
+      const [answear, heightRatio] = calculateCubeConnectionRatio(newCube, numberLayer, cubeEdge, side)
+      if (answear === 'equal') {
+        calclutationOfBars(2 + bar1, bar2, bar3, 2, 2, cubeSize)
+        updateJoins(0, 4, 0)
+      } else if (answear === 'equal and cube above') {
+        calclutationOfBars(2 + bar1, bar2, bar3, 2, 2, cubeSize)
+        updateJoins(2, 0, 2)
+      } else if (answear === 'higher') {
+        calclutationOfBars(3 + bar1, bar2, bar3, 2, 2, cubeSize, heightRatio)
+        updateJoins(2, 4, 0)
+      } else {
+        const [heightBar1, heightBar2, heightBar3] = calcBarsWhenNewCubeIsLower(heightRatio)
+        calclutationOfBars(3 + bar1 + heightBar1, bar2 + heightBar2, bar3 + heightBar3, 2, 2, cubeSize)
+        updateJoins(2, 4, 0)
+      }
+    }
+    // in case there is a cube from left side in the layer bellow and no cube from the right
+    else if (isCubeFromSideBellow !== -1 && isCubeFromOtherSide === -1) {
+      calclutationOfBars(3 + bar1, bar2, bar3, 4, 2, cubeSize)
+      updateJoins(4, 0, 2)
+    }
+    // in case there is a cube from right side and no cube from the left in the layer bellow
+    else if (isCubeFromSideBellow === -1 && isCubeFromOtherSide !== -1) {
+      const [answear, heightRatio] = calculateCubeConnectionRatio(newCube, numberLayer, cubeSecondEdge, oppositeSide)
+      if (answear === 'equal') {
+        calclutationOfBars(1, 0, 0, 2, 2, cubeSize)
+        updateJoins(-2, 4, 0)
+      } else if (answear === 'equal and cube above') {
+        calclutationOfBars(1, 0, 0, 2, 2, cubeSize)
+        updateJoins(0, 0, 2)
+      } else if (answear === 'higher') {
+        calclutationOfBars(2, 0, 0, 2, 2, cubeSize, heightRatio)
+        updateJoins(0, 4, 0)
+      } else {
+        const [heightBar1, heightBar2, heightBar3] = calcBarsWhenNewCubeIsLower(heightRatio)
+        calclutationOfBars(2 + heightBar1, heightBar2, heightBar3, 2, 2, cubeSize)
+        updateJoins(0, 4, 0)
+      }
+    }
+    // in case there is a cube from right side and also a cube from left side in the layer bellow
+    else if (isCubeFromSideBellow !== -1 && isCubeFromOtherSide !== -1) {
+      const [answear, heightRatio] = calculateCubeConnectionRatio(newCube, numberLayer, cubeSecondEdge, oppositeSide)
+      if (answear === 'equal') {
+        calclutationOfBars(1, 0, 0, 2, 2, cubeSize)
+        updateJoins(0, 0, 2)
+      } else if (answear === 'equal and cube above') {
+        calclutationOfBars(1, 0, 0, 2, 2, cubeSize)
+        updateJoins(2, -4, 4)
+      } else if (answear === 'higher') {
+        calclutationOfBars(2, 0, 0, 2, 2, cubeSize, heightRatio)
+        updateJoins(2, 0, 2)
+      } else {
+        const [heightBar1, heightBar2, heightBar3] = calcBarsWhenNewCubeIsLower(heightRatio)
+        calclutationOfBars(2 + heightBar1, heightBar2, heightBar3, 2, 2, cubeSize)
+        updateJoins(2, 0, 2)
+      }
+    }
+    // in case no cube from left in the layer bellow and no cube from right
+    else {
+      calclutationOfBars(2 + bar1, bar2, bar3, 4, 2, cubeSize)
+      updateJoins(2, 4, 0)
+    }
+    return
+  }
+  const calcJoinsAndBarsWhenCubesFromBothSides = (newCube, numberLayer, leftEdge, rightEdge) => {
+    const cubeSize = newCube.size
+    const [leftAnswear, leftHeightRatio] = calculateCubeConnectionRatio(newCube, numberLayer, leftEdge, 'left')
+    const [rightAnswear, rightHeightRatio] = calculateCubeConnectionRatio(newCube, numberLayer, rightEdge, 'right')
+    const combinedValue = `${leftAnswear}-${rightAnswear}`
+    console.log(combinedValue)
+    let leftBar1 = 0
+    let leftBar2 = 0
+    let leftBar3 = 0
+    let rightBar1 = 0
+    let rightBar2 = 0
+    let rightBar3 = 0
+    if (leftAnswear === 'lower') {
+      const bars = calcBarsWhenNewCubeIsLower(leftHeightRatio)
+      leftBar1 = bars[0]
+      leftBar2 = bars[1]
+      leftBar3 = bars[2]
+    }
+    if (rightAnswear === 'lower') {
+      const bars = calcBarsWhenNewCubeIsLower(rightHeightRatio)
+      rightBar1 = bars[0]
+      rightBar2 = bars[1]
+      rightBar3 = bars[2]
+    }
+    switch (combinedValue) {
+      case 'equal-equal':
+        console.log('omer')
+        calclutationOfBars(0, 0, 0, 0, 2, cubeSize)
+        updateJoins(-4, 4, 0)
+        return
+      case 'equal-equal and cube above':
+        calclutationOfBars(0, 0, 0, 0, 2, cubeSize)
+        updateJoins(-2, 0, 2)
+        return
+      case 'equal-lower':
+        calclutationOfBars(1 + rightBar1, rightBar2, rightBar3, 0, 2, cubeSize)
+        updateJoins(-2, 4, 0)
+        return
+      case 'equal-higher':
+        calclutationOfBars(1, 0, 0, 0, 2, cubeSize, rightHeightRatio)
+        updateJoins(-4, 4, 0)
+        return
+      case 'equal and cube above-equal':
+        calclutationOfBars(0, 0, 0, 0, 2, cubeSize)
+        updateJoins(-2, 0, 2)
+        return
+      case 'equal and cube above-equal and cube above':
+        calclutationOfBars(0, 0, 0, 0, 2, cubeSize)
+        updateJoins(0, -4, 4)
+        return
+      case 'equal and cube above-lower':
+        calclutationOfBars(1 + rightBar1, rightBar2, rightBar3, 0, 2, cubeSize)
+        updateJoins(0, 0, 2)
+        return
+      case 'equal and cube above-higher':
+        calclutationOfBars(1, 0, 0, 0, 2, cubeSize, rightHeightRatio)
+        updateJoins(0, 0, 2)
+        return
+      case 'lower-equal':
+        // console.log('whattt')
+        calclutationOfBars(1 + leftBar1, leftBar2, leftBar3, 0, 2, cubeSize)
+        updateJoins(-2, 4, 0)
+        return
+      case 'lower-equal and cube above':
+        calclutationOfBars(1 + leftBar1, leftBar2, leftBar3, 0, 2, cubeSize)
+        updateJoins(0, 0, 2)
+        return
+      case 'lower-lower':
+        calclutationOfBars(2 + leftBar1, leftBar2, leftBar3, 0, 2, cubeSize)
+        calclutationOfBars(rightBar1, rightBar2, rightBar3, 0, 0, cubeSize)
+        updateJoins(0, 4, 0)
+        return
+      case 'lower-higher':
+        calclutationOfBars(1 + leftBar1, leftBar2, leftBar3, 0, 2, cubeSize, rightHeightRatio)
+        calcBarsWhenNewCubeIsLower(leftHeightRatio)
+        updateJoins(0, 4, 0)
+        return
+      case 'higher-equal':
+        calclutationOfBars(1, 0, 0, 0, 2, cubeSize, leftHeightRatio)
+        updateJoins(-2, 4, 0)
+        return
+      case 'higher-equal and cube above':
+        calclutationOfBars(1, 0, 0, 0, 2, cubeSize, leftHeightRatio)
+        updateJoins(0, 0, 2)
+        return
+      case 'higher-lower':
+        calclutationOfBars(1 + rightBar1, rightBar2, rightBar3, 0, 2, cubeSize, leftHeightRatio)
+        updateJoins(0, 4, 0)
+        return
+      case 'higher-higher':
+        calclutationOfBars(1, 0, 0, 0, 2, cubeSize, leftHeightRatio)
+        calclutationOfBars(1, 0, 0, 0, 0, cubeSize, rightHeightRatio)
+        updateJoins(0, 4, 0)
+        return
+    }
+  }
   const calcJoinsTopConnection = (newCube, numberLayer) => {
-    console.log('new cube is :', newCube)
-    console.log('layer bellow is:', numberLayer)
     const cubeSize = newCube.size
     const leftEdge = newCube.position[0] - newCube.size[0] / 2
     const rightEdge = newCube.position[0] + newCube.size[0] / 2
@@ -472,9 +693,46 @@ export default function ClosetDesign() {
     let isCubeFromLeftSideBellow = findCube(numberLayer, leftEdge, 'right') // flag responsible for checking if the there ia cube from the left to edge of the cube layer bellow
     let isCubeFromRightSide = findCube(numberLayer + 1, rightEdge, 'left') // flag responsible for checking if the there ia cube from the right to edge of the new cube
     let isCubeFromLeftSide = findCube(numberLayer + 1, leftEdge, 'right') // flag responsible for checking if the there ia cube from the left to edge of the mew cube
+    let isCubeWithEqualLeftEdgeLayerBellow = findCube(numberLayer, leftEdge, 'left')
+    let isCubeWithEqualRightEdgeLayerBellow = findCube(numberLayer, rightEdge, 'right')
     // in case no cubes from the left and right
     console.log('index of cube from right side layer bellow:', isCubeFromRightSideBellow)
     console.log('index of cube from left side layer bellow:', isCubeFromLeftSideBellow)
+    if (isCubeWithEqualRightEdgeLayerBellow !== -1 && isCubeWithEqualLeftEdgeLayerBellow === -1) {
+      console.log('rightomer')
+      calcJoinsAndBarsWhenCubeHorizontalEdgeShorter(
+        'right',
+        'left',
+        numberLayer,
+        isCubeWithEqualRightEdgeLayerBellow,
+        rightEdge,
+        isCubeFromRightSide,
+        isCubeFromRightSideBellow,
+        isCubeFromLeftSide,
+        cubeSize,
+        newCube,
+        leftEdge
+      )
+      return
+    }
+    // in case the new cube match to left edge of some cube in the layer bellow but doesnt match to right edge of all of the cubes
+    if (isCubeWithEqualLeftEdgeLayerBellow !== -1 && isCubeWithEqualRightEdgeLayerBellow === -1) {
+      console.log('leftomer')
+      calcJoinsAndBarsWhenCubeHorizontalEdgeShorter(
+        'left',
+        'right',
+        numberLayer,
+        isCubeWithEqualLeftEdgeLayerBellow,
+        leftEdge,
+        isCubeFromLeftSide,
+        isCubeFromLeftSideBellow,
+        isCubeFromRightSide,
+        cubeSize,
+        newCube,
+        rightEdge
+      )
+      return
+    }
     if (isCubeFromLeftSideBellow === -1 && isCubeFromRightSideBellow === -1) {
       calclutationOfBars(2, 0, 0, 4, 2, cubeSize)
       updateJoins(0, 4, 0)
@@ -484,96 +742,8 @@ export default function ClosetDesign() {
     else if (isCubeFromLeftSideBellow !== -1 && isCubeFromRightSideBellow !== -1) {
       // in case there are cube from right and left edges of the new cube
       if (isCubeFromLeftSide !== -1 && isCubeFromRightSide !== -1) {
-        const [leftAnswear, leftHeightRatio] = calculateCubeConnectionRatio(newCube, numberLayer, leftEdge, 'left')
-        const [rightAnswear, rightHeightRatio] = calculateCubeConnectionRatio(newCube, numberLayer, rightEdge, 'right')
-        const combinedValue = `${leftAnswear}-${rightAnswear}`
-        let leftBar1 = 0
-        let leftBar2 = 0
-        let leftBar3 = 0
-        let rightBar1 = 0
-        let rightBar2 = 0
-        let rightBar3 = 0
-        if (leftAnswear === 'lower') {
-          const bars = calcBarsWhenNewCubeIsLower(leftHeightRatio)
-          leftBar1 = bars[0]
-          leftBar2 = bars[1]
-          leftBar3 = bars[2]
-        }
-        if (rightAnswear === 'lower') {
-          const bars = calcBarsWhenNewCubeIsLower(rightHeightRatio)
-          rightBar1 = bars[0]
-          rightBar2 = bars[1]
-          rightBar3 = bars[2]
-        }
-        switch (combinedValue) {
-          case 'equal-equal':
-            calclutationOfBars(0, 0, 0, 0, 2, cubeSize)
-            updateJoins(-4, 4, 0)
-            return
-          case 'equal-equal and cube above':
-            calclutationOfBars(0, 0, 0, 0, 2, cubeSize)
-            updateJoins(-2, 0, 2)
-            return
-          case 'equal-lower':
-            calclutationOfBars(1 + rightBar1, rightBar2, rightBar3, 0, 2, cubeSize)
-            updateJoins(-2, 4, 0)
-            return
-          case 'equal-higher':
-            calclutationOfBars(1, 0, 0, 0, 2, cubeSize, rightHeightRatio)
-            updateJoins(-4, 4, 0)
-            return
-          case 'equal and cube above-equal':
-            calclutationOfBars(0, 0, 0, 0, 2, cubeSize)
-            updateJoins(-2, 0, 2)
-            return
-          case 'equal and cube above-equal and cube above':
-            calclutationOfBars(0, 0, 0, 0, 2, cubeSize)
-            updateJoins(0, -4, 4)
-            return
-          case 'equal and cube above-lower':
-            calclutationOfBars(1 + rightBar1, rightBar2, rightBar3, 0, 2, cubeSize)
-            updateJoins(0, 0, 2)
-            return
-          case 'equal and cube above-higher':
-            calclutationOfBars(1, 0, 0, 0, 2, cubeSize, rightHeightRatio)
-            updateJoins(0, 0, 2)
-            return
-          case 'lower-equal':
-            calclutationOfBars(1 + leftBar1, leftBar2, leftBar3, 0, 2, cubeSize)
-            updateJoins(-2, 4, 0)
-            return
-          case 'lower-equal and cube above':
-            calclutationOfBars(1 + leftBar1, leftBar2, leftBar3, 0, 2, cubeSize)
-            updateJoins(0, 0, 2)
-            return
-          case 'lower-lower':
-            calclutationOfBars(2 + leftBar1, leftBar2, leftBar3, 0, 2, cubeSize)
-            calclutationOfBars(rightBar1, rightBar2, rightBar3, 0, 0, cubeSize)
-            updateJoins(0, 4, 0)
-            return
-          case 'lower-higher':
-            calclutationOfBars(1 + leftBar1, leftBar2, leftBar3, 0, 2, cubeSize, rightHeightRatio)
-            calcBarsWhenNewCubeIsLower(leftHeightRatio)
-            updateJoins(0, 4, 0)
-            return
-          case 'higher-equal':
-            calclutationOfBars(1, 0, 0, 0, 2, cubeSize, leftHeightRatio)
-            updateJoins(-2, 4, 0)
-            return
-          case 'higher-equal and cube above':
-            calclutationOfBars(1, 0, 0, 0, 2, cubeSize, leftHeightRatio)
-            updateJoins(0, 0, 2)
-            return
-          case 'higher-lower':
-            calclutationOfBars(1 + rightBar1, rightBar2, rightBar3, 0, 2, cubeSize, leftHeightRatio)
-            updateJoins(0, 4, 0)
-            return
-          case 'higher-higher':
-            calclutationOfBars(1, 0, 0, 0, 2, cubeSize, leftHeightRatio)
-            calclutationOfBars(1, 0, 0, 0, 0, cubeSize, rightHeightRatio)
-            updateJoins(0, 4, 0)
-            return
-        }
+        calcJoinsAndBarsWhenCubesFromBothSides(newCube, numberLayer, leftEdge, rightEdge)
+        return
       }
       // in case there is a cube from left edge and not from right edge of the new cube
       else if (isCubeFromLeftSide !== -1 && isCubeFromRightSide === -1) {
@@ -711,12 +881,10 @@ export default function ClosetDesign() {
     return start // the position that needs to place the new cube
   }
   const calcOffsetWhenIsTopConnection = (layer, buttomLayer, cubeSize, xPosition) => {
-    console.log('buttom layer', buttomLayer)
-    console.log('layer', layer)
     const offset = [0, layer * globalOffset]
     // try find cube in the layer bellow with the same right edge as the new cube
     const indexOFButoomCubeFromRight = findCube(buttomLayer, xPosition + cubeSize[0] / 2, 'right')
-    console.log('indexx right = : ', indexOFButoomCubeFromRight)
+
     // in case there is a cube bellow with the same right edge calc the offset of the new cube acording to the bellow cube
     if (indexOFButoomCubeFromRight !== -1) {
       const buttomRightCubeOffset = cubes[buttomLayer][indexOFButoomCubeFromRight].offset[0]
@@ -786,10 +954,7 @@ export default function ClosetDesign() {
         }
 
         if (containsButtomCube && !isOverRide) {
-          console.log('top')
-          console.log('x:', x)
           const offset = calcOffsetWhenIsTopConnection(layer, buttomLayer, cubeSize, x)
-
           let i
           for (i = 0; i < cubeSize[1]; i++) {
             const indexToInsert = findCubeRoom(`${layer + i}`, x)
@@ -935,7 +1100,7 @@ export default function ClosetDesign() {
             console.log('right')
             lastActions.push({
               type: 'cube',
-              layer: 0,
+              layer: layer,
               position: [rightEdge + cubeSize[0] / 2, layer + positionToAddYAxis],
               size: cubeSize,
             })
@@ -1044,6 +1209,7 @@ export default function ClosetDesign() {
     setIsMenu(true)
   }
   const removeLastAction = () => {
+    console.log(lastActions)
     if (lastActions.length === 0) {
       return
     }
@@ -1055,6 +1221,7 @@ export default function ClosetDesign() {
       setMessage({ messageType: 'success', title: 'המדף הוסר בהצלחה', content: '', arrow: false, topPosition: '20%', leftPosition: '50%' })
       return
     } else {
+      console.log(lastAction)
       const xPosition = lastAction.position[0]
       for (let i = lastAction.layer; i < lastAction.size[1] + lastAction.layer; i++) {
         const filteredArray = cubes[i].filter((cube) => {
