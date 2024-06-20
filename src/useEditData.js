@@ -12,7 +12,7 @@ const style = {
   boxShadow: 24,
   p: 4,
 }
-export default function useEditData(url, setData, data) {
+export default function useEditData(url, setData, data, objKey) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
   const [attributeName, setAttributeName] = useState('')
@@ -62,15 +62,31 @@ export default function useEditData(url, setData, data) {
                 })
                 const result = await response.json()
                 console.log(result)
-                setData(
-                  data.map((item) => {
-                    if (item.id === id) {
-                      return result
-                    } else {
-                      return item
+
+                if (data instanceof Array) {
+                  setData(
+                    data.map((item) => {
+                      if (item.id === id) {
+                        return result
+                      } else {
+                        return item
+                      }
+                    })
+                  )
+                } else {
+                  setData((prev) => {
+                    return {
+                      ...prev,
+                      [objKey]: prev[objKey].map((item) => {
+                        if (item.id === id) {
+                          return result
+                        } else {
+                          return item
+                        }
+                      }),
                     }
                   })
-                )
+                }
                 setName('')
               }}
             >

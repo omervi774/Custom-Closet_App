@@ -8,15 +8,17 @@ import json
 import re
 import os
 
+import logging
 # Connect to openAI API
 load_dotenv()
 api_key = os.getenv('OPENAI_API_KEY')
 if api_key is None:
     raise ValueError("OpenAI API key not found in environment variables.")
 client = OpenAI(api_key=api_key)
-
+# app = Flask(__name__, static_folder='../../CUSTOM-CLOSET-APP/public')
 app = Flask(__name__)
 CORS(app)
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
 # Use the path to your service account JSON file
 cred = credentials.Certificate(".\custom-closet-app-firebase-adminsdk-tetxw-78acf01b55.json")
@@ -24,6 +26,81 @@ firebase_admin.initialize_app(cred)
 
 # Get a Firestore client
 db = firestore.client()
+
+
+# Configure upload folder
+UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+
+# Setup logging
+logging.basicConfig(level=logging.DEBUG)
+
+@app.post('/upload_img')
+def upload_file():
+    logging.debug("Received file upload request")
+    if 'file' not in request.files:
+        return jsonify({'msg': 'No file part'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'msg': 'No selected file'}), 400
+    if file:
+        filename = file.filename
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        logging.debug(f"Saving file to {file_path}")
+        file.save(file_path)
+        collection_ref = db.collection("uploads")
+        doc_ref = collection_ref.add({
+            'path': f'/static/uploads/{filename}'
+        })
+        
+        return jsonify({'msg': 'File uploaded!', 'file': f'http://localhost:5000//static/uploads/{filename}', 'id': doc_ref[1].id}), 200
+
+
+
+@app.get('/uploads')
+def test_get_images():
+    logging.debug("Received request for test image list")
+    try:
+        images_ref = db.collection('uploads')
+        docs = images_ref.stream()
+        data = [{"id": doc.id, **doc.to_dict()} for doc in docs]
+        # print(data)
+        server_route = 'http://localhost:5000'
+        updated_data =[]
+        for item in data:
+            if 'price' in item:
+                updated_data.append({"path": f'{server_route}{item["path"]}',"id":item['id'],"price":item['price']})
+            else:
+                updated_data.append({"path": f'{server_route}{item["path"]}',"id":item['id']})
+        return jsonify({"data": updated_data})
+        
+    except Exception as e:
+        logging.error(f"Error fetching images: {e}")
+        return jsonify({'msg': 'Error fetching images'}), 500
+
+
+
+
+
+@app.put("/uploads/<document_id>")
+def update_price(document_id):
+    data = request.json
+    collection_ref = db.collection("uploads")
+    document_ref = collection_ref.document(document_id)
+    document_ref.update(data)
+    print(document_ref.get().id)
+    print(document_ref.get()._data)
+    path = f'http://localhost:5000{document_ref.get()._data["path"]}'
+    price = document_ref.get()._data["price"]
+    print(path)
+    return jsonify({"id": document_ref.get().id,"path":path,"price":price}),200        
+
+# @app.route('/uploads/<filename>')
+# def uploaded_file(filename):
+#     logging.debug(f"Received request for file {filename}")
+#     return send_from_directory(app.config['UPLOAD_FOLDER'], filename) 
 
 @app.route("/")
 
@@ -85,9 +162,21 @@ def delete_order(document_id):
 
 @app.route("/homePage")
 def get_home_page_data():
-    collection_ref = db.collection("homePage")
-    docs = collection_ref.stream()
-    data = [{"id": doc.id, **doc.to_dict()} for doc in docs]
+    home_page_ref = db.collection("homePage")
+    home_page_docs = home_page_ref.stream()
+    img_ref = db.collection("uploads")
+    img_docs = list(img_ref.stream())
+    img_data = [{"id": doc.id, **doc.to_dict()} for doc in img_docs]
+    data = {}
+    data['text_content'] = [{"id": doc.id, **doc.to_dict()} for doc in home_page_docs]
+    data['images'] = []
+    server_route = 'http://localhost:5000'    
+    for item in img_data:
+        if 'price' in item:
+            data['images'].append({"path": f'{server_route}{item["path"]}',"id":item['id'],"price":item['price']})
+        else:
+            data['images'].append({"path": f'{server_route}{item["path"]}',"id":item['id']})
+    
     return jsonify({"data": data})
 
 @app.put("/homePage/<document_id>")
@@ -198,7 +287,23 @@ def chat():
             print(f"Error: {e}")
             return None
 
-    # TODO - Check to see if the model can be replaced with the latest version (gpt-4o)
+    def handle_offset_adding(cubes:dict):
+        collection_of_layer_0 = cubes[0]
+        # the last element of the first layer has the largest right edge
+        last_element_layer_0 = collection_of_layer_0[-1]
+        # acording to the larget edge calculate the rest of the cubes offsets in the x axis
+        largest_right_edge = last_element_layer_0['position'][0] + last_element_layer_0['size'][0] /2
+        global_offset = 0.04
+
+        for layer, elements in cubes.items():
+            for cube in elements:
+                cube_right_edge = cube['position'][0] + cube['size'][0] /2
+                x_offset_value = (largest_right_edge - cube_right_edge) * global_offset
+                y_offset_value = int(layer) * global_offset
+                # Add the offset attribute
+                cube['offset'] = [x_offset_value, y_offset_value]
+                cube['display'] = True
+        return cubes
 
     chat = client.chat.completions.create(
         model="gpt-4", messages=messages
@@ -209,6 +314,7 @@ def chat():
     # Check if the initial response is creative
     initial_design = None
     try:
+        initial_design = json.loads(re.search(r'\{.*?\}', reply, re.DOTALL).group())
         initial_design = json.loads(reply.replace("'", '"').replace("```python", "").replace("```", "")) # Leave only the dictionary
     except json.JSONDecodeError:
         pass
@@ -235,9 +341,50 @@ def chat():
         return jsonify({"text": "The response was not creative enough. Please try again."})
 
     messages.append({"role": "assistant", "content": json.dumps(corrected_reply, indent=4)})
-    return jsonify({"text": json.dumps(corrected_reply, indent=4)})
+    corrected_reply = {int(key): value for key, value in corrected_reply.items()}
+    corrected_reply = handle_offset_adding(corrected_reply)
+    print('modify keys dict : ',corrected_reply)
+    return jsonify({"text": corrected_reply})
+
+@app.post('/offset')
+def offsets():
+     
+    def handle_offset_adding(cubes:dict):
+        cubes = {int(k): v for k, v in cubes.items()}
+        collection_of_layer_0 = cubes[0]
+        # the last element of the first layer has the largest right edge
+        last_element_layer_0 = collection_of_layer_0[-1]
+        # acording to the larget edge calculate the rest of the cubes offsets in the x axis
+        largest_right_edge = last_element_layer_0['position'][0] + last_element_layer_0['size'][0] /2
+        global_offset = 0.04
+
+        for layer, elements in cubes.items():
+            for cube in elements:
+                cube_right_edge = cube['position'][0] + cube['size'][0] /2
+                x_offset_value = (largest_right_edge - cube_right_edge) * global_offset
+                y_offset_value = int(layer) * global_offset
+                # Add the offset attribute
+                cube['offset'] = [x_offset_value, y_offset_value]
+                cube['display'] = True
+        return cubes
+
+    cubes = {
+    0: [{'position': [-1.5, 0, 0], 'size': [1, 1],'display':True}, {'position': [0, 0], 'size': [2, 1],'display':True}],
+    1: [{'position': [-1.5, 1.5, 0], 'size': [1, 2],'display':True}, {'position': [-0.5, 1, 0], 'size': [1, 1],'display':True}],
+    2:[{'position':[-1.5, 2, 0],'size':[1,1],'display':False}],
+    3:[{'position':[-1.5, 3, 0],'size':[1,1],'display':True}]
+}
+    cubes = handle_offset_adding(cubes)
+    return jsonify({"data": cubes})
+
+
+
 
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
+
+
 
