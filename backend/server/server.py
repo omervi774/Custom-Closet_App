@@ -202,7 +202,8 @@ def chat():
                         where each key represents a layer (floor in the closet) and the value is this: the "position" key is a list of coordinates representing the position of the CENTER of the cube in that layer and the "size" key represent the width and the hight of each cube.
                         The Z coordinate is always 0! The position of the center of the first cube at key 0 must be [0, 0, 0]. The cabinets consist of "parts" in sizes 1 meters, 2 meter and 3 meters.
                         The "y_hight" value of each cube must be 1. Therfore, the "size" key will always be [x_length, 1] and the "y" value of the "position" key will always be same as the layer number.
-                        For example: Let's say the sizes the user gave us are 3 meters high and 4 meters wide, an example of a valid response is: {0: [{position: [0, 0, 0], size: [1, 1]}, {position: [1.5, 0, 0], size: [2, 1]}, {position: [3, 0, 0], size: [1, 1]}], 1: [{position: [0.5, 1, 0], size: [2, 1]}, {position: [2.5, 1, 0], size: [2, 1]}], 2: [{position: [0, 2, 0], size: [1, 1]}, {position: [1, 2, 0], size: [1, 1]}]}. This is just an example, be creative!
+                        For example: Let's say the sizes the user gave us are 3 meters high and 4 meters wide, an example of a valid response is: {0: [{position: [0, 0, 0], size: [1, 1]}, {position: [1.5, 0, 0], size: [2, 1]}, {position: [3, 0, 0], size: [1, 1]}], 1: [{position: [0.5, 1, 0], size: [2, 1]}, {position: [2.5, 1, 0], size: [2, 1]}], 2: [{position: [0, 2, 0], size: [1, 1]}, {position: [1, 2, 0], size: [1, 1]}]}. 
+                        This is another example: Let's say the sizes the user gave us are 4 meters high and 3 meters wide: {0: [{position: [0, 0, 0], size: [1, 1]}, {position: [1.5, 0, 0], size: [2, 1]}], 1: [{position: [0, 1, 0], size: [1, 1]}, {position: [1, 1, 0], size: [1, 1]}, {position: [2, 1, 0], size: [1, 1]}], 2: [{position: [0, 2, 0], size: [1, 1]}], 3: [{position: [0, 3, 0], size: [1, 1]}]}. This is just an example, be creative!
                         The example above is a valid response because the number of cells in each layer is different and the x-positions of cells are different across layers. In addition, the x-positions and the y-positions of cells are calculated correctly and the size of the cabinet is 3x4 meters.
                         The cabinet must contain at least 2 layers. Be creative but always follow the rules!
                         The calculation for the center of a new cube in x position is as following:
@@ -228,26 +229,32 @@ def chat():
                     return False  # Non-creative as x-positions match
         return True  # Design is creative
 
-    def correct_x_positions(response):
+    def extract_dictionary(response):
         try:
-            # Check if the response contains "```python"
-            if "```python" in response:
-                # Extract the JSON-like string from the response
-                match = re.search(r"```python\s*(\{.*?\})\s*```", response, re.DOTALL)
-                if not match:
-                    raise ValueError("JSON-like content not found in the response")
-                json_str = match.group(1)
-            else:
-                json_str = response
+            # Find the JSON-like dictionary in the response using regex
+            match = re.search(r"\{[\s\S]*\}", response)
+            if not match:
+                raise ValueError("Dictionary not found in the response")
+            json_str = match.group(0)
 
             # Replace single quotes with double quotes for JSON compatibility
             json_str = json_str.replace("'", '"')
-            
-            # Ensure keys are quoted correctly by using regex
-            json_str = re.sub(r'(\w+):', r'"\1":', json_str)
-            
+
+            # Ensure keys are quoted correctly
+            json_str = re.sub(r'(?<=\{|,)\s*(\w+)\s*:', r'"\1":', json_str)
+
             # Parse the JSON string into a dictionary
             data = json.loads(json_str)
+            return data
+        except Exception as e:
+            print(f"Error: {e}")
+            return None
+
+    def correct_x_positions(response):
+        try:
+            data = extract_dictionary(response)
+            if data is None:
+                return None
             
             # Iterate through each layer
             for layer_key, cells in data.items():
@@ -257,7 +264,7 @@ def chat():
                 
                 # Iterate through each cell in the layer
                 for i in range(len(cells)):
-                    if i == 0 and layer_key == 0:
+                    if i == 0 and int(layer_key) == 0:
                         # First cell's x position should be 0
                         cells[i]['position'][0] = 0
                     elif i == 0:
@@ -275,11 +282,6 @@ def chat():
                         if cells[i]['position'][0] != expected_x:
                             cells[i]['position'][0] = expected_x
             
-            # Print the modified response
-            modified_response = json.dumps(data, indent=4)
-            print("Modified response:")
-            print(modified_response)
-            
             # Return the modified data
             return data
         
@@ -287,17 +289,17 @@ def chat():
             print(f"Error: {e}")
             return None
 
-    def handle_offset_adding(cubes:dict):
+    def handle_offset_adding(cubes: dict):
         collection_of_layer_0 = cubes[0]
         # the last element of the first layer has the largest right edge
         last_element_layer_0 = collection_of_layer_0[-1]
-        # acording to the larget edge calculate the rest of the cubes offsets in the x axis
-        largest_right_edge = last_element_layer_0['position'][0] + last_element_layer_0['size'][0] /2
+        # according to the largest edge calculate the rest of the cubes offsets in the x-axis
+        largest_right_edge = last_element_layer_0['position'][0] + last_element_layer_0['size'][0] / 2
         global_offset = 0.04
 
         for layer, elements in cubes.items():
             for cube in elements:
-                cube_right_edge = cube['position'][0] + cube['size'][0] /2
+                cube_right_edge = cube['position'][0] + cube['size'][0] / 2
                 x_offset_value = (largest_right_edge - cube_right_edge) * global_offset
                 y_offset_value = int(layer) * global_offset
                 # Add the offset attribute
@@ -311,15 +313,15 @@ def chat():
     reply = chat.choices[0].message.content
     print(f"ChatGPT: {reply}")
 
-    # Check if the initial response is creative
-    initial_design = None
-    try:
-        initial_design = json.loads(re.search(r'\{.*?\}', reply, re.DOTALL).group())
-        initial_design = json.loads(reply.replace("'", '"').replace("```python", "").replace("```", "")) # Leave only the dictionary
-    except json.JSONDecodeError:
-        pass
+    # Extract and clean the response to get only the dictionary
+    cleaned_reply = extract_dictionary(reply)
+    print(f"Cleaned Reply: {cleaned_reply}")  # Added print statement
 
-    if initial_design and not is_creative_response(initial_design):
+    if cleaned_reply is None:
+        return jsonify({"text": "The response was not in a valid format."})
+
+    # Check if the initial response is creative
+    if not is_creative_response(cleaned_reply):
         messages.append({
             "role": "assistant",
             "content": "There was an issue with your response. Please ensure that the design is creative. The number of cells in each layer should not be the same and the x-positions of cells should be different across layers."
@@ -327,7 +329,7 @@ def chat():
         return jsonify({"text": "The response was not creative enough. Please try again."})
 
     # Correct the x positions
-    corrected_reply = correct_x_positions(reply)
+    corrected_reply = correct_x_positions(json.dumps(cleaned_reply))
     print(f"Corrected response: {corrected_reply}")
 
     if corrected_reply is None:
@@ -343,48 +345,11 @@ def chat():
     messages.append({"role": "assistant", "content": json.dumps(corrected_reply, indent=4)})
     corrected_reply = {int(key): value for key, value in corrected_reply.items()}
     corrected_reply = handle_offset_adding(corrected_reply)
-    print('modify keys dict : ',corrected_reply)
+    print('Modified keys dict:', corrected_reply)
     return jsonify({"text": corrected_reply})
-
-@app.post('/offset')
-def offsets():
-     
-    def handle_offset_adding(cubes:dict):
-        cubes = {int(k): v for k, v in cubes.items()}
-        collection_of_layer_0 = cubes[0]
-        # the last element of the first layer has the largest right edge
-        last_element_layer_0 = collection_of_layer_0[-1]
-        # acording to the larget edge calculate the rest of the cubes offsets in the x axis
-        largest_right_edge = last_element_layer_0['position'][0] + last_element_layer_0['size'][0] /2
-        global_offset = 0.04
-
-        for layer, elements in cubes.items():
-            for cube in elements:
-                cube_right_edge = cube['position'][0] + cube['size'][0] /2
-                x_offset_value = (largest_right_edge - cube_right_edge) * global_offset
-                y_offset_value = int(layer) * global_offset
-                # Add the offset attribute
-                cube['offset'] = [x_offset_value, y_offset_value]
-                cube['display'] = True
-        return cubes
-
-    cubes = {
-    0: [{'position': [-1.5, 0, 0], 'size': [1, 1],'display':True}, {'position': [0, 0], 'size': [2, 1],'display':True}],
-    1: [{'position': [-1.5, 1.5, 0], 'size': [1, 2],'display':True}, {'position': [-0.5, 1, 0], 'size': [1, 1],'display':True}],
-    2:[{'position':[-1.5, 2, 0],'size':[1,1],'display':False}],
-    3:[{'position':[-1.5, 3, 0],'size':[1,1],'display':True}]
-}
-    cubes = handle_offset_adding(cubes)
-    return jsonify({"data": cubes})
-
-
-
-
 
 if __name__ == "__main__":
     app.run(debug=True)
 
 
-
-
-
+#TODO - Check the offset in the upper layers in the closet

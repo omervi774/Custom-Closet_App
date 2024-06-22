@@ -14,6 +14,7 @@ import Undo from '../components/Undo/Undo'
 import FileUpload from '../components/FileUpload/FileUpload'
 import { calculateJoins4Exists, calculateJoins3Exists, calculateJoins5Exists } from '../calculateJoins.js'
 import { useLocation } from 'react-router-dom'
+import emailjs from '@emailjs/browser'
 
 const globalOffset = 0.04
 const lastActions = []
@@ -752,6 +753,41 @@ export default function ClosetDesign() {
                 calculateJoins5Exists(cubes)
                 calculateJoins3Exists(cubes)
                 setShelfs([])
+
+                // TODO - Need to check how to use the .env file!
+
+                // require('dotenv').config()
+                // console.log(process.env) // remove this after you've confirmed it is working
+
+                // const serviceID = process.env.SERVICE_ID
+                // const templateID = process.env.TEMPLATE_ID
+                // const publicID = process.env.PUBLIC_KEY
+
+                // if (!serviceID) {
+                //   throw new Error('serviceID key not found in environment variables.')
+                // }
+                // if (!templateID) {
+                //   throw new Error('templateID key not found in environment variables.')
+                // }
+                // if (!publicID) {
+                //   throw new Error('publicID key not found in environment variables.')
+                // }
+
+                // Check if needed
+                const templateParams = {
+                  name: 'אורח',
+                }
+
+                // TODO - Need to check how to use the .env file!
+
+                emailjs.send('service_owb0ixg', 'template_ccyiflc', templateParams, 'N6AHBrG2D358AbCVW').then(
+                  (response) => {
+                    console.log('SUCCESS!', response.status, response.text)
+                  },
+                  (error) => {
+                    console.log('FAILED...', error)
+                  }
+                )
               }}
             >
               הזמן

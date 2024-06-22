@@ -77,6 +77,10 @@ function Ai(props) {
     ])
   }
 
+  // const createMessage = (userInput) => {
+  //   return `please give me another design following the exact rules. User input: ${userInput}`
+  // }
+
   return (
     <>
       {cubes[0].length === 0 ? (
@@ -210,13 +214,19 @@ function Ai(props) {
             variant="contained"
             sx={{ position: 'absolute', top: '70%', left: '55%' }}
             onClick={async () => {
+              const message = `please give me another design following the exact rules. User input: ${userInput}`
+              console.log(message) // Print the message to the console
+
+              // TODO: Need to fix the issue with the "userInput" not send to the server
+
               const response = await fetch('http://localhost:5000/ai', {
                 method: 'POST',
-                body: JSON.stringify({ text: 'please give me another design following the exact rules' }),
+                body: JSON.stringify({ text: message }),
                 headers: {
                   'Content-Type': 'application/json',
                 },
               })
+
               if (!response.ok) {
                 throw new Error('Network response was not ok')
               }
@@ -236,3 +246,5 @@ function Ai(props) {
 }
 
 export default Ai
+
+// TODO: Need to fix the issue with the "userInput" not send to the server
