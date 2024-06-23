@@ -12,7 +12,7 @@ import ModalMessage from '../components/ModalMessage/ModalMessage'
 import Modal from '../components/Modal'
 import Undo from '../components/Undo/Undo'
 import FileUpload from '../components/FileUpload/FileUpload'
-import { calculateJoins4Exists, calculateJoins3Exists, calculateJoins5Exists } from '../calculateJoins.js'
+import { calculateJoins4Exists, calculateJoins3Exists, calculateJoins5Exists, calculateBars } from '../calculateJoins.js'
 import { useLocation } from 'react-router-dom'
 import emailjs from '@emailjs/browser'
 
@@ -752,6 +752,7 @@ export default function ClosetDesign() {
                 calculateJoins4Exists(cubes)
                 calculateJoins5Exists(cubes)
                 calculateJoins3Exists(cubes)
+                calculateBars(cubes)
                 setShelfs([])
 
                 // TODO - Need to check how to use the .env file!

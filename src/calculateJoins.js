@@ -63,6 +63,143 @@ const heightRatio = (testedCube, CubeFromItsSide, numerLayer, cubes) => {
     }
   }
 }
+// check if the new cube and the cube from its left/right top edge is equal and also if there is a cube above
+const topEdgeComparation = (cubeForCompare, newCube, layer, side, cubes) => {
+  const cubeForCompareTopEdge = cubeForCompare.position[1] + cubeForCompare.size[1] / 2
+  const newCubeTopEdge = newCube.position[1] + newCube.size[1] / 2
+  const rightEdge = newCube.position[0] + newCube.size[0] / 2
+  const leftEdge = newCube.position[0] - newCube.size[0] / 2
+  // the new cube top edge is equal to the cube for compare
+  if (newCubeTopEdge === cubeForCompareTopEdge) {
+    let index
+    if (side === 'left') {
+      index = findCube(layer + 1, leftEdge, 'right', cubes)
+    } else {
+      index = findCube(layer + 1, rightEdge, 'left', cubes)
+    }
+    // there is no cube above cube for compare
+    if (index === -1) {
+      console.log('the cubes top edge is equal with no cube above ')
+      return 'equal'
+    }
+    // in case cube for compare display is equal false there is 2 options:
+    // 1. if the cube above displation is false as well -> the cube edge higher than the new one
+    // 2. if the cube above displation is true the cubes edges is equal and there is a cube above
+    if (cubeForCompare.display === false) {
+      if (cubes[layer + 1][index].display === false) {
+        console.log(`there is a cube ${side} to new cube with higher edge `)
+        return 'lower'
+      } else if (cubes[layer + 1][index].display === true) {
+        console.log('the cubes top edge is equal with also a cube above ')
+        return 'equal and cube above'
+      }
+    }
+    // in case cube to compare edge is the same as new cube and also index is differ from -1
+    else {
+      console.log('the cubes top edge is equal with also a cube above ')
+      return 'equal and cube above'
+    }
+  }
+  // in case the top edges are different the new cube top edge must be lower
+  else {
+    console.log(`there is a cube ${side} to new cube with higher edge `)
+    return 'lower'
+  }
+}
+// when the new cube connecting from top has a cube from one of the sides:
+// calculate the ratio between the cubes (same height with another cube on top,same height,higher,lower)
+const calculateCubeConnectionRatio = (newCube, numberLayer, edge, side, cubes) => {
+  const oppositeSide = side === 'left' ? 'right' : 'left'
+  const indexOfTopCube = findCube(numberLayer + newCube.size[1], edge, oppositeSide, cubes)
+  // in case there is a cube that its top edge match to new cube top edge and also the cube is next to new cube from left
+  if (indexOfTopCube !== -1) {
+    const cubeForCompare = cubes[numberLayer + newCube.size[1]][indexOfTopCube]
+    return topEdgeComparation(cubeForCompare, newCube, numberLayer + newCube.size[1], side, cubes)
+  }
+  // in case there is a cube next to new cube side but its top edge is smaller than new cube top edge
+  else {
+    return 'higher'
+  }
+}
+export const calculateBars = (cubes) => {
+  let bars = 0
+  Object.keys(cubes).forEach((layer) => {
+    const numberLayer = Number(layer)
+    const cubeLayerCollection = cubes[layer]
+    for (let i = 0; i < cubeLayerCollection.length; i++) {
+      let count = 0
+      const testedCube = cubeLayerCollection[i]
+      if (testedCube.display) {
+        const cubeHeight = testedCube.size[1]
+        const cubeWidth = testedCube.size[0]
+        const cubeLeftEdge = testedCube.position[0] - testedCube.size[0] / 2
+        const cubeRightEdge = testedCube.position[0] + testedCube.size[0] / 2
+        const isLayer0 = numberLayer === 0
+
+        count += 2 * cubeHeight + 1 // add the bars  of the related to the right side of the cube
+        count += 2 * cubeWidth // add the bars related to the cube width
+        if (!isLayer0) {
+          const isShorterFromRight = findCube(numberLayer - 1, cubeRightEdge, 'right', cubes)
+          if (isShorterFromRight === -1) {
+            count += 1
+          }
+        }
+        // in case it is layer 0 add the bars related to the buttom of the cube
+        if (isLayer0) {
+          count += 2 * cubeWidth + 1
+        }
+        // in case its the first cube in the layer add the the left bars (cube height)
+        if (i === 0) {
+          count += 2 * cubeHeight + 1
+          // in case it is layer 0 add the bar related to the buttom cube
+          // or it the first cube in the layer and it is also short from left add 1 bar related to the buttom of the cube
+          if (isLayer0 || findCube(numberLayer - 1, cubeLeftEdge, 'left', cubes) === -1) {
+            count += 1
+          }
+        }
+        // in case it is not the first cube in the layer
+        // 1) check if ther is cube from the left and acording to the height ratio add the bars from left
+        // 2) if there is no cube from the left add the full height of the cube similler when i is 0
+        else {
+          const possibleCubeFromLeft = cubeLayerCollection[i - 1]
+          const rightEdge = possibleCubeFromLeft.position[0] + possibleCubeFromLeft.size[0] / 2
+          // in case there is a cube from the left
+          if (cubeLeftEdge === rightEdge) {
+            const answear = calculateCubeConnectionRatio(testedCube, numberLayer - 1, cubeLeftEdge, 'left', cubes)
+            // if the cube is lower add 1 bar
+            if (answear === 'lower') {
+              count += 1
+            }
+            // if the tested cube is higher than the one from the left add the extra bars acording to the height differences
+            else if (answear === 'higher') {
+              count += 1
+              const index = findCube(numberLayer + 1, cubeLeftEdge, 'right', cubes)
+              if (index !== -1 || cubeHeight === 2) {
+                count += 2
+              } else {
+                count += 4
+              }
+            }
+          }
+          // in case no cube from the left
+          else {
+            count += 2 * cubeHeight + 1
+            // in case it is no layer 0 and the cube is shorter from left and also has no no cube from its left
+            if (!isLayer0) {
+              const isShorterFromLeft = findCube(numberLayer - 1, cubeLeftEdge, 'left', cubes)
+              if (isShorterFromLeft === -1) {
+                count += 1
+              }
+            }
+          }
+        }
+        bars += count
+        console.log(count, testedCube)
+      }
+    }
+  })
+  console.log('after finishing calc the used bars : ', bars)
+}
 export const calculateJoins5Exists = (cubes) => {
   let join5Exists = 0
   Object.keys(cubes).forEach((layer) => {
