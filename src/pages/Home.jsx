@@ -13,16 +13,6 @@ function Home() {
       return { ...prev, ['images']: [...prev['images'], file] }
     })
   }
-  // const updateContent = (updatedList) => {
-  //   setData((prev) => {
-  //     return { ...prev, ['text_content']: updatedList }
-  //   })
-  // }
-  // const updateimages = (updatedList) => {
-  //   setData((prev) => {
-  //     return { ...prev, ['images']: updatedList }
-  //   })
-  // }
   const [jsx, handleOpen] = useEditData('http://localhost:5000/homePage', setData, data, 'text_content')
   const [jsx1, handleOpen1] = useEditData('http://localhost:5000/uploads', setData, data, 'images')
   const user = useUser()
@@ -133,19 +123,41 @@ function Home() {
                 {data['images'] &&
                   data['images'].map((img, index) => {
                     return (
-                      <div style={{ margin: '10px' }} key={index}>
+                      <div style={{ margin: '20px', display: 'flex', flexDirection: 'column' }} key={index}>
                         <img src={img.path} alt="Placeholder" style={{ maxWidth: '200px', maxHeight: '200px', borderRadius: '5px' }} />
-                        {img.price && <h4>{img.price} : מחיר</h4>}
+                        {img.price && <h4 style={{ marginBottom: '20px' }}>{img.price} : מחיר</h4>}
                         {user ? (
-                          img.price ? (
-                            <Button variant="contained" onClick={() => handleOpen1(img.id, 'price')}>
-                              ערוך מחיר
+                          <>
+                            {img.price ? (
+                              <Button variant="contained" sx={{ marginBottom: '20px' }} onClick={() => handleOpen1(img.id, 'price')}>
+                                ערוך מחיר
+                              </Button>
+                            ) : (
+                              <Button Button variant="contained" sx={{ marginBottom: '20px' }} onClick={() => handleOpen1(img.id, 'price')}>
+                                קבע מחיר
+                              </Button>
+                            )}
+                            <Button
+                              variant="contained"
+                              color="error"
+                              onClick={async () => {
+                                await fetch(`http://localhost:5000/uploads/${img.id}`, {
+                                  method: 'DELETE',
+                                  headers: { 'Content-Type': 'application/json' },
+                                })
+                                setData((prev) => {
+                                  return {
+                                    ...prev,
+                                    images: prev['images'].filter((val) => {
+                                      return val.id !== img.id
+                                    }),
+                                  }
+                                })
+                              }}
+                            >
+                              מחק תמונה
                             </Button>
-                          ) : (
-                            <Button Button variant="contained" onClick={() => handleOpen1(img.id, 'price')}>
-                              קבע מחיר
-                            </Button>
-                          )
+                          </>
                         ) : null}
                       </div>
                     )

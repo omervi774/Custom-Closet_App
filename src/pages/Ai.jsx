@@ -214,7 +214,7 @@ function Ai(props) {
             variant="contained"
             sx={{ position: 'absolute', top: '70%', left: '55%' }}
             onClick={async () => {
-              const message = `please give me another design following the exact rules. User input: ${userInput}`
+              const message = `please give me another design following the exact rules. User input: ${chatMessages[1].text}`
               console.log(message) // Print the message to the console
 
               // TODO: Need to fix the issue with the "userInput" not send to the server

@@ -19,6 +19,7 @@ client = OpenAI(api_key=api_key)
 app = Flask(__name__)
 CORS(app)
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
+#app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'static/uploads')
 
 # Use the path to your service account JSON file
 cred = credentials.Certificate(".\custom-closet-app-firebase-adminsdk-tetxw-78acf01b55.json")
@@ -29,9 +30,9 @@ db = firestore.client()
 
 
 # Configure upload folder
-UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
+# UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
+# if not os.path.exists(UPLOAD_FOLDER):
+#     os.makedirs(UPLOAD_FOLDER)
 
 
 # Setup logging
@@ -54,6 +55,8 @@ def upload_file():
         doc_ref = collection_ref.add({
             'path': f'/static/uploads/{filename}'
         })
+        
+        
         
         return jsonify({'msg': 'File uploaded!', 'file': f'http://localhost:5000//static/uploads/{filename}', 'id': doc_ref[1].id}), 200
 
@@ -95,7 +98,40 @@ def update_price(document_id):
     path = f'http://localhost:5000{document_ref.get()._data["path"]}'
     price = document_ref.get()._data["price"]
     print(path)
-    return jsonify({"id": document_ref.get().id,"path":path,"price":price}),200        
+    return jsonify({"id": document_ref.get().id,"path":path,"price":price}),200    
+
+@app.delete("/uploads/<document_id>")
+def delete_img(document_id):
+    try:
+        collection_ref = db.collection("uploads")
+        document_ref = collection_ref.document(document_id)
+        doc = document_ref.get()
+        
+        if doc.exists:
+            file_path = doc.to_dict().get('path')
+            if file_path:
+                # Ensure the file path is correctly constructed
+                full_path = os.path.join(os.getcwd(), file_path)
+                
+                # Delete the document from Firestore
+                document_ref.delete()
+                print(f'{os.getcwd()}{file_path}')
+                full_path = f'{os.getcwd()}{file_path}'
+                print('full path:', full_path)
+                
+                # Delete the file from the filesystem
+                if os.path.exists(full_path):
+                    os.remove(full_path)
+                    return jsonify({'message': 'Document and file deleted successfully'}), 200
+                else:
+                    return jsonify({'message': 'Document deleted but file not found'}), 404
+            else:
+                return jsonify({'message': 'File path not found in document'}), 400
+        else:
+            return jsonify({'message': 'Document not found'}), 404
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # @app.route('/uploads/<filename>')
 # def uploaded_file(filename):
