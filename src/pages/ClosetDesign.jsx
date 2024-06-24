@@ -5,7 +5,6 @@ import { MenuItem, Paper, MenuList, Box } from '@mui/material'
 import DraggingCube from '../components/DraggingCube/DraggingCube'
 import Cube from '../components/Cube/Cube'
 import Circle from '../components/Circle/Circle'
-import GlassShelf from '../components/glassShelf/GlassShelf'
 import CubeUi from '../components/CubeUi/CubeUi'
 import ShelfUi from '../components/ShelfUi/ShelfUi'
 import ModalMessage from '../components/ModalMessage/ModalMessage'
@@ -15,7 +14,8 @@ import FileUpload from '../components/FileUpload/FileUpload'
 import { calculateJoins4Exists, calculateJoins3Exists, calculateJoins5Exists, calculateBars } from '../calculateJoins.js'
 import { useLocation } from 'react-router-dom'
 import emailjs from '@emailjs/browser'
-
+import { Shelf } from '../components/Shelf/Shelf.jsx'
+let shelfColor = ''
 const globalOffset = 0.04
 const lastActions = []
 export default function ClosetDesign() {
@@ -24,7 +24,7 @@ export default function ClosetDesign() {
     0: [],
   }
   // for the dragging cube
-  const [position, setPosition] = useState([-3, 2, 0])
+  const [position, setPosition] = useState([-6, 2, 0])
   // this state responssible to store the possitions and sizes of all the cubes
   const [cubes, setCubes] = useState(
     !initalCubes
@@ -146,7 +146,7 @@ export default function ClosetDesign() {
     }
     setIsMenu(true)
     setIsDragging(false)
-    setPosition([-3, 2, 0])
+    setPosition([-6, 2, 0])
   }
 
   // this function return true if there is enough room for the cube (x-axis)
@@ -435,7 +435,7 @@ export default function ClosetDesign() {
           }
           setIsMenu(true)
           setIsDragging(false)
-          setPosition([-3, 2, 0])
+          setPosition([-6, 2, 0])
           return
         }
       }
@@ -456,6 +456,17 @@ export default function ClosetDesign() {
 
       // check if the dragging cube is connecting from the left
       if (Math.abs(newPosition[0] + cubeSize[0] / 2 - leftEdge) < epsilon) {
+        if (newPosition[0] + cubeSize[0] / 2 < -5.5 + epsilon) {
+          setMessage({
+            messageType: 'error',
+            title: 'חיבור קובייה לא מצליח',
+            content: 'החיבור לא הצליח כי הקובייה המתחברת חורגת מהגבול המותר. נסה מחדש',
+            topPosition: '20%',
+            leftPosition: '50%',
+            arrow: false,
+          })
+          return
+        }
         if (isLayer0) {
           addingCubeToSide(layer.toString(), positionToAddYAxis, cubeSize, leftEdge - cubeSize[0] / 2, 'left')
           console.log('left')
@@ -563,12 +574,14 @@ export default function ClosetDesign() {
       lastActions.push({ type: 'cube', layer: 0, position: [0, yOffset], size: [width, height] })
       return
     } else {
+      setPosition([-6, 2, 0])
       setIsDragging(true)
       setIsMenu(false)
     }
   }
   const addNewShelf = (material) => {
     console.log(material)
+    shelfColor = material
     setIsMenu(false)
     setFirstOpen(true)
     setSecondaryOpen([false, undefined])
@@ -610,7 +623,7 @@ export default function ClosetDesign() {
   const handleAddingShelf = (xPosition, yPosition, xSize) => {
     lastActions.push({ type: 'shelf', position: [xPosition, yPosition, 0], xSize: xSize })
     setShelfs((prev) => {
-      return [...prev, { position: [xPosition, yPosition, 0], xSize: xSize }]
+      return [...prev, { position: [xPosition, yPosition, 0], xSize: xSize, shelfColor: shelfColor }]
     })
     setMessage({
       messageType: 'success',
@@ -625,10 +638,11 @@ export default function ClosetDesign() {
   }
   const cancelDragging = () => {
     setIsDragging(false)
-    setPosition([-3, 2, 0])
+    setPosition([-6, 2, 0])
     setIsMenu(true)
   }
   const CancelAddingDrawer = () => {
+    shelfColor = ''
     setAddDrawer(false)
     setIsMenu(true)
   }
@@ -858,12 +872,15 @@ export default function ClosetDesign() {
             {isDragging && <DraggingCube position={position} onDrag={handleDrag} url={`${size[0]}X${size[1]}`} size={size} />}
 
             {shelfs.map((shelf, index) => {
-              return <GlassShelf key={index} position={shelf.position} xSize={shelf.xSize} />
+              // return <GlassShelf key={index} position={shelf.position} xSize={shelf.xSize} />
+              return <Shelf key={index} position={shelf.position} xSize={shelf.xSize} url={shelf.shelfColor} />
             })}
+
             <Preload all />
           </Suspense>
         </Canvas>
       )}
+
       {addDrawer &&
         (() => {
           let indicator = 0

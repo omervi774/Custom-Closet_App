@@ -22,7 +22,7 @@ const ShelfUi = ({ title, addNewShelf, closeSecondaryMenu }) => {
         sx={{
           height: 40,
           width: 40,
-          backgroundColor: '#6FB6FF',
+          backgroundColor: '#C0C0C0',
           cursor: 'pointer',
           borderColor: 'lightgreen',
           borderStyle: clicked === 'glass' && 'solid',
@@ -44,7 +44,7 @@ const ShelfUi = ({ title, addNewShelf, closeSecondaryMenu }) => {
         sx={{
           height: 40,
           width: 40,
-          backgroundColor: '#C0C0C0',
+          backgroundColor: 'black',
           cursor: 'pointer',
           borderColor: 'lightgreen',
           borderStyle: clicked === 'metal' && 'solid',

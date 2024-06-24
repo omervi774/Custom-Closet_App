@@ -1,7 +1,7 @@
 import React, { useState, Suspense } from 'react'
 import useData from '../useData'
 import { Preload, OrbitControls, Environment } from '@react-three/drei'
-import GlassShelf from '../components/glassShelf/GlassShelf'
+import { Shelf } from '../components/Shelf/Shelf.jsx'
 import { Canvas } from '@react-three/fiber'
 import Cube from '../components/Cube/Cube'
 import Arrow from '../components/Arrow/Arrow'
@@ -73,7 +73,7 @@ function Orders() {
             )}
           {ordersData.length > 0 &&
             ordersData[orderIndex].shelfs.map((shelf, index) => {
-              return <GlassShelf key={index} position={shelf.position} xSize={shelf.xSize} />
+              return <Shelf key={index} position={shelf.position} xSize={shelf.xSize} url={shelf.shelfColor} />
             })}
 
           <Preload all />
