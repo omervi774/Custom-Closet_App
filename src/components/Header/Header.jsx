@@ -1,4 +1,4 @@
-import { useTheme } from '@emotion/react'
+//import { useTheme } from '@emotion/react'
 import React, { useState } from 'react'
 import { signOut } from 'firebase/auth'
 import { auth } from '../../firebase'
@@ -15,7 +15,7 @@ import NavigationMenu from '../NavigationMenu/NavigationMenu'
 import useUser from '../../useUser'
 
 export default function Header() {
-  const theme = useTheme()
+  //const theme = useTheme()
   const navigate = useNavigate() // allow navigation to different pages
   const [openLogInModal, setOpenLogInModal] = useState(false) // state that responssible when the modal is open/close
   const handleOpen = () => setOpenLogInModal(true) // open the modal
@@ -36,7 +36,7 @@ export default function Header() {
         color="theme.secondary.light"
         sx={{
           //backgroundColor: theme.palette.secondary.light,
-          backgroundColor: theme.palette.background.teal,
+          backgroundColor: '#ffffff80',
 
           ...style.wrapper,
           justifyContent: isDesktopScreen ? 'space-around' : 'space-between',
@@ -86,26 +86,26 @@ export default function Header() {
         {/* on desktop screen display the navigation items otherwise display the hamburger menu */}
         {isDesktopScreen ? (
           <List sx={style.itemsWrapper}>
-            <NavigationMenu color={theme.palette.text.primary} isUser={user} />
+            <NavigationMenu color="#222222" isUser={user} />
           </List>
         ) : (
           <>
-            <IconButton color="white" aria-label="open drawer" edge="start" onClick={handleToggleDrawer} sx={{ mr: 2 }}>
-              <MenuIcon sx={{ color: 'white' }} color="white" fontSize="large" />
+            <IconButton color="#222222" aria-label="open drawer" edge="start" onClick={handleToggleDrawer} sx={{ mr: 2 }}>
+              <MenuIcon sx={{ color: '#222222' }} color="#222222" fontSize="large" />
             </IconButton>
             {/* the menu that opens when the user click on the hamburger icon */}
-            <Drawer anchor="top" open={openHamburgerMenu} onClose={handleToggleDrawer}>
+            <Drawer color="#222222" anchor="top" open={openHamburgerMenu} onClose={handleToggleDrawer}>
               <List sx={style.drawerStyle}>
-                <Typography variant="h3" component="a">
+                <Typography variant="h3" component="a" sx={{ color: '#222222' }}>
                   הארונות שלנו
                 </Typography>
-                <NavigationMenu color="white" toolTipPlacement="left" handleToggleDrawer={handleToggleDrawer} isUser={user} />
+                <NavigationMenu color="#222222" toolTipPlacement="left" handleToggleDrawer={handleToggleDrawer} isUser={user} />
               </List>
             </Drawer>
           </>
         )}
         {isDesktopScreen && (
-          <Typography variant="h3" component="a" onClick={() => navigate('/')} color={'white'} style={style.heading}>
+          <Typography variant="h3" component="a" onClick={() => navigate('/')} color="#222222" style={style.heading}>
             הארונות שלנו
           </Typography>
         )}

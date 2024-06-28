@@ -1,27 +1,38 @@
 import React from 'react'
 import useData from '../useData'
 import useUser from '../useUser'
-import { Button } from '@mui/material'
-import useEditData from '../useEditData'
-import FileUpload from '../components/FileUpload/FileUpload'
+// import { Button } from '@mui/material'
+// import useEditData from '../useEditData'
+// import FileUpload from '../components/FileUpload/FileUpload'
+import AdminHome from '../components/HomePage/AdminHome'
+import CustomerHome from '../components/HomePage/CustomerHome'
 
 function Home() {
   const [data, setData] = useData('http://localhost:5000/homePage')
   // const [imgData, setImgData] = useData('http://localhost:5000/uploads')
-  const uploadFile = (file) => {
-    setData((prev) => {
-      return { ...prev, ['images']: [...prev['images'], file] }
-    })
-  }
-  const [jsx, handleOpen] = useEditData('http://localhost:5000/homePage', setData, data, 'text_content')
-  const [jsx1, handleOpen1] = useEditData('http://localhost:5000/uploads', setData, data, 'images')
+  // const uploadFile = (file) => {
+  //   setData((prev) => {
+  //     return { ...prev, ['images']: [...prev['images'], file] }
+  //   })
+  // }
+  // const [jsx, handleOpen] = useEditData('http://localhost:5000/homePage', setData, data, 'text_content')
+  // const [jsx1, handleOpen1] = useEditData('http://localhost:5000/uploads', setData, data, 'images')
   const user = useUser()
 
   return (
     <>
       {data['text_content'] ? (
+        user ? (
+          <AdminHome data={data} setData={setData} />
+        ) : (
+          <CustomerHome data={data} />
+        )
+      ) : (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>loading...</div>
+      )}
+      {/* {data['text_content'] ? (
         <div style={{ fontFamily: 'Arial, sans-serif' }}>
-          <div style={{ backgroundColor: '#f5f5f5', padding: '50px 0' }}>
+          <div style={{ backgroundColor: '#D3D3D3', padding: '50px 0' }}>
             <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <h1 style={{ textAlign: 'center', fontSize: '36px', marginBottom: '20px' }}>{data['text_content'][3].subTitle}</h1>
               {user && (
@@ -49,21 +60,7 @@ function Home() {
                   ערוך טקסט
                 </Button>
               )}
-              {/* <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <button
-            style={{
-              backgroundColor: '#007bff',
-              color: '#fff',
-              padding: '10px 20px',
-              fontSize: '16px',
-              borderRadius: '5px',
-              border: 'none',
-              cursor: 'pointer',
-            }}
-          >
-            Learn More
-          </button>
-        </div> */}
+             
             </div>
           </div>
           <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '50px 0' }}>
@@ -162,21 +159,8 @@ function Home() {
                       </div>
                     )
                   })}
-                {/* <div style={{ margin: '10px' }}>
-                  <img
-                    src="https://via.placeholder.com/200"
-                    alt="Placeholder"
-                    style={{ maxWidth: '200px', maxHeight: '200px', borderRadius: '5px' }}
-                  />
-                </div>
-                <div style={{ margin: '10px' }}>
-                  <img
-                    src="https://via.placeholder.com/200"
-                    alt="Placeholder"
-                    style={{ maxWidth: '200px', maxHeight: '200px', borderRadius: '5px' }}
-                  />
-                </div> */}
-                {/* Add more images here */}
+                
+                
               </div>
             </div>
           </div>
@@ -205,7 +189,7 @@ function Home() {
         </div>
       ) : (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>loading...</div>
-      )}
+      )} */}
     </>
   )
 }

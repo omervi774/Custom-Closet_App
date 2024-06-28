@@ -15,7 +15,7 @@ const ModalMessage = ({ typeOfMessage, title, content, onCloseModal, topPosition
     left: `${leftPosition}`,
     transform: 'translate(-50%, -50%)',
     width: 400,
-    bgcolor: 'white',
+    bgcolor: '#e5e5e5',
 
     borderRadius: '30px', // Add border radius here
     // border: '2px solid #000',

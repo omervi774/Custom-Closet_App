@@ -18,7 +18,7 @@ function App() {
       <Box
         style={{
           // backgroundColor: theme.palette.background.default,
-          backgroundColor: 'lightblue',
+          backgroundColor: '#ffffffb3',
           height: '100vh',
           margin: 0,
           padding: 0,

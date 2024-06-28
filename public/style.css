@@ -70,3 +70,43 @@ h1 {
 .delete-button:hover {
   opacity: 0.8;
 }
+.slide {
+  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+  opacity: 1;
+  position: absolute;
+}
+
+.slide.out {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.slide.in {
+  transform: translateX(0%);
+  opacity: 1;
+}
+
+.gallery-container {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.gallery-flex {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.image-container {
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 40px); /* Adjust for margin */
+}
+
+.responsive-image {
+  width: 100%;
+  height: auto;
+  max-height: 300px; /* Set a maximum height */
+  border-radius: 5px;
+  object-fit: cover; /* Ensure the image covers the container */
+}

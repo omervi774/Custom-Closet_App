@@ -720,9 +720,9 @@ export default function ClosetDesign() {
         </div>
       )}
 
-      <div style={{ position: 'absolute', top: '10vh', zIndex: 1000 }}>
+      <div style={{ position: 'absolute', top: '10vh', zIndex: 1000, backgroundColor: '#e5e5e5' }}>
         {/* menu container */}
-        <Paper sx={{ height: '90vh', width: '15vh', display: !isMenu && 'none' }}>
+        <Paper sx={{ height: '90vh', width: '15vh', display: !isMenu && 'none', backgroundColor: '#e5e5e5' }}>
           {/* first menu - let the use the option to add new cube or shelf */}
           <MenuList>
             <MenuItem
