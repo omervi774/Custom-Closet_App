@@ -29,7 +29,7 @@ export default function ClosetDesign() {
   const [cubes, setCubes] = useState(
     !initalCubes
       ? {
-          0: [],
+          '-1': [],
         }
       : initalCubes
   )
@@ -85,15 +85,18 @@ export default function ClosetDesign() {
       orbitControlsRef.current.reset() // Reset rotation
     }
   }
+  const isFirstLayer = (layer) => {
+    return layer === -1
+  }
   const addingCubeToSide = (layer, positionToAddYAxis, cubeSize, xPosition, side) => {
     layer = Number(layer)
-    const isLayer0 = layer === 0 ? true : false
+    const isLayer0 = isFirstLayer(layer)
     let offset = [0, 0]
     // this block of code responsible to calc the offset
     if (isLayer0) {
       // in case it is layer 0 and  connect from the left
       if (side === 'left') {
-        const conectedCube = cubes[0][0] // in case the layer is 0 calc the offset to right for the cube
+        const conectedCube = cubes[-1][0] // in case the layer is 0 calc the offset to right for the cube
         offset[0] = conectedCube.offset[0]
         offset[1] = conectedCube.offset[1]
         offset[0] += globalOffset
@@ -248,7 +251,7 @@ export default function ClosetDesign() {
       messageType: 'success',
       title: '! חיבור קוביות חוקי',
       content: 'המשך לחבר קוביות כרצונך',
-      topPosition: '20%',
+      topPosition: '90%',
       leftPosition: '50%',
       arrow: false,
     })
@@ -309,7 +312,7 @@ export default function ClosetDesign() {
     return start // the position that needs to place the new cube
   }
   const calcOffsetWhenIsTopConnection = (layer, buttomLayer, cubeSize, xPosition) => {
-    const offset = [0, layer * globalOffset]
+    const offset = [0, (layer + 1) * globalOffset]
     // try find cube in the layer bellow with the same right edge as the new cube
     const indexOFButoomCubeFromRight = findCube(buttomLayer, xPosition + cubeSize[0] / 2, 'right')
 
@@ -353,7 +356,7 @@ export default function ClosetDesign() {
     const size = 1
     const layer = Math.floor(newPosition[1])
 
-    if (layer < 0) {
+    if (layer < -1) {
       return
     }
     let positionToAddYAxis = 0
@@ -363,7 +366,7 @@ export default function ClosetDesign() {
       positionToAddYAxis = 1
     }
     const buttomLayer = layer - 1
-    if (buttomLayer >= 0 && cubes[buttomLayer]) {
+    if (buttomLayer >= -1 && cubes[buttomLayer]) {
       // check if the dragging cube connects from the top
       if (Math.abs(newPosition[1] - (buttomLayer + size)) < epsilon + positionToAddYAxis) {
         // check if there is a cube to connect to
@@ -375,13 +378,23 @@ export default function ClosetDesign() {
             messageType: 'error',
             title: 'חיבור קוביות לא חוקי',
             content: 'החיבור לא הצליח כי הקובייה המתחברת עלתה על קובייה קיימת, נסה מחדש',
-            topPosition: '20%',
+            topPosition: '90%',
+            leftPosition: '50%',
+            arrow: false,
+          })
+        }
+        if (!isOverRide && containsButtomCube && newPosition[1] + cubeSize[1] / 2 >= 4) {
+          setMessage({
+            messageType: 'error',
+            title: 'חיבור קוביות לא חוקי',
+            content: 'החיבור לא הצליח כי הקובייה המתחברת חורגת מהגובה המותר, נסה מחדש',
+            topPosition: '90%',
             leftPosition: '50%',
             arrow: false,
           })
         }
 
-        if (containsButtomCube && !isOverRide) {
+        if (containsButtomCube && !isOverRide && newPosition[1] + cubeSize[1] / 2 < 4) {
           const offset = calcOffsetWhenIsTopConnection(layer, buttomLayer, cubeSize, x)
           let i
           for (i = 0; i < cubeSize[1]; i++) {
@@ -399,7 +412,7 @@ export default function ClosetDesign() {
                 messageType: 'error',
                 title: 'חיבור קוביות לא חוקי',
                 content: 'החיבור לא הצליח כי הקובייה המתחברת עלתה על קובייה קיימת, נסה מחדש',
-                topPosition: '20%',
+                topPosition: '90%',
                 leftPosition: '50%',
                 arrow: false,
               })
@@ -452,7 +465,7 @@ export default function ClosetDesign() {
 
     // check if the dragging cube is in the same height of the layer
     if (Math.abs(newPosition[1] - layer) < epsilon + positionToAddYAxis) {
-      const isLayer0 = layer === 0
+      const isLayer0 = isFirstLayer(layer)
 
       // check if the dragging cube is connecting from the left
       if (Math.abs(newPosition[0] + cubeSize[0] / 2 - leftEdge) < epsilon) {
@@ -461,7 +474,7 @@ export default function ClosetDesign() {
             messageType: 'error',
             title: 'חיבור קובייה לא מצליח',
             content: 'החיבור לא הצליח כי הקובייה המתחברת חורגת מהגבול המותר. נסה מחדש',
-            topPosition: '20%',
+            topPosition: '90%',
             leftPosition: '50%',
             arrow: false,
           })
@@ -470,7 +483,7 @@ export default function ClosetDesign() {
         if (isLayer0) {
           addingCubeToSide(layer.toString(), positionToAddYAxis, cubeSize, leftEdge - cubeSize[0] / 2, 'left')
           console.log('left')
-          lastActions.push({ type: 'cube', layer: 0, position: [leftEdge - cubeSize[0] / 2, positionToAddYAxis], size: cubeSize })
+          lastActions.push({ type: 'cube', layer: -1, position: [leftEdge - cubeSize[0] / 2, positionToAddYAxis], size: cubeSize })
           return
         } else {
           // in case try adding cube to layers thats requires cube bellow
@@ -491,9 +504,20 @@ export default function ClosetDesign() {
         // check if the dragging cube is connecting from the right
       } else if (Math.abs(newPosition[0] - cubeSize[0] / 2 - rightEdge) < epsilon) {
         if (isLayer0) {
+          if (newPosition[0] + cubeSize[0] / 2 > 7.5 + epsilon) {
+            setMessage({
+              messageType: 'error',
+              title: 'חיבור קובייה לא מצליח',
+              content: 'החיבור לא הצליח כי הקובייה המתחברת חורגת מהגבול המותר. נסה מחדש',
+              topPosition: '90%',
+              leftPosition: '50%',
+              arrow: false,
+            })
+            return
+          }
           addingCubeToSide(layer.toString(), positionToAddYAxis, cubeSize, rightEdge + cubeSize[0] / 2, 'right')
           console.log('right')
-          lastActions.push({ type: 'cube', layer: 0, position: [rightEdge + cubeSize[0] / 2, positionToAddYAxis], size: cubeSize })
+          lastActions.push({ type: 'cube', layer: -1, position: [rightEdge + cubeSize[0] / 2, positionToAddYAxis], size: cubeSize })
           setCubes((prev) => {
             const cubesCopy = JSON.parse(JSON.stringify(prev))
             const offsetToAdd = globalOffset * cubeSize[0]
@@ -556,7 +580,7 @@ export default function ClosetDesign() {
     setMessage({ messageType: undefined, title: '', content: '', topPosition: '', leftPosition: '', arrow: false })
     setFirstOpen(true)
     setSecondaryOpen([false, undefined])
-    if (cubes['0'].length === 0) {
+    if (cubes['-1'].length === 0) {
       let yOffset = 0
       if (height === 3) {
         yOffset = 1
@@ -564,14 +588,14 @@ export default function ClosetDesign() {
         yOffset = 0.5
       }
       for (let i = 0; i < height; i++) {
-        const yPosition = i === 0 ? 0 + yOffset : i
+        const yPosition = i === 0 ? -1 + yOffset : i - 1
         const cubeAddingSize = i === 0 ? [width, height] : [width, 1]
 
         const display = i === 0 ? true : false
         // in case the layer in new
-        handleAddingCube(`${0 + i}`, [{ position: [0, yPosition, 0], size: cubeAddingSize, display: display, offset: [0, 0] }])
+        handleAddingCube(`${-1 + i}`, [{ position: [0, yPosition, 0], size: cubeAddingSize, display: display, offset: [0, 0] }])
       }
-      lastActions.push({ type: 'cube', layer: 0, position: [0, yOffset], size: [width, height] })
+      lastActions.push({ type: 'cube', layer: -1, position: [0, yOffset], size: [width, height] })
       return
     } else {
       setPosition([-6, 2, 0])
@@ -601,7 +625,7 @@ export default function ClosetDesign() {
       //in case shelf position matchs top edge of the cube
       if (shelfs[i].position[1] === cubeTopEdge && shelfs[i].position[0] === cubeXposition) {
         // in case the cube in layer 0, checking if there a shelf in the buttom of the cube as well
-        if (layer === 0) {
+        if (isFirstLayer(layer)) {
           const cubeButtomEdge = cube.position[1] - cube.size[1] / 2
           for (let j = 0; j < shelfs.length; j++) {
             // in case the cube is in layer 0 and there are shelfs that match to its top edge and buttom edge
@@ -629,7 +653,7 @@ export default function ClosetDesign() {
       messageType: 'success',
       title: 'המדף נוסף בהצלחה',
       content: 'המשך להוסיף מדפים כרצונך',
-      topPosition: '20%',
+      topPosition: '90%',
       leftPosition: '50%',
       arrow: false,
     })
@@ -662,7 +686,7 @@ export default function ClosetDesign() {
           title: 'המדף הוסר בהצלחה',
           content: '',
           arrow: false,
-          topPosition: '20%',
+          topPosition: '90%',
           leftPosition: '50%',
         })
         return
@@ -681,8 +705,8 @@ export default function ClosetDesign() {
             } else {
               delete newCubes[i]
             }
-            if (newCubes[0] === undefined) {
-              return { 0: [] }
+            if (newCubes['-1'] === undefined) {
+              return { '-1': [] }
             }
 
             return newCubes
@@ -693,7 +717,7 @@ export default function ClosetDesign() {
           title: 'הקובייה הוסרה בהצלחה',
           content: '',
           arrow: false,
-          topPosition: '20%',
+          topPosition: '90%',
           leftPosition: '50%',
         })
       }
@@ -788,21 +812,21 @@ export default function ClosetDesign() {
                 //   throw new Error('publicID key not found in environment variables.')
                 // }
 
-                // Check if needed
-                const templateParams = {
-                  name: 'אורח',
-                }
+                // // Check if needed
+                // const templateParams = {
+                //   name: 'אורח',
+                // }
 
-                // TODO - Need to check how to use the .env file!
+                // // TODO - Need to check how to use the .env file!
 
-                emailjs.send('service_owb0ixg', 'template_ccyiflc', templateParams, 'N6AHBrG2D358AbCVW').then(
-                  (response) => {
-                    console.log('SUCCESS!', response.status, response.text)
-                  },
-                  (error) => {
-                    console.log('FAILED...', error)
-                  }
-                )
+                // emailjs.send('service_owb0ixg', 'template_ccyiflc', templateParams, 'N6AHBrG2D358AbCVW').then(
+                //   (response) => {
+                //     console.log('SUCCESS!', response.status, response.text)
+                //   },
+                //   (error) => {
+                //     console.log('FAILED...', error)
+                //   }
+                // )
               }}
             >
               הזמן

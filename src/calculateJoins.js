@@ -134,7 +134,7 @@ export const calculateBars = (cubes) => {
         const cubeWidth = testedCube.size[0]
         const cubeLeftEdge = testedCube.position[0] - testedCube.size[0] / 2
         const cubeRightEdge = testedCube.position[0] + testedCube.size[0] / 2
-        const isLayer0 = numberLayer === 0
+        const isLayer0 = numberLayer === -1
 
         count += 2 * cubeHeight + 1 // add the bars  of the related to the right side of the cube
         count += 2 * cubeWidth // add the bars related to the cube width
@@ -290,7 +290,7 @@ export const calculateJoins4Exists = (cubes) => {
         const cubeRightEdge = testedCube.position[0] + testedCube.size[0] / 2
         // checks if the tested cube has no cube from the left and no cube from the left in layer bellow
         // also if it short in the right side
-        if (numberLayer !== 0) {
+        if (numberLayer !== -1) {
           const isTestedCubeShorterLeft = findCube(numberLayer - 1, cubeLeftEdge, 'left', cubes)
           const isTestedCubeShorterRight = findCube(numberLayer - 1, cubeRightEdge, 'right', cubes)
           if (isTestedCubeShorterRight === -1) {
@@ -327,10 +327,11 @@ export const calculateJoins4Exists = (cubes) => {
             const cubeFromRight = cubes[j][indexCubeFromRight]
             const heightComparation = heightRatio(testedCube, cubeFromRight, numberLayer, cubes)
             const cubeFromRightHeight = cubeFromRight.position[1] + cubeFromRight.size[1] / 2
+
             // if the tested cube is higher and the layer is 0 add 4 if layer no 0 add 2
             // and run find cube for another iteration
             if (heightComparation === 'higher') {
-              if (cubeFromRightHeight < 1) {
+              if (cubeFromRightHeight < 0) {
                 count += 4
               } else {
                 count += 2
@@ -339,7 +340,7 @@ export const calculateJoins4Exists = (cubes) => {
             // if the tested cube is equal/lower and if its layer 0 add 4 joins if above layer 0 add 2
             // and continiue for the next cube
             else if (heightComparation === 'equal' || heightComparation === 'lower') {
-              if (j === 0) {
+              if (j === -1) {
                 count += 4
               } else {
                 count += 2
@@ -349,7 +350,7 @@ export const calculateJoins4Exists = (cubes) => {
             // if the tested cube is equal and cube above and if its layer 0 add 2 joins
             // and continiue for the next cube
             else {
-              if (j === 0) {
+              if (j === -1) {
                 count += 2
               }
               break
@@ -359,7 +360,7 @@ export const calculateJoins4Exists = (cubes) => {
           // if it in nont layer 0 check if the cube has no cube from the right in the layer bellow
           // and if so add 2 more joins
           else {
-            if (j === numberLayer && numberLayer !== 0) {
+            if (j === numberLayer && numberLayer !== -1) {
               const isCubeFromRightBellow = findCube(numberLayer - 1, cubeRightEdge, 'left', cubes)
               if (isCubeFromRightBellow === -1) {
                 count += 2
