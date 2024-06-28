@@ -143,6 +143,9 @@ def delete_img(document_id):
 def get_data():
     data = {"message": "This is JSON data from the server!"}
     return jsonify(data)
+@app.route("/<name>")
+def hello(name):
+    return f"Hello, {name}!"
 
 @app.route("/stocks")
 def get_stocks():
@@ -150,6 +153,21 @@ def get_stocks():
     docs = collection_ref.stream()
     data = [{"id": doc.id, **doc.to_dict()} for doc in docs]
     return jsonify({"data": data})
+
+@app.route('/stocks/<name>')
+def get_stock_by_name(name):
+    try:
+        collection_ref = db.collection("stocks")
+        query_ref = collection_ref.where('name', '==', name).stream()
+        results = [{"id": doc.id, **doc.to_dict()} for doc in query_ref]
+        
+        if results:
+            return jsonify({"data": results}), 200
+        else:
+            return jsonify({"message": "No matching documents found"}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 @app.post("/stocks")
 def add_new_field():

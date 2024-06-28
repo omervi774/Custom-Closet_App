@@ -15,6 +15,7 @@ import { calculateJoins4Exists, calculateJoins3Exists, calculateJoins5Exists, ca
 import { useLocation } from 'react-router-dom'
 import emailjs from '@emailjs/browser'
 import { Shelf } from '../components/Shelf/Shelf.jsx'
+import useData from '../useData'
 let shelfColor = ''
 const globalOffset = 0.04
 const lastActions = []
@@ -23,6 +24,7 @@ export default function ClosetDesign() {
   const { initalCubes } = location.state || {
     0: [],
   }
+  const [barObject] = useData('http://localhost:5000/stocks/מוטות ברזל')
   // for the dragging cube
   const [position, setPosition] = useState([-6, 2, 0])
   // this state responssible to store the possitions and sizes of all the cubes
@@ -790,8 +792,11 @@ export default function ClosetDesign() {
                 calculateJoins4Exists(cubes)
                 calculateJoins5Exists(cubes)
                 calculateJoins3Exists(cubes)
-                calculateBars(cubes)
+                const barsUsed = calculateBars(cubes)
                 setShelfs([])
+                const priceOfOneBar = Number(barObject[0].price)
+                const OrderPrice = priceOfOneBar * barsUsed
+                console.log(OrderPrice)
 
                 // TODO - Need to check how to use the .env file!
 

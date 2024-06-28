@@ -199,6 +199,7 @@ export const calculateBars = (cubes) => {
     }
   })
   console.log('after finishing calc the used bars : ', bars)
+  return bars
 }
 export const calculateJoins5Exists = (cubes) => {
   let join5Exists = 0
