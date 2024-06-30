@@ -20,6 +20,7 @@ let shelfColor = ''
 const globalOffset = 0.04
 const lastActions = []
 export default function ClosetDesign() {
+
   const location = useLocation()
   const { initalCubes } = location.state || {
     0: [],
@@ -797,7 +798,21 @@ export default function ClosetDesign() {
                 const priceOfOneBar = Number(barObject[0].price)
                 const OrderPrice = priceOfOneBar * barsUsed
                 console.log(OrderPrice)
-
+                const formData = {
+                  Operation: '1',  // Charge only
+                  TerminalNumber: '1000',
+                  UserName: 'test9611',
+                  SumToBill: OrderPrice.toString() ,
+                  CoinId: '1',  // Shekel
+                  Language: 'he',  
+                  ProductName: 'ארון בהאתמה אישית',
+                  APILevel: '10',
+                  Codepage: '65001', // utf 8
+                  SuccessRedirectUrl: 'https://www.walla.co.il/',
+                  ErrorRedirectUrl: 'https://www.sport5.co.il/'
+                  // Add more parameters as needed
+              };
+              
                 // TODO - Need to check how to use the .env file!
 
                 // require('dotenv').config()
@@ -832,7 +847,50 @@ export default function ClosetDesign() {
                 //     console.log('FAILED...', error)
                 //   }
                 // )
-              }}
+
+                
+                try {
+                  const response = await fetch('https://secure.cardcom.solutions/Interface/LowProfile.aspx', {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                      },
+                      body: new URLSearchParams(formData).toString(),
+                  });
+
+                  if (!response.ok) {
+                      throw new Error('Network response was not ok');
+                  }
+
+                  const responseData = await response.text();
+                  console.log('Response from Cardcom API:', responseData);
+
+                  //decoding all 3 url to give to the clinet 
+
+                  const params = new URLSearchParams(responseData);
+
+                  const url = decodeURIComponent(params.get('url'));
+                  const paypalUrl = decodeURIComponent(params.get('PayPalUrl'));
+                  const bitUrl = decodeURIComponent(params.get('BitUrl'));
+
+                  console.log('Decoded URL:', url);
+                  console.log('Decoded PayPal URL:', paypalUrl);
+                  console.log('Decoded Bit URL:', bitUrl);
+
+
+                  window.open(url, '_blank');
+
+
+
+                  // Process the response as needed
+                } catch (error) {
+                  console.error('Error fetching data:', error);
+                  // Handle errors here
+                }
+
+
+                }}
+                              
             >
               הזמן
             </MenuItem>
