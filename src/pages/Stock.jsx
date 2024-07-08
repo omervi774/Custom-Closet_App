@@ -3,6 +3,7 @@ import useData from '../useData'
 
 import StockCard from '../components/StockCard/StockCard'
 import useEditData from '../useEditData'
+import { serverRoute } from '../components/consts/consts'
 
 const TitleStyle = {
   textAlign: 'center',
@@ -16,8 +17,8 @@ const ConstiarCardStyle = {
 }
 
 const StockManagementPage = () => {
-  const [stockData, setStockData] = useData('http://localhost:5000/stocks')
-  const [jsx, handleOpen] = useEditData('http://localhost:5000/stocks', setStockData, stockData)
+  const [stockData, setStockData] = useData(`${serverRoute}/stocks`)
+  const [jsx, handleOpen] = useEditData(`${serverRoute}/stocks`, setStockData, stockData)
 
   return (
     <div className="stock-management-container">

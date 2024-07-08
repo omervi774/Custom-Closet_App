@@ -6,19 +6,6 @@ export default function CustomerHome({ data }) {
     <>
       <div style={{ fontFamily: 'Arial, sans-serif' }}>
         <TextSwap data={data['text_content']} />
-        {/* <div className="gallery-container">
-          <div className="gallery-flex">
-            {data['images'] &&
-              data['images']
-                .filter((val) => val.main === true)
-                .map((img, index) => (
-                  <div className="image-container" key={index}>
-                    <img src={img.path} alt="Placeholder" className="responsive-image" />
-                    {/* {img.price && <h4>{img.price} : מחיר</h4>} */}
-        {/* </div> */}
-        {/* ))} */} */
-        {/* </div> */}
-        {/* </div> */}
         <div style={{ backgroundColor: '#f5f5f5', padding: '50px 0' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
             <h2 style={{ textAlign: 'center', fontSize: '30px', marginBottom: '20px' }}>גלריית תמונות</h2>

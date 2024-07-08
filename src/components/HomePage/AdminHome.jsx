@@ -2,9 +2,10 @@ import React from 'react'
 import { Button } from '@mui/material'
 import useEditData from '../../useEditData'
 import FileUpload from '../FileUpload/FileUpload'
+import { serverRoute } from '../consts/consts'
 export default function AdminHome({ data, setData }) {
-  const [jsx, handleOpen] = useEditData('http://localhost:5000/homePage', setData, data, 'text_content')
-  const [jsx1, handleOpen1] = useEditData('http://localhost:5000/uploads', setData, data, 'images')
+  const [jsx, handleOpen] = useEditData(`${serverRoute}/homePage`, setData, data, 'text_content')
+  const [jsx1, handleOpen1] = useEditData(`${serverRoute}/uploads`, setData, data, 'images')
   const uploadFile = (file) => {
     setData((prev) => {
       return { ...prev, ['images']: [...prev['images'], file] }
@@ -112,7 +113,7 @@ export default function AdminHome({ data, setData }) {
                           variant="contained"
                           color="error"
                           onClick={async () => {
-                            await fetch(`http://localhost:5000/uploads/${img.id}`, {
+                            await fetch(`${serverRoute}/uploads/${img.id}`, {
                               method: 'DELETE',
                               headers: { 'Content-Type': 'application/json' },
                             })

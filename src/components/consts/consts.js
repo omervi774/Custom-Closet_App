@@ -10,6 +10,8 @@ export const routingItemsForAdmin = [
   { id: 1, label: 'דף הבית', routing: '/' },
 ]
 
+export const serverRoute = process.env.REACT_APP_SERVER_ROUTE
+
 // login modal style
 export const loginModalStyle = {
   modalWrapper: {

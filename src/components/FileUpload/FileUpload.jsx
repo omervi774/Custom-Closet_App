@@ -2,6 +2,7 @@ import React from 'react'
 import { Button } from '@mui/material'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'
 import { styled } from '@mui/material/styles'
+import { serverRoute } from '../consts/consts'
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -30,7 +31,7 @@ const FileUpload = ({ handleFileChange, handleClose, uploadFile }) => {
         formData.append('file', file)
 
         try {
-          const response = await fetch('http://localhost:5000/upload_img', {
+          const response = await fetch(`${serverRoute}/upload_img`, {
             method: 'POST',
             body: formData,
           })

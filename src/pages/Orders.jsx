@@ -6,8 +6,9 @@ import { Canvas } from '@react-three/fiber'
 import Cube from '../components/Cube/Cube'
 import Arrow from '../components/Arrow/Arrow'
 import { Button } from '@mui/material'
+import { serverRoute } from '../components/consts/consts.js'
 function Orders() {
-  const [ordersData, setOrdersData] = useData('http://localhost:5000/orders')
+  const [ordersData, setOrdersData] = useData(`${serverRoute}/orders`)
   const [orderIndex, setOrderIndex] = useState(0)
   const handleForwardClick = () => {
     setOrderIndex((orderIndex + 1) % ordersData.length)
@@ -26,7 +27,7 @@ function Orders() {
   const deleteOrder = async () => {
     console.log(ordersData[orderIndex].id)
     const id = ordersData[orderIndex].id
-    await fetch(`http://localhost:5000/orders/${id}`, {
+    await fetch(`${serverRoute}/orders/${id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -81,7 +82,7 @@ function Orders() {
       </Canvas>
       {ordersData.length > 0 && (
         <>
-          <Button sx={{ position: 'absolute', left: '40%', top: '72%' }} variant="contained" onClick={deleteOrder}>
+          <Button sx={{ position: 'absolute', left: '40%', top: '80%' }} variant="contained" onClick={deleteOrder}>
             {' '}
             הסר הזמנה מהזמנות פעיולות
           </Button>

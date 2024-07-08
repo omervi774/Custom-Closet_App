@@ -21,7 +21,7 @@ function Arrow({ arrowType, handleClick, leftPosition }) {
         //minHeight: '100vh', // Full screen height to center the container
         backgroundColor: '#f5f5f5', // Light background color
         position: 'absolute',
-        top: '83%',
+        top: '88%',
         left: `${leftPosition}%`,
         borderRadius: '10px',
       }}

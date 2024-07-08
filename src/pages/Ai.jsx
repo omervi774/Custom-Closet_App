@@ -7,16 +7,17 @@ import Cube from '../components/Cube/Cube'
 import { Button } from '@mui/material'
 import useData from '../useData'
 import TextSwap from '../components/TextSwap/TextSwap'
+import { serverRoute } from '../components/consts/consts'
 
 function Ai(props) {
   const [chatMessages, setChatMessages] = useState([])
   const [userInput, setUserInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
-  const [data] = useData('http://localhost:5000/homePage')
+  const [data] = useData(`${serverRoute}/homePage`)
 
   const navigate = useNavigate()
   const [cubes, setCubes] = useState({
-    0: [],
+    '-1': [],
   })
 
   // Popup modal
@@ -42,7 +43,7 @@ function Ai(props) {
         setUserInput('')
 
         // Send user input to the server
-        const response = await fetch('http://localhost:5000/ai', {
+        const response = await fetch(`${serverRoute}/ai`, {
           method: 'POST',
           body: JSON.stringify({ text: userInput }),
           headers: {
@@ -56,8 +57,18 @@ function Ai(props) {
 
         // Get the response from the server
         const responseData = await response.json()
-        setCubes(responseData.text)
-        // navigate('/closetDesign', { state: { initalCubes: responseData.text } })
+        // if (responseData.text !== 'תשובתך לא הייתה בפורמט הנכון, רענן את הדף ונסה שוב בבקשה.') {
+        //   setCubes(responseData.text)
+        // }
+        if (responseData.text !== 'תשובתך לא הייתה בפורמט הנכון, רענן את הדף ונסה שוב בבקשה.') {
+          const transformedData = {}
+          Object.keys(responseData.text).forEach((key) => {
+            const newKey = parseInt(key) === 0 ? '-1' : parseInt(key) - 1
+            transformedData[newKey] = responseData.text[key]
+          })
+          setCubes(transformedData)
+          console.log(transformedData)
+        }
 
         // Add ChatGPT response to chat messages state
         setChatMessages((prevMessages) => [...prevMessages, { text: responseData.text, sender: 'ai' }])
@@ -74,26 +85,22 @@ function Ai(props) {
   if (chatMessages.length === 0) {
     setChatMessages([
       {
-        text: 'היי! אשמח לעזור לך בעיצוב הארון. כתוב לי את המידע הבא: רוחב הארון וגובה הארון, תודה',
+        text: 'היי! אשמח לעזור לך בעיצוב הארון. כתוב לי את המידע הבא: רוחב הארון הרצוי וגובה הארון הרצוי, תודה',
         sender: 'ai',
       },
     ])
   }
 
-  // const createMessage = (userInput) => {
-  //   return `please give me another design following the exact rules. User input: ${userInput}`
-  // }
-
   return (
     <>
-      {cubes[0].length === 0 ? (
+      {cubes['-1'].length === 0 ? (
         <>
           {data && <TextSwap data={data['text_content']} />}
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <div style={{ width: '800px', marginTop: '10px' }}>
               <div
                 style={{
-                  height: '450px',
+                  height: '350px',
                   border: '1px solid #ccc',
                   borderRadius: '8px',
                   padding: '10px',
@@ -137,8 +144,8 @@ function Ai(props) {
                     </div>
                   </div>
                 ))}
-                {/* Typing indicator */}
-                {isTyping && <div style={{ textAlign: 'right', fontStyle: 'italic' }}>Typing...</div>}
+                {/* Building indicator */}
+                {isTyping && <div style={{ textAlign: 'right', fontStyle: 'italic' }}>...Building</div>}
               </div>
               <form onSubmit={handleSendMessage}>
                 <div style={{ display: 'flex' }}>
@@ -210,7 +217,7 @@ function Ai(props) {
           </Canvas>
           <Button
             variant="contained"
-            sx={{ position: 'absolute', top: '70%', left: '45%' }}
+            sx={{ position: 'absolute', top: '82%', left: '47%' }}
             onClick={() => navigate('/closetDesign', { state: { initalCubes: cubes } })}
           >
             {' '}
@@ -218,14 +225,11 @@ function Ai(props) {
           </Button>
           <Button
             variant="contained"
-            sx={{ position: 'absolute', top: '70%', left: '55%' }}
+            sx={{ position: 'absolute', top: '82%', left: '57%' }}
             onClick={async () => {
               const message = `please give me another design following the exact rules. User input: ${chatMessages[1].text}`
-              console.log(message) // Print the message to the console
 
-              // TODO: Need to fix the issue with the "userInput" not send to the server
-
-              const response = await fetch('http://localhost:5000/ai', {
+              const response = await fetch(`${serverRoute}/ai`, {
                 method: 'POST',
                 body: JSON.stringify({ text: message }),
                 headers: {
@@ -239,7 +243,13 @@ function Ai(props) {
 
               // Get the response from the server
               const responseData = await response.json()
-              setCubes(responseData.text)
+              const transformedData = {}
+              Object.keys(responseData.text).forEach((key) => {
+                const newKey = parseInt(key) === 0 ? '-1' : parseInt(key) - 1
+                transformedData[newKey] = responseData.text[key]
+              })
+              setCubes(transformedData)
+              console.log(transformedData)
             }}
           >
             {' '}
@@ -252,5 +262,3 @@ function Ai(props) {
 }
 
 export default Ai
-
-// TODO: Need to fix the issue with the "userInput" not send to the server

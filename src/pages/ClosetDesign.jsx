@@ -16,16 +16,17 @@ import { useLocation } from 'react-router-dom'
 import emailjs from '@emailjs/browser'
 import { Shelf } from '../components/Shelf/Shelf.jsx'
 import useData from '../useData'
+import { v4 as uuidv4 } from 'uuid'
+import { serverRoute } from '../components/consts/consts.js'
 let shelfColor = ''
 const globalOffset = 0.04
 const lastActions = []
 export default function ClosetDesign() {
-
   const location = useLocation()
   const { initalCubes } = location.state || {
-    0: [],
+    '-1': [],
   }
-  const [barObject] = useData('http://localhost:5000/stocks/מוטות ברזל')
+  const [barObject] = useData(`${serverRoute}/stocks/מוטות ברזל`)
   // for the dragging cube
   const [position, setPosition] = useState([-6, 2, 0])
   // this state responssible to store the possitions and sizes of all the cubes
@@ -778,18 +779,24 @@ export default function ClosetDesign() {
             <MenuItem
               sx={{ color: 'black', display: !isFirstOpen && 'none' }}
               onClick={async () => {
+                if (cubes['-1'].length === 0) {
+                  return
+                }
                 console.log('cubes', cubes)
                 console.log('shelfs', shelfs)
+                const uniqueId = uuidv4()
+                console.log(uniqueId)
                 // await fetch(`http://localhost:5000/orders`, {
                 //   method: 'post',
-                //   body: JSON.stringify({ cubes: cubes, shelfs: shelfs }),
+                //   body: JSON.stringify({ cubes: cubes, shelfs: shelfs, orderId: uniqueId, paid: false }),
                 //   headers: {
                 //     'Content-Type': 'application/json',
                 //   },
                 // })
                 // setCubes({
-                //   0: [],
+                //   '-1': [],
                 // })
+
                 calculateJoins4Exists(cubes)
                 calculateJoins5Exists(cubes)
                 calculateJoins3Exists(cubes)
@@ -799,20 +806,26 @@ export default function ClosetDesign() {
                 const OrderPrice = priceOfOneBar * barsUsed
                 console.log(OrderPrice)
                 const formData = {
-                  Operation: '1',  // Charge only
+                  Operation: '1', // Charge only
                   TerminalNumber: '1000',
-                  UserName: 'test9611',
-                  SumToBill: OrderPrice.toString() ,
-                  CoinId: '1',  // Shekel
-                  Language: 'he',  
+                  UserName: 'test2025',
+                  SumToBill: OrderPrice.toString(),
+                  CoinId: '1', // Shekel
+                  Language: 'he',
                   ProductName: 'ארון בהאתמה אישית',
                   APILevel: '10',
                   Codepage: '65001', // utf 8
-                  SuccessRedirectUrl: 'https://www.walla.co.il/',
-                  ErrorRedirectUrl: 'https://www.sport5.co.il/'
+                  ReturnValue: uniqueId,
+                  ShowCardOwnerPhone: true,
+                  ReqCardOwnerPhone: true,
+                  ShowCardOwnerEmail: true,
+                  ReqCardOwnerEmail: true,
+                  IndicatorUrl: `${serverRoute}/payment-indicator`,
+                  SuccessRedirectUrl: `${serverRoute}/pyament-success`,
+                  ErrorRedirectUrl: `${serverRoute}/pyament-error`,
                   // Add more parameters as needed
-              };
-              
+                }
+
                 // TODO - Need to check how to use the .env file!
 
                 // require('dotenv').config()
@@ -848,49 +861,54 @@ export default function ClosetDesign() {
                 //   }
                 // )
 
-                
                 try {
                   const response = await fetch('https://secure.cardcom.solutions/Interface/LowProfile.aspx', {
-                      method: 'POST',
-                      headers: {
-                          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                      },
-                      body: new URLSearchParams(formData).toString(),
-                  });
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    },
+                    body: new URLSearchParams(formData).toString(),
+                  })
 
                   if (!response.ok) {
-                      throw new Error('Network response was not ok');
+                    throw new Error('Network response was not ok')
                   }
 
-                  const responseData = await response.text();
-                  console.log('Response from Cardcom API:', responseData);
+                  const responseData = await response.text()
+                  console.log('Response from Cardcom API:', responseData)
 
-                  //decoding all 3 url to give to the clinet 
+                  //decoding all 3 url to give to the clinet
 
-                  const params = new URLSearchParams(responseData);
+                  const params = new URLSearchParams(responseData)
 
-                  const url = decodeURIComponent(params.get('url'));
-                  const paypalUrl = decodeURIComponent(params.get('PayPalUrl'));
-                  const bitUrl = decodeURIComponent(params.get('BitUrl'));
+                  const url = decodeURIComponent(params.get('url'))
+                  const paypalUrl = decodeURIComponent(params.get('PayPalUrl'))
+                  const bitUrl = decodeURIComponent(params.get('BitUrl'))
+                  const lowProfileCode = decodeURIComponent(params.get('LowProfileCode'))
 
-                  console.log('Decoded URL:', url);
-                  console.log('Decoded PayPal URL:', paypalUrl);
-                  console.log('Decoded Bit URL:', bitUrl);
+                  console.log('Decoded URL:', url)
+                  console.log('Decoded PayPal URL:', paypalUrl)
+                  console.log('Decoded Bit URL:', bitUrl)
+                  console.log('Decoded low profile code:', lowProfileCode)
+                  await fetch(`${serverRoute}/orders`, {
+                    method: 'post',
+                    body: JSON.stringify({ cubes: cubes, shelfs: shelfs, orderId: lowProfileCode, paid: false }),
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                  })
+                  setCubes({
+                    '-1': [],
+                  })
 
-
-                  window.open(url, '_blank');
-
-
+                  window.open(url, '_blank')
 
                   // Process the response as needed
                 } catch (error) {
-                  console.error('Error fetching data:', error);
+                  console.error('Error fetching data:', error)
                   // Handle errors here
                 }
-
-
-                }}
-                              
+              }}
             >
               הזמן
             </MenuItem>

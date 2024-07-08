@@ -1,22 +1,12 @@
 import React from 'react'
 import useData from '../useData'
 import useUser from '../useUser'
-// import { Button } from '@mui/material'
-// import useEditData from '../useEditData'
-// import FileUpload from '../components/FileUpload/FileUpload'
 import AdminHome from '../components/HomePage/AdminHome'
 import CustomerHome from '../components/HomePage/CustomerHome'
-
+import { serverRoute } from '../components/consts/consts'
 function Home() {
-  const [data, setData] = useData('http://localhost:5000/homePage')
-  // const [imgData, setImgData] = useData('http://localhost:5000/uploads')
-  // const uploadFile = (file) => {
-  //   setData((prev) => {
-  //     return { ...prev, ['images']: [...prev['images'], file] }
-  //   })
-  // }
-  // const [jsx, handleOpen] = useEditData('http://localhost:5000/homePage', setData, data, 'text_content')
-  // const [jsx1, handleOpen1] = useEditData('http://localhost:5000/uploads', setData, data, 'images')
+  console.log(serverRoute)
+  const [data, setData] = useData(`${serverRoute}/homePage`)
   const user = useUser()
 
   return (
