@@ -25,7 +25,7 @@ const TextSwap = ({ data }) => {
       <div
         style={{
           maxWidth: '1200px',
-          height: '30px',
+          //height: '0.5%',
           margin: '0 auto',
           display: 'flex',
           flexDirection: 'column',
@@ -34,7 +34,7 @@ const TextSwap = ({ data }) => {
         }}
       >
         <div className={`slide ${isSwapping ? 'out' : 'in'}`}>
-          <h1 style={{ textAlign: 'center', fontSize: '26px', marginBottom: '20px' }}>{data[currentIndex].title}</h1>
+          {/* <h1 style={{ textAlign: 'center', fontSize: '26px', marginBottom: '20px' }}>{data[currentIndex].title}</h1> */}
           <p style={{ textAlign: 'center', fontSize: '18px', color: 'black', marginBottom: '20px' }}>{data[currentIndex].subTitle}</p>
         </div>
       </div>
