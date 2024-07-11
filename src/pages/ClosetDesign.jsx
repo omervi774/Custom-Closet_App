@@ -18,6 +18,9 @@ import { Shelf } from '../components/Shelf/Shelf.jsx'
 import useData from '../useData'
 import { v4 as uuidv4 } from 'uuid'
 import { serverRoute } from '../components/consts/consts.js'
+import UserDetailsModal from '../components/UserDetailsModal/UserDetailsModal.jsx'
+let url = ''
+let lowProfileCode = ''
 let shelfColor = ''
 const globalOffset = 0.04
 const lastActions = []
@@ -43,6 +46,12 @@ export default function ClosetDesign() {
     setIsModalOpen(false)
     setMessage({ messageType: 'success', title: 'התחל לבנות ארון', content: '', topPosition: '20%', leftPosition: '40%', arrow: true })
   }
+  // modal for fill the user details
+  const [detailsModal, setDetailsModal] = useState(false)
+  const handleCloseDetailsModal = () => {
+    setDetailsModal(false)
+  }
+
   const [preview, setPreview] = useState('')
   const handleFileChange = (file) => {
     // Create a preview URL
@@ -727,6 +736,23 @@ export default function ClosetDesign() {
       }
     }
   }
+  const submitDetailsModal = async (userDetails) => {
+    await fetch(`${serverRoute}/orders`, {
+      method: 'post',
+      body: JSON.stringify({ cubes: cubes, shelfs: shelfs, orderId: lowProfileCode, paid: false, userDetails: userDetails }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    setCubes({
+      '-1': [],
+    })
+
+    window.open(url, '_blank')
+    // url = ''
+    // lowProfileCode = ''
+    handleCloseDetailsModal()
+  }
   return (
     <>
       {/* popup modal */}
@@ -742,6 +768,8 @@ export default function ClosetDesign() {
           <FileUpload handleFileChange={handleFileChange} handleClose={handleCloseModal} />
         </Modal>
       )}
+      {detailsModal && <UserDetailsModal onSubmit={submitDetailsModal} open={detailsModal} />}
+
       {preview && (
         <div style={{ position: 'absolute' }}>
           <img src={preview} alt="Selected" style={{ maxWidth: '100%', height: 'auto' }} />
@@ -881,27 +909,28 @@ export default function ClosetDesign() {
 
                   const params = new URLSearchParams(responseData)
 
-                  const url = decodeURIComponent(params.get('url'))
+                  url = decodeURIComponent(params.get('url'))
                   const paypalUrl = decodeURIComponent(params.get('PayPalUrl'))
                   const bitUrl = decodeURIComponent(params.get('BitUrl'))
-                  const lowProfileCode = decodeURIComponent(params.get('LowProfileCode'))
+                  lowProfileCode = decodeURIComponent(params.get('LowProfileCode'))
+                  setDetailsModal(true)
 
                   console.log('Decoded URL:', url)
                   console.log('Decoded PayPal URL:', paypalUrl)
                   console.log('Decoded Bit URL:', bitUrl)
                   console.log('Decoded low profile code:', lowProfileCode)
-                  await fetch(`${serverRoute}/orders`, {
-                    method: 'post',
-                    body: JSON.stringify({ cubes: cubes, shelfs: shelfs, orderId: lowProfileCode, paid: false }),
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                  })
-                  setCubes({
-                    '-1': [],
-                  })
+                  // await fetch(`${serverRoute}/orders`, {
+                  //   method: 'post',
+                  //   body: JSON.stringify({ cubes: cubes, shelfs: shelfs, orderId: lowProfileCode, paid: false }),
+                  //   headers: {
+                  //     'Content-Type': 'application/json',
+                  //   },
+                  // })
+                  // setCubes({
+                  //   '-1': [],
+                  // })
 
-                  window.open(url, '_blank')
+                  // window.open(url, '_blank')
 
                   // Process the response as needed
                 } catch (error) {
