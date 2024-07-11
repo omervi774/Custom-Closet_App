@@ -44,11 +44,11 @@ export default function Header() {
       >
         {/*   register and login buttons */}
         <Stack direction="row" spacing="1rem " color="success">
-          {isDesktopScreen && user === null && (
-            <Button color="success" variant="contained" sx={{ color: 'white' }}>
+          {/* {isDesktopScreen && user === null && (
+            <Button color="success" variant="contained" sx={{ color: 'white' }}
               הרשמה
             </Button>
-          )}
+          )} */}
 
           {user === null && (
             <Button

@@ -1,7 +1,7 @@
 import React, { Suspense, useState, useRef } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { Preload, OrbitControls, Environment } from '@react-three/drei'
-import { MenuItem, Paper, MenuList, Box } from '@mui/material'
+import { MenuItem, Paper, MenuList, Box, Button } from '@mui/material'
 import DraggingCube from '../components/DraggingCube/DraggingCube'
 import Cube from '../components/Cube/Cube'
 import Circle from '../components/Circle/Circle'
@@ -776,190 +776,186 @@ export default function ClosetDesign() {
         </div>
       )}
 
-      <div style={{ position: 'absolute', top: '10vh', zIndex: 1000, backgroundColor: '#e5e5e5' }}>
-        {/* menu container */}
-        <Paper sx={{ height: '90vh', width: '15vh', display: !isMenu && 'none', backgroundColor: '#e5e5e5' }}>
-          {/* first menu - let the use the option to add new cube or shelf */}
-          <MenuList>
-            <MenuItem
-              sx={{ color: 'black', display: !isFirstOpen && 'none', marginBottom: 1 }}
-              onClick={() => {
-                setFirstOpen(false)
-                setSecondaryOpen([true, 'קוביות'])
-                handleResetRotation()
-              }}
-            >
-              קוביות
-            </MenuItem>
-            <MenuItem
-              sx={{ color: 'black', display: !isFirstOpen && 'none', marginBottom: 1 }}
-              onClick={() => {
-                setFirstOpen(false)
-                setSecondaryOpen([true, 'מדפים'])
-                handleResetRotation()
-              }}
-            >
-              מדפים
-            </MenuItem>
-            <MenuItem onClick={removeLastAction} sx={{ color: 'black', display: !isFirstOpen && 'none', marginBottom: 1 }}>
-              בטל פעולה
-            </MenuItem>
-            <MenuItem
-              sx={{ color: 'black', display: !isFirstOpen && 'none' }}
-              onClick={async () => {
-                if (cubes['-1'].length === 0) {
-                  return
+      <div
+        style={{
+          position: 'absolute',
+          top: '10vh',
+          zIndex: 1000,
+          right: 0,
+          textAlign: 'right',
+          display: !isMenu && 'none',
+          // display: 'flex',
+          // justifyContent: 'flex-end',
+          direction: 'rtl',
+          height: '90vh',
+        }}
+      >
+        <MenuList sx={{ textAlign: 'right', width: '15vh' }}>
+          <Button
+            variant="outlined"
+            sx={{
+              color: 'black',
+              display: !isFirstOpen && 'none',
+              marginBottom: 1,
+              textAlign: 'right',
+              minWidth: '100%', // Ensure buttons are the same width
+              borderColor: 'grey !important', // Grey border color
+              borderRadius: '10px', // Slightly rounded corners
+              borderWidth: '1px', // Border width
+              // margin: '8px 0', // Add margin between buttons
+            }}
+            onClick={() => {
+              setFirstOpen(false)
+              setSecondaryOpen([true, 'קוביות'])
+              handleResetRotation()
+            }}
+          >
+            קוביות
+          </Button>
+          <Button
+            variant="outlined"
+            sx={{
+              color: 'black',
+              display: !isFirstOpen && 'none',
+              marginBottom: 1,
+              textAlign: 'right',
+              minWidth: '100%', // Ensure buttons are the same width
+              borderColor: 'grey !important', // Grey border color
+              borderRadius: '10px', // Slightly rounded corners
+              borderWidth: '1px', // Border width
+              //margin: '8px 0', // Add margin between buttons
+            }}
+            onClick={() => {
+              setFirstOpen(false)
+              setSecondaryOpen([true, 'מדפים'])
+              handleResetRotation()
+            }}
+          >
+            מדפים
+          </Button>
+          <Button
+            variant="outlined"
+            color="info"
+            onClick={removeLastAction}
+            sx={{
+              color: 'black',
+              display: !isFirstOpen && 'none',
+              marginBottom: 1,
+              textAlign: 'right',
+              minWidth: '100%', // Ensure buttons are the same width
+              borderColor: 'grey !important', // Grey border color
+              borderRadius: '10px', // Slightly rounded corners
+              borderWidth: '1px', // Border width
+              //margin: '8px 0', // Add margin between buttons
+            }}
+          >
+            בטל פעולה
+          </Button>
+          <Button
+            variant="outlined"
+            sx={{
+              color: 'black',
+              display: !isFirstOpen && 'none',
+              textAlign: 'right',
+              minWidth: '100%', // Ensure buttons are the same width
+              borderColor: 'grey !important', // Grey border color
+              borderRadius: '10px', // Slightly rounded corners
+              borderWidth: '1px', // Border width
+              // margin: '8px 0', // Add margin between buttons
+            }}
+            onClick={async () => {
+              if (cubes['-1'].length === 0) {
+                return
+              }
+              console.log('cubes', cubes)
+              console.log('shelfs', shelfs)
+              const uniqueId = uuidv4()
+              console.log(uniqueId)
+
+              calculateJoins4Exists(cubes)
+              calculateJoins5Exists(cubes)
+              calculateJoins3Exists(cubes)
+              const barsUsed = calculateBars(cubes)
+              setShelfs([])
+              const priceOfOneBar = Number(barObject[0].price)
+              const OrderPrice = priceOfOneBar * barsUsed
+              console.log(OrderPrice)
+              const formData = {
+                Operation: '1', // Charge only
+                TerminalNumber: '1000',
+                UserName: 'test2025',
+                SumToBill: OrderPrice.toString(),
+                CoinId: '1', // Shekel
+                Language: 'he',
+                ProductName: 'ארון בהאתמה אישית',
+                APILevel: '10',
+                Codepage: '65001', // utf 8
+                ReturnValue: uniqueId,
+                ShowCardOwnerPhone: true,
+                ReqCardOwnerPhone: true,
+                ShowCardOwnerEmail: true,
+                ReqCardOwnerEmail: true,
+                IndicatorUrl: `${serverRoute}/payment-indicator`,
+                SuccessRedirectUrl: `${serverRoute}/pyament-success`,
+                ErrorRedirectUrl: `${serverRoute}/pyament-error`,
+                // Add more parameters as needed
+              }
+
+              try {
+                const response = await fetch('https://secure.cardcom.solutions/Interface/LowProfile.aspx', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                  },
+                  body: new URLSearchParams(formData).toString(),
+                })
+
+                if (!response.ok) {
+                  throw new Error('Network response was not ok')
                 }
-                console.log('cubes', cubes)
-                console.log('shelfs', shelfs)
-                const uniqueId = uuidv4()
-                console.log(uniqueId)
-                // await fetch(`http://localhost:5000/orders`, {
-                //   method: 'post',
-                //   body: JSON.stringify({ cubes: cubes, shelfs: shelfs, orderId: uniqueId, paid: false }),
-                //   headers: {
-                //     'Content-Type': 'application/json',
-                //   },
-                // })
-                // setCubes({
-                //   '-1': [],
-                // })
 
-                calculateJoins4Exists(cubes)
-                calculateJoins5Exists(cubes)
-                calculateJoins3Exists(cubes)
-                const barsUsed = calculateBars(cubes)
-                setShelfs([])
-                const priceOfOneBar = Number(barObject[0].price)
-                const OrderPrice = priceOfOneBar * barsUsed
-                console.log(OrderPrice)
-                const formData = {
-                  Operation: '1', // Charge only
-                  TerminalNumber: '1000',
-                  UserName: 'test2025',
-                  SumToBill: OrderPrice.toString(),
-                  CoinId: '1', // Shekel
-                  Language: 'he',
-                  ProductName: 'ארון בהאתמה אישית',
-                  APILevel: '10',
-                  Codepage: '65001', // utf 8
-                  ReturnValue: uniqueId,
-                  ShowCardOwnerPhone: true,
-                  ReqCardOwnerPhone: true,
-                  ShowCardOwnerEmail: true,
-                  ReqCardOwnerEmail: true,
-                  IndicatorUrl: `${serverRoute}/payment-indicator`,
-                  SuccessRedirectUrl: `${serverRoute}/pyament-success`,
-                  ErrorRedirectUrl: `${serverRoute}/pyament-error`,
-                  // Add more parameters as needed
-                }
+                const responseData = await response.text()
+                console.log('Response from Cardcom API:', responseData)
 
-                // TODO - Need to check how to use the .env file!
+                //decoding all 3 url to give to the clinet
+                const params = new URLSearchParams(responseData)
+                const url = decodeURIComponent(params.get('url'))
+                const paypalUrl = decodeURIComponent(params.get('PayPalUrl'))
+                const bitUrl = decodeURIComponent(params.get('BitUrl'))
+                const lowProfileCode = decodeURIComponent(params.get('LowProfileCode'))
+                setDetailsModal(true)
 
-                // require('dotenv').config()
-                // console.log(process.env) // remove this after you've confirmed it is working
+                console.log('Decoded URL:', url)
+                console.log('Decoded PayPal URL:', paypalUrl)
+                console.log('Decoded Bit URL:', bitUrl)
+                console.log('Decoded low profile code:', lowProfileCode)
 
-                // const serviceID = process.env.SERVICE_ID
-                // const templateID = process.env.TEMPLATE_ID
-                // const publicID = process.env.PUBLIC_KEY
-
-                // if (!serviceID) {
-                //   throw new Error('serviceID key not found in environment variables.')
-                // }
-                // if (!templateID) {
-                //   throw new Error('templateID key not found in environment variables.')
-                // }
-                // if (!publicID) {
-                //   throw new Error('publicID key not found in environment variables.')
-                // }
-
-                // // Check if needed
-                // const templateParams = {
-                //   name: 'אורח',
-                // }
-
-                // // TODO - Need to check how to use the .env file!
-
-                // emailjs.send('service_owb0ixg', 'template_ccyiflc', templateParams, 'N6AHBrG2D358AbCVW').then(
-                //   (response) => {
-                //     console.log('SUCCESS!', response.status, response.text)
-                //   },
-                //   (error) => {
-                //     console.log('FAILED...', error)
-                //   }
-                // )
-
-                try {
-                  const response = await fetch('https://secure.cardcom.solutions/Interface/LowProfile.aspx', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                    },
-                    body: new URLSearchParams(formData).toString(),
-                  })
-
-                  if (!response.ok) {
-                    throw new Error('Network response was not ok')
-                  }
-
-                  const responseData = await response.text()
-                  console.log('Response from Cardcom API:', responseData)
-
-                  //decoding all 3 url to give to the clinet
-
-                  const params = new URLSearchParams(responseData)
-
-                  url = decodeURIComponent(params.get('url'))
-                  const paypalUrl = decodeURIComponent(params.get('PayPalUrl'))
-                  const bitUrl = decodeURIComponent(params.get('BitUrl'))
-                  lowProfileCode = decodeURIComponent(params.get('LowProfileCode'))
-                  setDetailsModal(true)
-
-                  console.log('Decoded URL:', url)
-                  console.log('Decoded PayPal URL:', paypalUrl)
-                  console.log('Decoded Bit URL:', bitUrl)
-                  console.log('Decoded low profile code:', lowProfileCode)
-                  // await fetch(`${serverRoute}/orders`, {
-                  //   method: 'post',
-                  //   body: JSON.stringify({ cubes: cubes, shelfs: shelfs, orderId: lowProfileCode, paid: false }),
-                  //   headers: {
-                  //     'Content-Type': 'application/json',
-                  //   },
-                  // })
-                  // setCubes({
-                  //   '-1': [],
-                  // })
-
-                  // window.open(url, '_blank')
-
-                  // Process the response as needed
-                } catch (error) {
-                  console.error('Error fetching data:', error)
-                  // Handle errors here
-                }
-              }}
-            >
-              הזמן
-            </MenuItem>
-          </MenuList>
-          {/* second menu item - display the user the cubes size and let him choose the required size */}
-          <MenuItem sx={{ color: 'black', display: isSecondaryOpen[0] && isSecondaryOpen[1] === 'קוביות' ? 'block' : 'none' }}>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 1,
-              }}
-            >
-              <CubeUi title="קוביות" newDraggingCube={newDraggingCube} closeSecondaryMenu={closeSecondaryMenu} />
-            </Box>
-          </MenuItem>
-          {isSecondaryOpen[0] && isSecondaryOpen[1] === 'מדפים' && (
-            <ShelfUi title={'מדפים'} addNewShelf={addNewShelf} closeSecondaryMenu={closeSecondaryMenu} />
-          )}
-        </Paper>
+                // Process the response as needed
+              } catch (error) {
+                console.error('Error fetching data:', error)
+                // Handle errors here
+              }
+            }}
+          >
+            הזמן
+          </Button>
+        </MenuList>
+        <MenuItem sx={{ color: 'black', display: isSecondaryOpen[0] && isSecondaryOpen[1] === 'קוביות' ? 'block' : 'none' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 1,
+            }}
+          >
+            <CubeUi title="קוביות" newDraggingCube={newDraggingCube} closeSecondaryMenu={closeSecondaryMenu} />
+          </Box>
+        </MenuItem>
+        {isSecondaryOpen[0] && isSecondaryOpen[1] === 'מדפים' && (
+          <ShelfUi title={'מדפים'} addNewShelf={addNewShelf} closeSecondaryMenu={closeSecondaryMenu} />
+        )}
       </div>
 
       {message.messageType !== undefined && (
