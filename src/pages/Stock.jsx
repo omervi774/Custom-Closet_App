@@ -1,7 +1,5 @@
 import React from 'react'
 import useData from '../useData'
-
-import StockCard from '../components/StockCard/StockCard'
 import useEditData from '../useEditData'
 import { serverRoute } from '../components/consts/consts'
 
@@ -9,11 +7,27 @@ const TitleStyle = {
   textAlign: 'center',
 }
 
-const ConstiarCardStyle = {
+const TableStyle = {
+  width: '80%',
+  margin: '0 auto',
+  borderCollapse: 'collapse',
+  marginTop: '20px',
+}
+
+const ThTdStyle = {
+  border: '1px solid black',
+  padding: '8px',
+  textAlign: 'center',
+}
+
+const ButtonContainerStyle = {
   display: 'flex',
-  justifyContent: 'center',
-  flexWrap: 'wrap',
-  paddingTop: '5%',
+  flexDirection: 'column',
+  alignItems: 'center',
+}
+
+const ButtonStyle = {
+  margin: '4px 0',
 }
 
 const StockManagementPage = () => {
@@ -27,12 +41,32 @@ const StockManagementPage = () => {
         Add Item
       </button> */}
 
-      <div style={ConstiarCardStyle}>
-        {stockData &&
-          stockData.map((item, index) => (
-            <StockCard key={index} name={item.name} quantity={item.quantity} price={item.price} id={item.id} handleOpen={handleOpen} />
-          ))}
-      </div>
+      <table style={TableStyle}>
+        <thead>
+          <tr>
+            <th style={ThTdStyle}>פעולה</th>
+            <th style={ThTdStyle}>מחיר</th>
+            <th style={ThTdStyle}>כמות</th>
+            <th style={ThTdStyle}>שם</th>
+          </tr>
+        </thead>
+        <tbody>
+          {stockData &&
+            stockData.map((item, index) => (
+              <tr key={index}>
+                <td style={ThTdStyle}>
+                  <div style={ButtonContainerStyle}>
+                    <button style={ButtonStyle} onClick={() => handleOpen(item.id, 'quantity')}>ערוך כמות</button>
+                    <button style={ButtonStyle} onClick={() => handleOpen(item.id, 'price')}>ערוך מחיר</button>
+                  </div>
+                </td>
+                <td style={ThTdStyle}>{item.price}</td>
+                <td style={ThTdStyle}>{item.quantity}</td>
+                <td style={ThTdStyle}>{item.name}</td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
       {jsx()}
     </div>
   )
