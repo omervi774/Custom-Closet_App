@@ -57,9 +57,6 @@ function Ai(props) {
 
         // Get the response from the server
         const responseData = await response.json()
-        // if (responseData.text !== 'תשובתך לא הייתה בפורמט הנכון, רענן את הדף ונסה שוב בבקשה.') {
-        //   setCubes(responseData.text)
-        // }
         if (responseData.text !== 'תשובתך לא הייתה בפורמט הנכון, רענן את הדף ונסה שוב בבקשה.') {
           const transformedData = {}
           Object.keys(responseData.text).forEach((key) => {
@@ -102,22 +99,27 @@ function Ai(props) {
                 style={{
                   height: '350px',
                   border: '1px solid #ccc',
-                  borderRadius: '8px',
+                  borderRadius: '15px',
                   padding: '10px',
                   marginBottom: '10px',
                   overflowY: 'auto',
                   backgroundColor: '#f9f9f9',
+                  backgroundImage: 'url(/whatapp_background.jpg)',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
                   direction: 'rtl',
                 }}
               >
                 {/* popup model */}
                 {isModalOpen && (
                   <Modal isOpen={isModalOpen} handleClose={handleCloseModal}>
-                    <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>AI Assistent</h2>
-                    <p style={{ fontSize: '18px', lineHeight: '1.6' }}>
-                      לפניכם מערכת AI שנועדה לעזור לכם לעצב ארון. כתבו בתיבת הטקסט את גדלי הארון הרצויים והמערכת תדאג לעצב לכם ארון בגדלים
-                      שביקשתם!
-                    </p>
+                    <div style={{ padding: '20px', textAlign: 'center', fontFamily: 'Arial, sans-serif', color: '#333', width: '450px' }}>
+                      <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#4CAF50' }}>AI Assistant</h2>
+                      <p style={{ fontSize: '18px', lineHeight: '1.6', marginBottom: '20px' }}>
+                        ברוכים הבאים למערכת ה-AI שלנו, שנועדה לסייע לכם בעיצוב ארון מותאם אישית. כתבו בתיבת הטקסט את המידות הרצויות והמערכת
+                        תיצור עבורכם עיצוב מושלם בהתאם לבקשותיכם!
+                      </p>
+                    </div>
                   </Modal>
                 )}
 
@@ -126,7 +128,7 @@ function Ai(props) {
                     key={index}
                     style={{
                       marginBottom: '5px',
-                      textAlign: message.sender === 'ai' ? 'right' : 'left',
+                      textAlign: message.sender === 'ai' ? 'right' : 'right',
                     }}
                   >
                     <div
@@ -134,7 +136,7 @@ function Ai(props) {
                         display: 'inline-block',
                         borderRadius: '8px',
                         padding: '8px',
-                        fontSize: '21px',
+                        fontSize: '22px',
                         margin: '7px',
                         backgroundColor: message.sender === 'ai' ? '#dff0d8' : '#d9edf7',
                         color: message.sender === 'ai' ? '#4CAF50' : '#337ab7',
@@ -145,7 +147,7 @@ function Ai(props) {
                   </div>
                 ))}
                 {/* Building indicator */}
-                {isTyping && <div style={{ textAlign: 'right', fontStyle: 'italic' }}>...Building</div>}
+                {isTyping && <div style={{ textAlign: 'right', fontStyle: 'italic', fontSize: '22px', margin: '5px' }}>בונה ארון...</div>}
               </div>
               <form onSubmit={handleSendMessage}>
                 <div style={{ display: 'flex' }}>
@@ -153,14 +155,14 @@ function Ai(props) {
                     type="submit"
                     style={{
                       padding: '8px 16px',
-                      borderRadius: '8px',
+                      borderRadius: '15px',
                       backgroundColor: '#4CAF50',
                       color: 'white',
                       border: 'none',
                       cursor: 'pointer',
                     }}
                   >
-                    Send
+                    שלח
                   </button>
                   <input
                     type="text"
@@ -169,7 +171,7 @@ function Ai(props) {
                     style={{
                       flex: '1',
                       padding: '8px',
-                      borderRadius: '8px',
+                      borderRadius: '15px',
                       border: '1px solid #ccc',
                       marginLeft: '10px',
                       direction: 'rtl',
