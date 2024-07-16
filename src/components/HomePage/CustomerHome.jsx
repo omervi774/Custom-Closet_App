@@ -3,11 +3,13 @@ import TextSwap from '../TextSwap/TextSwap'
 import { Button } from '@mui/material'
 import UserDetailsModal from '../UserDetailsModal/UserDetailsModal'
 import { serverRoute } from '../consts/consts'
+import { useNavigate } from 'react-router-dom'
 let url = ''
 let lowProfileCode = ''
 let orderImgPath = ''
 export default function CustomerHome({ data }) {
   const [detailsModal, setDetailsModal] = useState(false)
+  const navigate = useNavigate()
   const handleOrder = async (price, path) => {
     const formData = {
       Operation: '1', // Charge only
@@ -108,6 +110,9 @@ export default function CustomerHome({ data }) {
             <h2 style={{ textAlign: 'center', fontSize: '30px', color: '#fff', marginBottom: '20px' }}> ?מוכנים להתחיל</h2>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <button
+                onClick={() => {
+                  navigate('/closetDesign')
+                }}
                 style={{
                   backgroundColor: '#fff',
                   color: '#007bff',

@@ -277,6 +277,7 @@ export const calculateJoins5Exists = (cubes) => {
     }
   })
   console.log('finish calculate joint 5 exists : ', join5Exists)
+  return join5Exists
 }
 export const calculateJoins4Exists = (cubes) => {
   let joins4Exists = 0
@@ -376,6 +377,7 @@ export const calculateJoins4Exists = (cubes) => {
     }
   })
   console.log('after finsih calac joins 4 exists is :', joins4Exists)
+  return joins4Exists
 }
 export const calculateJoins3Exists = (cubes) => {
   let join3Exists = 4
@@ -403,4 +405,5 @@ export const calculateJoins3Exists = (cubes) => {
     }
   })
   console.log('after finish calc joins 3 exists : ', join3Exists)
+  return join3Exists
 }

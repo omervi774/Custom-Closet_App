@@ -1,14 +1,15 @@
 import React from 'react'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 
 const AnimatedArrow = () => {
   return (
-    <ArrowBackIcon
+    <ArrowForwardIcon
       fontSize="large"
       style={{
         position: 'absolute',
         top: '17%',
-        left: '15%',
+        right: '15%',
         transform: 'scaleX(3)',
         animation: 'moveArrow 1s infinite',
       }}

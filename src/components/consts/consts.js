@@ -11,6 +11,7 @@ export const routingItemsForAdmin = [
 ]
 
 export const serverRoute = process.env.REACT_APP_SERVER_ROUTE
+export const appRoute = process.env.REACT_APP_ROUTE
 
 // login modal style
 export const loginModalStyle = {

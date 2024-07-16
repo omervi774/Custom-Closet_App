@@ -1,7 +1,7 @@
 import React, { Suspense, useState, useRef } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { Preload, OrbitControls, Environment } from '@react-three/drei'
-import { MenuItem, Paper, MenuList, Box, Button } from '@mui/material'
+import { MenuItem, MenuList, Box, Button } from '@mui/material'
 import DraggingCube from '../components/DraggingCube/DraggingCube'
 import Cube from '../components/Cube/Cube'
 import Circle from '../components/Circle/Circle'
@@ -13,11 +13,11 @@ import Undo from '../components/Undo/Undo'
 import FileUpload from '../components/FileUpload/FileUpload'
 import { calculateJoins4Exists, calculateJoins3Exists, calculateJoins5Exists, calculateBars } from '../calculateJoins.js'
 import { useLocation } from 'react-router-dom'
-import emailjs from '@emailjs/browser'
 import { Shelf } from '../components/Shelf/Shelf.jsx'
 import useData from '../useData'
 import { v4 as uuidv4 } from 'uuid'
 import { serverRoute } from '../components/consts/consts.js'
+import { appRoute } from '../components/consts/consts.js'
 import UserDetailsModal from '../components/UserDetailsModal/UserDetailsModal.jsx'
 let url = ''
 let lowProfileCode = ''
@@ -44,7 +44,7 @@ export default function ClosetDesign() {
   const [isModalOpen, setIsModalOpen] = useState(true)
   const handleCloseModal = () => {
     setIsModalOpen(false)
-    setMessage({ messageType: 'success', title: 'התחל לבנות ארון', content: '', topPosition: '20%', leftPosition: '40%', arrow: true })
+    setMessage({ messageType: 'success', title: 'התחל לבנות ארון', content: '', topPosition: '20%', leftPosition: '65%', arrow: true })
   }
   // modal for fill the user details
   const [detailsModal, setDetailsModal] = useState(false)
@@ -737,9 +737,23 @@ export default function ClosetDesign() {
     }
   }
   const submitDetailsModal = async (userDetails) => {
+    const joins3Exists = calculateJoins3Exists(cubes)
+    const joins4Exists = calculateJoins4Exists(cubes)
+    const joins5Exists = calculateJoins5Exists(cubes)
+    const barsUsed = calculateBars(cubes)
     await fetch(`${serverRoute}/orders`, {
       method: 'post',
-      body: JSON.stringify({ cubes: cubes, shelfs: shelfs, orderId: lowProfileCode, paid: false, userDetails: userDetails }),
+      body: JSON.stringify({
+        cubes: cubes,
+        shelfs: shelfs,
+        orderId: lowProfileCode,
+        paid: false,
+        userDetails: userDetails,
+        joins3Exists: joins3Exists,
+        joins4Exists: joins4Exists,
+        joins5Exists: joins5Exists,
+        bars: barsUsed,
+      }),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -747,10 +761,9 @@ export default function ClosetDesign() {
     setCubes({
       '-1': [],
     })
+    setShelfs([])
 
     window.open(url, '_blank')
-    // url = ''
-    // lowProfileCode = ''
     handleCloseDetailsModal()
   }
   return (
@@ -872,11 +885,7 @@ export default function ClosetDesign() {
               const uniqueId = uuidv4()
               console.log(uniqueId)
 
-              calculateJoins4Exists(cubes)
-              calculateJoins5Exists(cubes)
-              calculateJoins3Exists(cubes)
               const barsUsed = calculateBars(cubes)
-              setShelfs([])
               const priceOfOneBar = Number(barObject[0].price)
               const OrderPrice = priceOfOneBar * barsUsed
               console.log(OrderPrice)
@@ -919,10 +928,10 @@ export default function ClosetDesign() {
 
                 //decoding all 3 url to give to the clinet
                 const params = new URLSearchParams(responseData)
-                const url = decodeURIComponent(params.get('url'))
+                url = decodeURIComponent(params.get('url'))
                 const paypalUrl = decodeURIComponent(params.get('PayPalUrl'))
                 const bitUrl = decodeURIComponent(params.get('BitUrl'))
-                const lowProfileCode = decodeURIComponent(params.get('LowProfileCode'))
+                lowProfileCode = decodeURIComponent(params.get('LowProfileCode'))
                 setDetailsModal(true)
 
                 console.log('Decoded URL:', url)

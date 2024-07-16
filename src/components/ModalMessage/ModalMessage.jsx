@@ -30,7 +30,7 @@ const ModalMessage = ({ typeOfMessage, title, content, onCloseModal, topPosition
       if (onCloseModal) {
         onCloseModal()
       }
-    }, 2000) // 3 seconds
+    }, 2000)
 
     return () => clearTimeout(timer) // Cleanup timer on unmount
   }, [onCloseModal])
