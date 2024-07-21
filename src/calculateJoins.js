@@ -245,7 +245,7 @@ export const calculateJoins5Exists = (cubes) => {
         }
         for (let j = numberLayer; j < numberLayer + testedCube.size[1]; j++) {
           const indexOfPossibleCubeFromRight = findCube(j, cubeRightEdge, 'left', cubes)
-          // no cube from left -> continiue
+          // no cube from right -> continiue
           if (indexOfPossibleCubeFromRight === -1) {
             break
           }

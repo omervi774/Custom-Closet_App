@@ -23,6 +23,7 @@ let url = ''
 let lowProfileCode = ''
 let shelfColor = ''
 const globalOffset = 0.04
+let closetRightEdge = 0
 const lastActions = []
 export default function ClosetDesign() {
   const location = useLocation()
@@ -105,27 +106,8 @@ export default function ClosetDesign() {
     layer = Number(layer)
     const isLayer0 = isFirstLayer(layer)
     let offset = [0, 0]
-    // this block of code responsible to calc the offset
-    if (isLayer0) {
-      // in case it is layer 0 and  connect from the left
-      if (side === 'left') {
-        const conectedCube = cubes[-1][0] // in case the layer is 0 calc the offset to right for the cube
-        offset[0] = conectedCube.offset[0]
-        offset[1] = conectedCube.offset[1]
-        offset[0] += globalOffset
-        //in case the connected cube is 2 add another offset(because it represent as 2 cobe connected togther hance the left cube has offset itself)
-        if (conectedCube.size[0] === 2) {
-          offset[0] += globalOffset
-        }
-        // same princeble as the if above
-        if (conectedCube.size[0] === 3) {
-          offset[0] += globalOffset * 2
-        }
-        // if it is layer0 and connected from right the calc of the offset happen after the func is over
-      }
-    }
-    // in case the connection is not on layer 0 calc the offset as it is so conneceted fron top
-    else {
+
+    if (!isLayer0 || (isLayer0 && side === 'left')) {
       offset = calcOffsetWhenIsTopConnection(Number(layer), Number(layer) - 1, cubeSize, xPosition)
     }
 
@@ -274,32 +256,7 @@ export default function ClosetDesign() {
     setMessage({ messageType: undefined, title: '', content: '', topPosition: '', leftPosition: '', arrow: false })
     //setIsMenu(true)
   }
-  // return cube from the layer with the right/left edge as the edge param (if cube exsists)
-  const findCube = (layer, edge, side) => {
-    if (!cubes[layer]) {
-      return -1
-    }
-    let start = 0
-    let end = cubes[layer].length - 1
 
-    do {
-      let mid = Math.floor((end + start) / 2)
-      let xPosition =
-        side === 'right'
-          ? cubes[layer][mid].position[0] + cubes[layer][mid].size[0] / 2
-          : cubes[layer][mid].position[0] - cubes[layer][mid].size[0] / 2
-      if (xPosition > edge) {
-        end = mid - 1
-      } else if (xPosition < edge) {
-        start = mid + 1
-      } else {
-        // in case there is existing cube at the requierd position
-        return mid
-      }
-    } while (start <= end)
-
-    return -1
-  }
   // in case the cube is connecting from the top need to find its place in the sorted array of the layer + size
   const findCubeRoom = (layer, val) => {
     // in case the cube is the first element in the layer
@@ -325,43 +282,8 @@ export default function ClosetDesign() {
     return start // the position that needs to place the new cube
   }
   const calcOffsetWhenIsTopConnection = (layer, buttomLayer, cubeSize, xPosition) => {
-    const offset = [0, (layer + 1) * globalOffset]
-    // try find cube in the layer bellow with the same right edge as the new cube
-    const indexOFButoomCubeFromRight = findCube(buttomLayer, xPosition + cubeSize[0] / 2, 'right')
-
-    // in case there is a cube bellow with the same right edge calc the offset of the new cube acording to the bellow cube
-    if (indexOFButoomCubeFromRight !== -1) {
-      const buttomRightCubeOffset = cubes[buttomLayer][indexOFButoomCubeFromRight].offset[0]
-      offset[0] = buttomRightCubeOffset
-    }
-    // in case there is no cube in the layer bellow with right edge as the new cube
-    else {
-      // finde cube with in the layer bellow with the same left edge as new cube
-      const indexOFButoomCubeFromLeft = findCube(buttomLayer, xPosition - cubeSize[0] / 2, 'left')
-      console.log('indexx left = : ', indexOFButoomCubeFromRight)
-      if (indexOFButoomCubeFromLeft !== -1) {
-        const buttomLeftCubeOffset = cubes[buttomLayer][indexOFButoomCubeFromLeft].offset[0]
-        const buttomLeftCubeSize = cubes[buttomLayer][indexOFButoomCubeFromLeft].size[0]
-        if (buttomLeftCubeSize === 1) {
-          if (cubeSize[0] === buttomLeftCubeSize) {
-            offset[0] = buttomLeftCubeOffset
-          } else {
-            offset[0] = buttomLeftCubeOffset - (cubeSize[0] - buttomLeftCubeSize) * globalOffset
-          }
-        } else if (buttomLeftCubeSize === 2) {
-          if (cubeSize[0] < buttomLeftCubeSize) {
-            offset[0] = buttomLeftCubeOffset + globalOffset
-          } else if (cubeSize[0] === buttomLeftCubeSize) {
-            offset[0] = buttomLeftCubeOffset
-          } else {
-            offset[0] = buttomLeftCubeOffset - globalOffset
-          }
-        } else {
-          offset[0] = buttomLeftCubeOffset + (buttomLeftCubeSize - cubeSize[0]) * globalOffset
-        }
-      }
-    }
-    return offset
+    const rightEdge = xPosition + cubeSize[0] / 2
+    return [(closetRightEdge - rightEdge) * globalOffset, (layer + 1) * globalOffset]
   }
   const handleDrag = (newPosition, cubeSize) => {
     setPosition(newPosition)
@@ -561,7 +483,7 @@ export default function ClosetDesign() {
               }
             })
           })
-
+          closetRightEdge = rightEdge + cubeSize[0]
           return
         } else {
           // in case try adding cube to layers thats requires cube bellow
@@ -609,6 +531,7 @@ export default function ClosetDesign() {
         handleAddingCube(`${-1 + i}`, [{ position: [0, yPosition, 0], size: cubeAddingSize, display: display, offset: [0, 0] }])
       }
       lastActions.push({ type: 'cube', layer: -1, position: [0, yOffset], size: [width, height] })
+      closetRightEdge = 0 + width / 2
       return
     } else {
       setPosition([-6, 2, 0])
@@ -724,7 +647,55 @@ export default function ClosetDesign() {
 
             return newCubes
           })
+          if (cubes['-1'].length === 0) {
+            closetRightEdge = 0
+          }
         }
+
+        // checks if after remove the last cube that added if the right edge of the closet change
+        // and if so update the offsets and the right edge of the closet
+        setCubes((prev) => {
+          const cubesCopy = JSON.parse(JSON.stringify(prev))
+          if (cubesCopy['-1'].length > 0) {
+            const closetRightCube = cubesCopy['-1'][cubesCopy['-1'].length - 1]
+            const possibleClosetRightEdge = closetRightCube.position[0] + closetRightCube.size[0] / 2
+            const offsetToSub = globalOffset * (closetRightEdge - possibleClosetRightEdge) * -1
+            // in case the right edge of the closet change
+            if (possibleClosetRightEdge !== closetRightEdge) {
+              setShelfs((prev) => {
+                return prev.map((shelf) => {
+                  return {
+                    ...shelf,
+                    position: [shelf.position[0] + offsetToSub, shelf.position[1], shelf.position[2]],
+                  }
+                })
+              })
+              for (const key in cubesCopy) {
+                cubesCopy[key] = cubesCopy[key].map((item) => {
+                  if (item.position[0] + item.size[0] / 2 === possibleClosetRightEdge) {
+                    // return the item with x offest of zero
+                    return {
+                      ...item,
+                      offset: [0, item.offset[1]],
+                    }
+                  } else {
+                    // update the offset
+                    return {
+                      ...item,
+                      offset: [item.offset[0] + offsetToSub, item.offset[1]],
+                    }
+                  }
+                })
+              }
+              console.log('copyCube ', cubesCopy)
+              closetRightEdge = possibleClosetRightEdge
+            }
+            return cubesCopy
+          } else {
+            return prev
+          }
+        })
+
         setMessage({
           messageType: 'success',
           title: 'הקובייה הוסרה בהצלחה',
@@ -762,6 +733,7 @@ export default function ClosetDesign() {
       '-1': [],
     })
     setShelfs([])
+    closetRightEdge = 0
 
     window.open(url, '_blank')
     handleCloseDetailsModal()
