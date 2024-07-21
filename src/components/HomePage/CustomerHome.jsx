@@ -10,6 +10,9 @@ let orderImgPath = ''
 export default function CustomerHome({ data }) {
   const [detailsModal, setDetailsModal] = useState(false)
   const navigate = useNavigate()
+  const handleCloseDetailsModal = () => {
+    setDetailsModal(false)
+  }
   const handleOrder = async (price, path) => {
     const formData = {
       Operation: '1', // Charge only
@@ -79,7 +82,7 @@ export default function CustomerHome({ data }) {
   }
   return (
     <>
-      {detailsModal && <UserDetailsModal onSubmit={submittingOrder} open={detailsModal} />}
+      {detailsModal && <UserDetailsModal onSubmit={submittingOrder} open={detailsModal} onClose={handleCloseDetailsModal} />}
       <div style={{ fontFamily: 'Arial, sans-serif' }}>
         <TextSwap data={data['text_content']} />
         <div style={{ backgroundColor: '#f5f5f5', padding: '50px 0' }}>

@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
-import { Modal, Box, TextField, Button, Typography } from '@mui/material'
+import { Modal, Box, TextField, Button, Typography, IconButton } from '@mui/material'
+import { Close as CloseIcon } from '@mui/icons-material'
 
-const UserDetailsModal = ({ onSubmit, open }) => {
+const UserDetailsModal = ({ onSubmit, open, onClose }) => {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -13,9 +14,11 @@ const UserDetailsModal = ({ onSubmit, open }) => {
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData({ ...formData, [name]: value })
-    validateField(e.target.name, e.target.value)
+    validateField(name, value)
   }
+
   const [errors, setErrors] = useState({})
+
   const validateField = (name, value) => {
     let tempErrors = { ...errors }
 
@@ -27,6 +30,7 @@ const UserDetailsModal = ({ onSubmit, open }) => {
 
     setErrors(tempErrors)
   }
+
   const validate = () => {
     let tempErrors = {}
     if (!formData.name) tempErrors.name = true
@@ -37,9 +41,9 @@ const UserDetailsModal = ({ onSubmit, open }) => {
     setErrors(tempErrors)
     return Object.keys(tempErrors).length === 0
   }
+
   const handleSubmit = () => {
     if (validate()) {
-      console.log(formData)
       onSubmit(formData)
     }
   }
@@ -54,6 +58,11 @@ const UserDetailsModal = ({ onSubmit, open }) => {
     border: '2px solid #000',
     boxShadow: 24,
     p: 4,
+    borderRadius: 2,
+    outline: 'none',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 2,
   }
 
   const titleStyle = {
@@ -61,10 +70,17 @@ const UserDetailsModal = ({ onSubmit, open }) => {
     textAlign: 'right',
   }
 
+  const closeButtonStyle = {
+    alignSelf: 'flex-end',
+  }
+
   return (
     <div>
-      <Modal open={open}>
+      <Modal open={open} onClose={onClose}>
         <Box sx={modalStyle}>
+          <IconButton aria-label="close" onClick={onClose} sx={closeButtonStyle}>
+            <CloseIcon />
+          </IconButton>
           <Typography variant="h6" component="h2" sx={titleStyle}>
             פרטי תקשורת
           </Typography>
@@ -115,7 +131,6 @@ const UserDetailsModal = ({ onSubmit, open }) => {
             variant="filled"
             sx={{
               textAlign: 'right',
-              //   color: 'black',
               '& .MuiInputBase-input': {
                 color: 'black', // Set input text color to black
               },
@@ -155,7 +170,6 @@ const UserDetailsModal = ({ onSubmit, open }) => {
               },
               '& .MuiInputBase-input': {
                 color: 'black', // Set input text color to black
-                //textAlign: 'right', // Align input text to the right
               },
               '& .MuiFormHelperText-root': {
                 textAlign: 'right', // Align error message to the right
@@ -236,7 +250,7 @@ const UserDetailsModal = ({ onSubmit, open }) => {
               },
             }}
           />
-          <Button variant="contained" fullWidth sx={{ mt: 2 }} onClick={handleSubmit}>
+          <Button variant="contained" fullWidth onClick={handleSubmit}>
             מעבר לדף תשלום
           </Button>
         </Box>

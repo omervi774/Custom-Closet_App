@@ -1,12 +1,14 @@
-import React, { useState, Suspense } from 'react'
-import useData from '../useData'
-import { Preload, OrbitControls, Environment } from '@react-three/drei'
-import { Shelf } from '../components/Shelf/Shelf.jsx'
-import { Canvas } from '@react-three/fiber'
-import Cube from '../components/Cube/Cube'
-import Arrow from '../components/Arrow/Arrow'
-import { Button, Typography, Box, Modal } from '@mui/material'
-import { serverRoute } from '../components/consts/consts.js'
+import React, { useState, Suspense } from 'react';
+import useData from '../useData';
+import { Preload, OrbitControls, Environment } from '@react-three/drei';
+import { Shelf } from '../components/Shelf/Shelf.jsx';
+import { Canvas } from '@react-three/fiber';
+import Cube from '../components/Cube/Cube';
+import Arrow from '../components/Arrow/Arrow';
+import { Button, Typography, Box, Modal, IconButton } from '@mui/material';
+import { Close as CloseIcon } from '@mui/icons-material';
+import { serverRoute } from '../components/consts/consts.js';
+
 const modalStyle = {
   position: 'absolute',
   top: '50%',
@@ -17,47 +19,56 @@ const modalStyle = {
   border: '2px solid #000',
   boxShadow: 24,
   p: 4,
-}
+  borderRadius: 2,
+  outline: 'none',
+};
+
 const titleStyle = {
   direction: 'rtl',
   textAlign: 'right',
-}
+};
+
+const closeButtonStyle = {
+  position: 'absolute',
+  top: 8,
+  left: 8,
+  color: 'primary.main',
+};
+
 function Orders() {
-  const [detailsModal, setDetailsModal] = useData(false)
-  const [ordersData, setOrdersData] = useData(`${serverRoute}/orders`)
-  const [orderIndex, setOrderIndex] = useState(0)
+  const [detailsModal, setDetailsModal] = useState(false);
+  const [ordersData, setOrdersData] = useData(`${serverRoute}/orders`);
+  const [orderIndex, setOrderIndex] = useState(0);
+
   const handleForwardClick = () => {
-    setOrderIndex((orderIndex + 1) % ordersData.length)
-  }
+    setOrderIndex((orderIndex + 1) % ordersData.length);
+  };
+
   const handleBackwardClick = () => {
     setOrderIndex((prev) => {
       if (prev === 0 && ordersData.length > 1) {
-        return ordersData.length - 1
+        return ordersData.length - 1;
       } else if (ordersData.length === 0 || ordersData.length === 1) {
-        return 0
+        return 0;
       }
+      return prev - 1;
+    });
+  };
 
-      return prev - 1
-    })
-  }
   const deleteOrder = async () => {
-    console.log(ordersData[orderIndex].id)
-    const id = ordersData[orderIndex].id
+    const id = ordersData[orderIndex].id;
     await fetch(`${serverRoute}/orders/${id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
       },
-    })
-    setOrdersData(
-      ordersData.filter((order) => {
-        return order.id !== id
-      })
-    )
+    });
+    setOrdersData(ordersData.filter((order) => order.id !== id));
     if (orderIndex !== 0) {
-      setOrderIndex(orderIndex - 1)
+      setOrderIndex(orderIndex - 1);
     }
-  }
+  };
+
   return (
     <>
       {ordersData.length > 0 && ordersData[orderIndex].cubes !== undefined && (
@@ -73,7 +84,6 @@ function Orders() {
           }}
         >
           <Environment preset="city" />
-
           <Suspense fallback={null}>
             <OrbitControls enableZoom={false} maxPolarAngle={Math.PI} minPolarAngle={Math.PI / 2} />
             {ordersData.length > 0 &&
@@ -90,10 +100,9 @@ function Orders() {
                 )
               )}
             {ordersData.length > 0 &&
-              ordersData[orderIndex].shelfs.map((shelf, index) => {
-                return <Shelf key={index} position={shelf.position} xSize={shelf.xSize} url={shelf.shelfColor} />
-              })}
-
+              ordersData[orderIndex].shelfs.map((shelf, index) => (
+                <Shelf key={index} position={shelf.position} xSize={shelf.xSize} url={shelf.shelfColor} />
+              ))}
             <Preload all />
           </Suspense>
         </Canvas>
@@ -122,11 +131,9 @@ function Orders() {
       {ordersData.length > 0 && (
         <>
           <Button sx={{ position: 'absolute', left: '40%', top: '80%' }} variant="contained" onClick={() => setDetailsModal(true)}>
-            {' '}
             ראה פרטיי תקשורת
           </Button>
           <Button sx={{ position: 'absolute', left: '40%', top: '86.5%' }} variant="contained" onClick={deleteOrder}>
-            {' '}
             הסר הזמנה מהזמנות פעיולות
           </Button>
           <Arrow leftPosition={50} arrowType="forward" handleClick={handleForwardClick} />
@@ -136,25 +143,28 @@ function Orders() {
       {ordersData.length > 0 && (
         <Modal open={detailsModal} onClose={() => setDetailsModal(false)}>
           <Box sx={modalStyle}>
+            <IconButton
+              aria-label="close"
+              onClick={() => setDetailsModal(false)}
+              sx={closeButtonStyle}
+            >
+              <CloseIcon />
+            </IconButton>
             <Typography variant="h6" component="h2" sx={titleStyle}>
               פרטי תקשורת
             </Typography>
             <Typography variant="h6" component="h2" sx={titleStyle}>
               שם : {ordersData[orderIndex].userDetails['name']}
             </Typography>
-
             <Typography variant="h6" component="h2" sx={titleStyle}>
               כתובת : {ordersData[orderIndex].userDetails['address']}
             </Typography>
-
             <Typography variant="h6" component="h2" sx={titleStyle}>
               עיר : {ordersData[orderIndex].userDetails['city']}
             </Typography>
-
             <Typography variant="h6" component="h2" sx={titleStyle}>
               מייל : {ordersData[orderIndex].userDetails['email']}
             </Typography>
-
             <Typography variant="h6" component="h2" sx={titleStyle}>
               מספר טלפון : {ordersData[orderIndex].userDetails['phone']}
             </Typography>
@@ -162,7 +172,7 @@ function Orders() {
         </Modal>
       )}
     </>
-  )
+  );
 }
 
-export default Orders
+export default Orders;

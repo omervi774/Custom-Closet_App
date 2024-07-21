@@ -8,12 +8,14 @@ import { Button } from '@mui/material'
 import useData from '../useData'
 import TextSwap from '../components/TextSwap/TextSwap'
 import { serverRoute } from '../components/consts/consts'
+import CircularProgress from '@mui/material/CircularProgress';
 
 function Ai(props) {
   const [chatMessages, setChatMessages] = useState([])
   const [userInput, setUserInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const [data] = useData(`${serverRoute}/homePage`)
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate()
   const [cubes, setCubes] = useState({
@@ -229,7 +231,9 @@ function Ai(props) {
             variant="contained"
             sx={{ position: 'absolute', top: '82%', left: '57%' }}
             onClick={async () => {
+              setLoading(true);
               const message = `please give me another design following the exact rules. User input: ${chatMessages[1].text}`
+              // to fix 
 
               const response = await fetch(`${serverRoute}/ai`, {
                 method: 'POST',
@@ -252,11 +256,17 @@ function Ai(props) {
               })
               setCubes(transformedData)
               console.log(transformedData)
+              setLoading(false);
+
             }}
+            disabled={loading} // Disable the button while loading
           >
             {' '}
-            נסה עיצוב נוסף
+            {loading ? <CircularProgress size={24} /> : 'נסה עיצוב נוסף'}
+      
+            
           </Button>
+          
         </>
       )}
     </>
