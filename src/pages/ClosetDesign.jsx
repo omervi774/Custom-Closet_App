@@ -753,7 +753,7 @@ export default function ClosetDesign() {
           <FileUpload handleFileChange={handleFileChange} handleClose={handleCloseModal} />
         </Modal>
       )}
-      {detailsModal && <UserDetailsModal onSubmit={submitDetailsModal} open={detailsModal} />}
+      {detailsModal && <UserDetailsModal onSubmit={submitDetailsModal} open={detailsModal} onClose={handleCloseDetailsModal} />}
 
       {preview && (
         <div style={{ position: 'absolute' }}>
@@ -850,6 +850,14 @@ export default function ClosetDesign() {
             }}
             onClick={async () => {
               if (cubes['-1'].length === 0) {
+                setMessage({
+                  messageType: 'error',
+                  title: 'שגיאה לא ניתן לשלם ',
+                  content: 'הסכום לתשלום חייב להיות גדול מ 0 ',
+                  arrow: false,
+                  topPosition: '20%',
+                  leftPosition: '50%',
+                })
                 return
               }
               console.log('cubes', cubes)
