@@ -17,7 +17,7 @@ import { Shelf } from '../components/Shelf/Shelf.jsx'
 import useData from '../useData'
 import { v4 as uuidv4 } from 'uuid'
 import { serverRoute } from '../components/consts/consts.js'
-//import { appRoute } from '../components/consts/consts.js'
+import { appRoute } from '../components/consts/consts.js'
 import UserDetailsModal from '../components/UserDetailsModal/UserDetailsModal.jsx'
 let url = ''
 let lowProfileCode = ''
@@ -929,8 +929,8 @@ export default function ClosetDesign() {
                 ShowCardOwnerEmail: true,
                 ReqCardOwnerEmail: true,
                 IndicatorUrl: `${serverRoute}/payment-indicator`,
-                SuccessRedirectUrl: `${serverRoute}/pyament-success`,
-                ErrorRedirectUrl: `${serverRoute}/pyament-error`,
+                SuccessRedirectUrl: `${appRoute}paymentSuccess`,
+                ErrorRedirectUrl: `${appRoute}paymentFailure`,
                 // Add more parameters as needed
               }
 
