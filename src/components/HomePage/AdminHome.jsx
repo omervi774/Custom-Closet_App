@@ -8,9 +8,10 @@ export default function AdminHome({ data, setData }) {
   const [jsx1, handleOpen1] = useEditData(`${serverRoute}/uploads`, setData, data, 'images')
   const uploadFile = (file) => {
     setData((prev) => {
-      return { ...prev, ['images']: [...prev['images'], file] }
+      return { ...prev, images: [...prev.images, file] }
     })
   }
+
   return (
     <>
       <div style={{ fontFamily: 'Calibri, sans-serif' }}>

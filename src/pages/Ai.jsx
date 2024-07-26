@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom'
 import { Preload, OrbitControls, Environment } from '@react-three/drei'
 import Cube from '../components/Cube/Cube'
 import { Button } from '@mui/material'
-import useData from '../useData'
-import TextSwap from '../components/TextSwap/TextSwap'
+// import useData from '../useData'
+//import TextSwap from '../components/TextSwap/TextSwap'
 import { serverRoute } from '../components/consts/consts'
 import CircularProgress from '@mui/material/CircularProgress'
 
@@ -14,7 +14,7 @@ function Ai(props) {
   const [chatMessages, setChatMessages] = useState([])
   const [userInput, setUserInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
-  const [data] = useData(`${serverRoute}/homePage`)
+
   const [loading, setLoading] = useState(false)
 
   const navigate = useNavigate()

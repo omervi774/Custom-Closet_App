@@ -45,7 +45,12 @@ const Cube = ({ position, url }) => {
       scale = [(3 - offset * 2) / 3, (3 - 2 * offset) / 3, 0.84]
       possitionOffset = [position[0] + offset, position[1] - offset, 0]
       break
+    default:
+      scale = [1, 1, 1]
+      possitionOffset = [0, 0, 0]
+      break
   }
+
   useEffect(() => {
     // Clone the scene toRight avoid modifying the original
     const clonedScene = scene.clone(true)
