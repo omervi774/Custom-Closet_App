@@ -9,6 +9,7 @@ let lowProfileCode = ''
 let orderImgPath = ''
 
 export default function CustomerHome({ data }) {
+  console.log(data['text_content'])
   const [detailsModal, setDetailsModal] = useState(false)
   const navigate = useNavigate()
 
@@ -88,7 +89,15 @@ export default function CustomerHome({ data }) {
     <>
       {detailsModal && <UserDetailsModal onSubmit={submittingOrder} open={detailsModal} onClose={handleCloseDetailsModal} />}
       <div style={{ fontFamily: 'Calibri, sans-serif' }}>
-        <TextSwap data={data['text_content']} />
+        <TextSwap
+          data={data['text_content'].filter((val, index) => {
+            return index !== 1
+          })}
+        />
+        <div>
+          <h1 style={{ textAlign: 'center', fontSize: '26px', marginBottom: '20px' }}>{data['text_content'][1].title}</h1>
+          <p style={{ textAlign: 'center', fontSize: '18px', color: 'black', marginBottom: '20px' }}>{data['text_content'][1].subTitle}</p>
+        </div>
         <div style={{ backgroundColor: 'white', padding: '50px 0' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
             <h2 style={{ textAlign: 'center', fontSize: '30px', marginBottom: '20px' }}>המוצרים שלנו</h2>

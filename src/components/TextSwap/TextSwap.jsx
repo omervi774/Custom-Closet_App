@@ -10,7 +10,7 @@ const TextSwap = ({ data }) => {
 
       setTimeout(() => {
         setCurrentIndex((prevIndex) => {
-          return (prevIndex + 1) % 4
+          return (prevIndex + 1) % 3
         })
 
         setIsSwapping(false)
