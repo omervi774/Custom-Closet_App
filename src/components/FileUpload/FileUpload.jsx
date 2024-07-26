@@ -50,16 +50,71 @@ const FileUpload = ({ handleFileChange, handleClose, uploadFile }) => {
       {handleFileChange ? (
         <>
           {' '}
-          <Button sx={{ marginRight: 40 }} variant="contained" onClick={handleClose}>
+          <Button
+            sx={{
+              marginRight: 20,
+              backgroundColor: '#5f7b8c',
+              color: 'white',
+              width: 'auto',
+              fontFamily: 'Calibri, sans-serif',
+              flexShrink: 0,
+              borderColor: '#5f7b8c', // Grey border color
+
+              '&:hover': {
+                backgroundColor: 'white', // Optional: Set a darker color for hover effect
+                color: '#5f7b8c',
+                borderColor: '#5f7b8c', // Grey border color
+              },
+            }}
+            variant="contained"
+            onClick={handleClose}
+          >
             להמשיך עם הרקע הדיפולטיבי
           </Button>
-          <Button component="label" variant="contained" startIcon={<CloudUploadIcon />}>
+          <Button
+            sx={{
+              backgroundColor: '#5f7b8c',
+              color: 'white',
+              width: 'auto',
+              fontFamily: 'Calibri, sans-serif',
+              flexShrink: 0,
+              borderColor: '#5f7b8c', // Grey border color
+
+              '&:hover': {
+                backgroundColor: 'white', // Optional: Set a darker color for hover effect
+                color: '#5f7b8c',
+                borderColor: '#5f7b8c', // Grey border color
+              },
+            }}
+            component="label"
+            variant="contained"
+            startIcon={<CloudUploadIcon />}
+          >
             העלאת קובץ
             <VisuallyHiddenInput type="file" onChange={onFileChange} accept="image/*" />
           </Button>
         </>
       ) : (
-        <Button component="label" variant="contained" startIcon={<CloudUploadIcon />}>
+        <Button
+          sx={{
+            marginRight: 20,
+            backgroundColor: '#5f7b8c',
+            color: 'white',
+            width: 'auto',
+            fontFamily: 'Calibri, sans-serif',
+            flexShrink: 0,
+            borderColor: '#5f7b8c', // Grey border color
+
+            '&:hover': {
+              backgroundColor: 'white', // Optional: Set a darker color for hover effect
+              color: '#5f7b8c',
+              borderColor: '#5f7b8c', // Grey border color
+            },
+          }}
+          component="label"
+          variant="contained"
+          startIcon={<CloudUploadIcon />}
+        >
           העלאת תמונה
           <VisuallyHiddenInput type="file" onChange={onFileChange} accept="image/*" />
         </Button>

@@ -8,7 +8,7 @@ const AnimatedArrow = () => {
       fontSize="large"
       style={{
         position: 'absolute',
-        top: '17%',
+        top: '19%',
         right: '15%',
         transform: 'scaleX(3)',
         animation: 'moveArrow 1s infinite',

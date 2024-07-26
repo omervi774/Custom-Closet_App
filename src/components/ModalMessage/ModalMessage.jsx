@@ -14,13 +14,19 @@ const ModalMessage = ({ typeOfMessage, title, content, onCloseModal, topPosition
     top: `${topPosition}`,
     left: `${leftPosition}`,
     transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: '#e5e5e5',
+    width: 150,
+    // bgcolor: '#e2dede',
+    overflowY: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
 
-    borderRadius: '30px', // Add border radius here
+    borderRadius: '20px', // Add border radius here
     // border: '2px solid #000',
     //boxShadow: 24,
-    p: 4,
+    p: 1,
   }
 
   const [visible, setVisible] = useState('visible')
@@ -30,7 +36,7 @@ const ModalMessage = ({ typeOfMessage, title, content, onCloseModal, topPosition
       if (onCloseModal) {
         onCloseModal()
       }
-    }, 2000)
+    }, 2500)
 
     return () => clearTimeout(timer) // Cleanup timer on unmount
   }, [onCloseModal])
@@ -41,14 +47,17 @@ const ModalMessage = ({ typeOfMessage, title, content, onCloseModal, topPosition
       <Box sx={style}>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', visibility: visible }}>
           <Typography
-            sx={{ color: typeOfMessage === 'success' ? 'lightgreen' : 'darkred' }}
+            sx={{ fontFamily: 'Calibri, sans-serif', fontWeight: 'bold', color: typeOfMessage === 'success' ? 'black' : 'black' }}
             id="modal-modal-title"
             variant="h6"
             component="h2"
           >
             {title !== '' && title}
           </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2, color: typeOfMessage === 'success' ? 'lightgreen' : 'darkred' }}>
+          <Typography
+            id="modal-modal-description"
+            sx={{ fontFamily: 'Calibri, sans-serif', mt: 2, color: typeOfMessage === 'success' ? 'black' : 'black' }}
+          >
             {content !== '' && content}
           </Typography>
         </Box>

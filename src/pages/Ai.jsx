@@ -8,14 +8,14 @@ import { Button } from '@mui/material'
 import useData from '../useData'
 import TextSwap from '../components/TextSwap/TextSwap'
 import { serverRoute } from '../components/consts/consts'
-import CircularProgress from '@mui/material/CircularProgress';
+import CircularProgress from '@mui/material/CircularProgress'
 
 function Ai(props) {
   const [chatMessages, setChatMessages] = useState([])
   const [userInput, setUserInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const [data] = useData(`${serverRoute}/homePage`)
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
   const navigate = useNavigate()
   const [cubes, setCubes] = useState({
@@ -84,7 +84,7 @@ function Ai(props) {
   if (chatMessages.length === 0) {
     setChatMessages([
       {
-        text: 'היי! אשמח לעזור לך בעיצוב הארון. כתוב לי את המידע הבא: רוחב הארון הרצוי וגובה הארון הרצוי, תודה',
+        text: 'היי! אשמח לעזור לך בעיצוב הארון. כתוב לי את המידע הבא: רוחב הארון הרצוי וגובה הארון הרצוי, תודה :)',
         sender: 'ai',
       },
     ])
@@ -94,9 +94,8 @@ function Ai(props) {
     <>
       {cubes['-1'].length === 0 ? (
         <>
-          {data && <TextSwap data={data['text_content']} />}
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <div style={{ width: '800px', marginTop: '10px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', backgroundColor: 'white', height: '100%' }}>
+            <div style={{ width: '800px', marginTop: '100px' }}>
               <div
                 style={{
                   height: '350px',
@@ -115,8 +114,8 @@ function Ai(props) {
                 {/* popup model */}
                 {isModalOpen && (
                   <Modal isOpen={isModalOpen} handleClose={handleCloseModal}>
-                    <div style={{ padding: '20px', textAlign: 'center', fontFamily: 'Arial, sans-serif', color: '#333', width: '450px' }}>
-                      <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#4CAF50' }}>AI Assistant</h2>
+                    <div style={{ padding: '20px', textAlign: 'right', fontFamily: 'calibri, sans-serif', color: '#333', width: '450px' }}>
+                      <h2 style={{ textAlign: 'right', marginBottom: '20px', color: 'black' }}>סוכן חכם</h2>
                       <p style={{ fontSize: '18px', lineHeight: '1.6', marginBottom: '20px' }}>
                         ברוכים הבאים למערכת ה-AI שלנו, שנועדה לסייע לכם בעיצוב ארון מותאם אישית. כתבו בתיבת הטקסט את המידות הרצויות והמערכת
                         תיצור עבורכם עיצוב מושלם בהתאם לבקשותיכם!
@@ -130,6 +129,7 @@ function Ai(props) {
                     key={index}
                     style={{
                       marginBottom: '5px',
+                      fontFamily: 'Cascadia Code, sans-serif',
                       textAlign: message.sender === 'ai' ? 'right' : 'right',
                     }}
                   >
@@ -138,10 +138,11 @@ function Ai(props) {
                         display: 'inline-block',
                         borderRadius: '8px',
                         padding: '8px',
-                        fontSize: '22px',
+                        fontSize: '18px',
+                        fontFamily: 'Cascadia Code, sans-serif',
                         margin: '7px',
-                        backgroundColor: message.sender === 'ai' ? '#dff0d8' : '#d9edf7',
-                        color: message.sender === 'ai' ? '#4CAF50' : '#337ab7',
+                        backgroundColor: message.sender === 'ai' ? '#dbffd1' : 'white',
+                        color: message.sender === 'ai' ? 'black' : 'black',
                       }}
                     >
                       {message.text}
@@ -149,7 +150,24 @@ function Ai(props) {
                   </div>
                 ))}
                 {/* Building indicator */}
-                {isTyping && <div style={{ textAlign: 'right', fontStyle: 'italic', fontSize: '22px', margin: '5px' }}>בונה ארון...</div>}
+                {isTyping && (
+                  <div
+                    style={{
+                      backgroundColor: '#dbffd1',
+                      color: 'black',
+                      textAlign: 'right',
+                      fontFamily: 'Cascadia Code, sans-serif',
+                      fontSize: '18px',
+                      margin: '5px',
+                      marginTop: '10px',
+                      display: 'inline-block',
+                      padding: '5px',
+                    }}
+                  >
+                    בונה ארון....
+                  </div>
+                )}
+                {/* אני רוצה ארון בגובה 4 מטר וברוחב 3 מטר בבקשה */}
               </div>
               <form onSubmit={handleSendMessage}>
                 <div style={{ display: 'flex' }}>
@@ -157,10 +175,12 @@ function Ai(props) {
                     type="submit"
                     style={{
                       padding: '8px 16px',
-                      borderRadius: '15px',
-                      backgroundColor: '#4CAF50',
-                      color: 'white',
+                      borderRadius: '5px',
+                      backgroundColor: '#5f7b8c',
+                      color: '#f3efeb',
+                      fontFamily: 'calibri, sans-serif',
                       border: 'none',
+                      fontWeight: 'bold',
                       cursor: 'pointer',
                     }}
                   >
@@ -173,8 +193,10 @@ function Ai(props) {
                     style={{
                       flex: '1',
                       padding: '8px',
-                      borderRadius: '15px',
+                      borderRadius: '5px',
                       border: '1px solid #ccc',
+                      fontFamily: 'calibri, sans-serif',
+
                       marginLeft: '10px',
                       direction: 'rtl',
                       fontSize: '20px',
@@ -196,6 +218,15 @@ function Ai(props) {
               fov: 45,
               near: 0.1,
               far: 200,
+            }}
+            style={{
+              alignSelf: 'center',
+              alignItems: 'center',
+              alignContent: 'center',
+              // backgroundColor: 'yellow',
+              width: '90vw',
+              // height: '75vh',
+              // marginRight: '10%',
             }}
           >
             <Environment preset="city" />
@@ -219,54 +250,75 @@ function Ai(props) {
               <Preload all />
             </Suspense>
           </Canvas>
-          <Button
-            variant="contained"
-            sx={{ position: 'absolute', top: '82%', left: '47%' }}
-            onClick={() => navigate('/closetDesign', { state: { initalCubes: cubes } })}
-          >
-            {' '}
-            המשך עם ארון זה
-          </Button>
-          <Button
-            variant="contained"
-            sx={{ position: 'absolute', top: '82%', left: '57%' }}
-            onClick={async () => {
-              setLoading(true);
-              const message = `please give me another design following the exact rules. User input: ${chatMessages[1].text}`
-              // to fix 
 
-              const response = await fetch(`${serverRoute}/ai`, {
-                method: 'POST',
-                body: JSON.stringify({ text: message }),
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-              })
-
-              if (!response.ok) {
-                throw new Error('Network response was not ok')
-              }
-
-              // Get the response from the server
-              const responseData = await response.json()
-              const transformedData = {}
-              Object.keys(responseData.text).forEach((key) => {
-                const newKey = parseInt(key) === 0 ? '-1' : parseInt(key) - 1
-                transformedData[newKey] = responseData.text[key]
-              })
-              setCubes(transformedData)
-              console.log(transformedData)
-              setLoading(false);
-
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '10px', // Adjust the gap between buttons as needed
+              marginTop: '-150px', // Adjust the top margin as needed
             }}
-            disabled={loading} // Disable the button while loading
           >
-            {' '}
-            {loading ? <CircularProgress size={24} /> : 'נסה עיצוב נוסף'}
-      
-            
-          </Button>
-          
+            <Button
+              variant="contained"
+              onClick={() => navigate('/closetDesign', { state: { initalCubes: cubes } })}
+              sx={{
+                padding: '8px 16px',
+                borderRadius: '5px',
+                backgroundColor: '#5f7b8c',
+                color: '#f3efeb',
+                fontFamily: 'calibri, sans-serif',
+                border: 'none',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+              }}
+            >
+              המשך עם ארון זה
+            </Button>
+            <Button
+              variant="contained"
+              onClick={async () => {
+                setLoading(true)
+                const message = `please give me another design following the exact rules. User input: ${chatMessages[1].text}`
+
+                const response = await fetch(`${serverRoute}/ai`, {
+                  method: 'POST',
+                  body: JSON.stringify({ text: message }),
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                })
+
+                if (!response.ok) {
+                  throw new Error('Network response was not ok')
+                }
+
+                const responseData = await response.json()
+                const transformedData = {}
+                Object.keys(responseData.text).forEach((key) => {
+                  const newKey = parseInt(key) === 0 ? '-1' : parseInt(key) - 1
+                  transformedData[newKey] = responseData.text[key]
+                })
+                setCubes(transformedData)
+                console.log(transformedData)
+                setLoading(false)
+              }}
+              disabled={loading}
+              sx={{
+                padding: '8px 16px',
+                borderRadius: '5px',
+                backgroundColor: '#5f7b8c',
+                color: '#f3efeb',
+                fontFamily: 'calibri, sans-serif',
+                border: 'none',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+              }}
+            >
+              {loading ? <CircularProgress size={24} /> : 'נסה עיצוב נוסף'}
+            </Button>
+          </div>
         </>
       )}
     </>

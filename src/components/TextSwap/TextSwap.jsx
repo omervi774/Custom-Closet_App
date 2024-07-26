@@ -21,7 +21,7 @@ const TextSwap = ({ data }) => {
   }, [data.length])
 
   return (
-    <div style={{ backgroundColor: '#d3d3d3', padding: '40px 0' }}>
+    <div style={{ backgroundColor: '#f3efeb', padding: '40px 0' }}>
       <div
         style={{
           maxWidth: '1200px',

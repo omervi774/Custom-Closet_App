@@ -13,7 +13,7 @@ export default function AdminHome({ data, setData }) {
   }
   return (
     <>
-      <div style={{ fontFamily: 'Arial, sans-serif' }}>
+      <div style={{ fontFamily: 'Calibri, sans-serif' }}>
         <div style={{ backgroundColor: '#f5f5f5', padding: '50px 0' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <h1 style={{ textAlign: 'center', fontSize: '36px', marginBottom: '20px' }}>{data['text_content'][1].title}</h1>
@@ -89,15 +89,16 @@ export default function AdminHome({ data, setData }) {
         </div>
         <div style={{ backgroundColor: '#f5f5f5', padding: '50px 0' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            <h2 style={{ textAlign: 'center', fontSize: '30px', marginBottom: '20px' }}>גלריית תמונות</h2>
+            <h2 style={{ textAlign: 'center', fontSize: '30px', marginBottom: '20px' }}>המוצרים שלנו</h2>
             <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
+              {/* התמונות צריכות להיות 200 על 200 מילימטר  */}
               <FileUpload uploadFile={uploadFile} />
               {data['images'] &&
                 data['images'].map((img, index) => {
                   return (
                     <div style={{ margin: '20px', display: 'flex', flexDirection: 'column' }} key={index}>
                       <img src={img.path} alt="Placeholder" style={{ maxWidth: '200px', maxHeight: '200px', borderRadius: '5px' }} />
-                      {img.price && <h4 style={{ marginBottom: '20px' }}>{img.price} : מחיר</h4>}
+                      {img.price && <h4 style={{ marginBottom: '20px', direction: 'rtl', textAlign: 'right' }}> מחיר: {img.price} ש"ח</h4>}
 
                       <>
                         {img.price ? (

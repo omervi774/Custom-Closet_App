@@ -96,11 +96,11 @@ function LogInForm({ handleClose }) {
         sx={isDeskTopSize ? { color: 'white', ...loginModalStyle.buttons } : phoneLogInStyle.buttons}
         children="התחבר"
       />
-      {isDeskTopSize && <Button color="success" variant="outlined" sx={loginModalStyle.buttons} children="הרשמה" />}
+      {/* {isDeskTopSize && <Button color="success" variant="outlined" sx={loginModalStyle.buttons} children="הרשמה" />}
 
       <Typography id="modal-modal-title" component="p" sx={isDeskTopSize ? loginModalStyle.text : phoneLogInStyle.text}>
         שכחתי פרטי זיהוי
-      </Typography>
+      </Typography> */}
     </Box>
   )
 }

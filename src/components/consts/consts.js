@@ -17,8 +17,8 @@ export const appRoute = process.env.REACT_APP_ROUTE
 export const loginModalStyle = {
   modalWrapper: {
     position: 'absolute',
-    top: '42vh',
-    left: '28.5vh',
+    top: '33vh',
+    left: '29vh',
 
     transform: 'translate(-50%, -50%)',
     width: 400,

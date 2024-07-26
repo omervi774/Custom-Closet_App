@@ -7,12 +7,15 @@ import { useNavigate } from 'react-router-dom'
 let url = ''
 let lowProfileCode = ''
 let orderImgPath = ''
+
 export default function CustomerHome({ data }) {
   const [detailsModal, setDetailsModal] = useState(false)
   const navigate = useNavigate()
+
   const handleCloseDetailsModal = () => {
     setDetailsModal(false)
   }
+
   const handleOrder = async (price, path) => {
     const formData = {
       Operation: '1', // Charge only
@@ -45,8 +48,7 @@ export default function CustomerHome({ data }) {
       const responseData = await response.text()
       console.log('Response from Cardcom API:', responseData)
 
-      //decoding all 3 url to give to the clinet
-
+      // decoding all 3 urls to give to the client
       const params = new URLSearchParams(responseData)
       orderImgPath = path
       url = decodeURIComponent(params.get('url'))
@@ -66,6 +68,7 @@ export default function CustomerHome({ data }) {
       // Handle errors here
     }
   }
+
   const submittingOrder = async (userDetails) => {
     await fetch(`${serverRoute}/orders`, {
       method: 'post',
@@ -80,14 +83,15 @@ export default function CustomerHome({ data }) {
     // lowProfileCode = ''
     setDetailsModal(false)
   }
+
   return (
     <>
       {detailsModal && <UserDetailsModal onSubmit={submittingOrder} open={detailsModal} onClose={handleCloseDetailsModal} />}
-      <div style={{ fontFamily: 'Arial, sans-serif' }}>
+      <div style={{ fontFamily: 'Calibri, sans-serif' }}>
         <TextSwap data={data['text_content']} />
-        <div style={{ backgroundColor: '#f5f5f5', padding: '50px 0' }}>
+        <div style={{ backgroundColor: 'white', padding: '50px 0' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            <h2 style={{ textAlign: 'center', fontSize: '30px', marginBottom: '20px' }}>גלריית תמונות</h2>
+            <h2 style={{ textAlign: 'center', fontSize: '30px', marginBottom: '20px' }}>המוצרים שלנו</h2>
             <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
               {data['images'] &&
                 data['images'].map((img, index) => {
@@ -96,8 +100,18 @@ export default function CustomerHome({ data }) {
                       <img src={img.path} alt="Placeholder" style={{ maxWidth: '200px', maxHeight: '200px', borderRadius: '5px' }} />
                       {img.price && (
                         <>
-                          <h4 style={{ marginBottom: '20px' }}>{img.price} : מחיר</h4>
-                          <Button variant="outlined" onClick={() => handleOrder(img.price, img.path)}>
+                          <h4 style={{ marginBottom: '20px', direction: 'rtl', textAlign: 'right' }}>מחיר: {img.price} ש"ח</h4>
+                          <Button
+                            variant="outlined"
+                            onClick={() => handleOrder(img.price, img.path)}
+                            sx={{
+                              color: '#334055', // Text color
+                              borderColor: '#334055', // Border color
+                              '&:hover': {
+                                borderColor: '#cad8e4', // Border color on hover
+                              },
+                            }}
+                          >
                             הזמן עכשיו
                           </Button>
                         </>
@@ -108,22 +122,24 @@ export default function CustomerHome({ data }) {
             </div>
           </div>
         </div>
-        <div style={{ backgroundColor: '#007bff', padding: '50px 0' }}>
+        <div style={{ backgroundColor: '#5f7b8c', padding: '50px 0' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            <h2 style={{ textAlign: 'center', fontSize: '30px', color: '#fff', marginBottom: '20px' }}> ?מוכנים להתחיל</h2>
+            <h2 style={{ textAlign: 'center', fontSize: '30px', color: '#f3efeb', marginBottom: '20px' }}> ?מוכנים להתחיל</h2>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <button
                 onClick={() => {
                   navigate('/closetDesign')
                 }}
                 style={{
-                  backgroundColor: '#fff',
-                  color: '#007bff',
+                  backgroundColor: '#f3efeb',
+                  color: '#5f7b8c',
+                  fontWeight: 'bold',
                   padding: '10px 20px',
                   fontSize: '18px',
                   borderRadius: '5px',
                   border: 'none',
                   cursor: 'pointer',
+                  fontFamily: 'Calibri, sans-serif',
                 }}
               >
                 עיצוב ארון

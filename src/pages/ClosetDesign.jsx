@@ -1,7 +1,7 @@
 import React, { Suspense, useState, useRef } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { Preload, OrbitControls, Environment } from '@react-three/drei'
-import { MenuItem, MenuList, Box, Button } from '@mui/material'
+import { MenuList, Box, Button } from '@mui/material'
 import DraggingCube from '../components/DraggingCube/DraggingCube'
 import Cube from '../components/Cube/Cube'
 import Circle from '../components/Circle/Circle'
@@ -34,18 +34,22 @@ export default function ClosetDesign() {
   // for the dragging cube
   const [position, setPosition] = useState([-6, 2, 0])
   // this state responssible to store the possitions and sizes of all the cubes
-  const [cubes, setCubes] = useState(
-    !initalCubes
-      ? {
-          '-1': [],
-        }
-      : initalCubes
-  )
+  const [cubes, setCubes] = useState(() => {
+    if (!initalCubes) {
+      return {
+        '-1': [],
+      }
+    } else {
+      const closetRightCube = initalCubes['-1'][initalCubes['-1'].length - 1]
+      closetRightEdge = closetRightCube.position[0] + closetRightCube.size[0] / 2
+      return initalCubes
+    }
+  })
   // Popup modal when the use first enter the page for basic explanation about the essence of the page
   const [isModalOpen, setIsModalOpen] = useState(true)
   const handleCloseModal = () => {
     setIsModalOpen(false)
-    setMessage({ messageType: 'success', title: 'התחל לבנות ארון', content: '', topPosition: '20%', leftPosition: '65%', arrow: true })
+    setMessage({ messageType: 'success', title: 'התחל כאן', content: '', topPosition: '22.55%', leftPosition: '77.5%', arrow: true })
   }
   // modal for fill the user details
   const [detailsModal, setDetailsModal] = useState(false)
@@ -244,8 +248,8 @@ export default function ClosetDesign() {
     })
     setMessage({
       messageType: 'success',
-      title: '! חיבור קוביות חוקי',
-      content: 'המשך לחבר קוביות כרצונך',
+      title: '!חיבור חוקי',
+      content: '',
       topPosition: '90%',
       leftPosition: '50%',
       arrow: false,
@@ -311,8 +315,8 @@ export default function ClosetDesign() {
         if (isOverRide && containsButtomCube) {
           setMessage({
             messageType: 'error',
-            title: 'חיבור קוביות לא חוקי',
-            content: 'החיבור לא הצליח כי הקובייה המתחברת עלתה על קובייה קיימת, נסה מחדש',
+            title: 'חיבור לא חוקי',
+            content: '',
             topPosition: '90%',
             leftPosition: '50%',
             arrow: false,
@@ -321,8 +325,8 @@ export default function ClosetDesign() {
         if (!isOverRide && containsButtomCube && newPosition[1] + cubeSize[1] / 2 >= 4) {
           setMessage({
             messageType: 'error',
-            title: 'חיבור קוביות לא חוקי',
-            content: 'החיבור לא הצליח כי הקובייה המתחברת חורגת מהגובה המותר, נסה מחדש',
+            title: 'חיבור לא חוקי',
+            content: '',
             topPosition: '90%',
             leftPosition: '50%',
             arrow: false,
@@ -345,8 +349,8 @@ export default function ClosetDesign() {
               console.log(Number(layer))
               setMessage({
                 messageType: 'error',
-                title: 'חיבור קוביות לא חוקי',
-                content: 'החיבור לא הצליח כי הקובייה המתחברת עלתה על קובייה קיימת, נסה מחדש',
+                title: 'חיבור לא חוקי',
+                content: '',
                 topPosition: '90%',
                 leftPosition: '50%',
                 arrow: false,
@@ -407,8 +411,8 @@ export default function ClosetDesign() {
         if (newPosition[0] + cubeSize[0] / 2 < -5.5 + epsilon) {
           setMessage({
             messageType: 'error',
-            title: 'חיבור קובייה לא מצליח',
-            content: 'החיבור לא הצליח כי הקובייה המתחברת חורגת מהגבול המותר. נסה מחדש',
+            title: 'חיבור לא מצליח',
+            content: '',
             topPosition: '90%',
             leftPosition: '50%',
             arrow: false,
@@ -442,8 +446,8 @@ export default function ClosetDesign() {
           if (newPosition[0] + cubeSize[0] / 2 > 7.5 + epsilon) {
             setMessage({
               messageType: 'error',
-              title: 'חיבור קובייה לא מצליח',
-              content: 'החיבור לא הצליח כי הקובייה המתחברת חורגת מהגבול המותר. נסה מחדש',
+              title: 'חיבור לא מצליח',
+              content: '',
               topPosition: '90%',
               leftPosition: '50%',
               arrow: false,
@@ -588,7 +592,7 @@ export default function ClosetDesign() {
     setMessage({
       messageType: 'success',
       title: 'המדף נוסף בהצלחה',
-      content: 'המשך להוסיף מדפים כרצונך',
+      content: '',
       topPosition: '90%',
       leftPosition: '50%',
       arrow: false,
@@ -743,13 +747,24 @@ export default function ClosetDesign() {
       {/* popup modal */}
       {isModalOpen && (
         <Modal isOpen={isModalOpen} handleClose={handleCloseModal}>
-          <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>עיצוב ארון בהתאמה אישית</h2>
-          <div style={{ textAlign: 'right' }}>
+          <div style={{ padding: '20px', textAlign: 'right', fontFamily: 'calibri, sans-serif', color: '#333', width: '450px' }}>
+            <h2 style={{ textAlign: 'right', marginBottom: '20px', color: 'black' }}>עיצוב ארון בהתאמה אישית</h2>
             <p style={{ fontSize: '18px', lineHeight: '1.6' }}>
               לפניכם עמוד בו תוכלו לגרור קוביות ולחברם לקוביות מהצד או מלמעלה ובכך לבנות ארון בהתאמה אישית
             </p>
-            <p style={{ fontSize: '18px', lineHeight: '1.6' }}>: קודם כל ניתן לבחור תמונת רקע או להמשיך עם הרקע הדיפולטיבי</p>
+            <p style={{ fontSize: '18px', lineHeight: '1.6', marginBottom: '20px' }}>
+              :קודם כל ניתן לבחור תמונת רקע או להמשיך עם הרקע הדיפולטיבי
+            </p>
           </div>
+
+          {/* <div style={{ textAlign: 'right' }}>
+            <p style={{ fontSize: '18px', lineHeight: '1.6' }}>
+              .לפניכם עמוד בו תוכלו לגרור קוביות ולחברם לקוביות מהצד או מלמעלה ובכך לבנות ארון בהתאמה אישית
+            </p>
+            <p style={{ fontSize: '18px', lineHeight: '1.6', marginBottom: '20px' }}>
+              :קודם כל ניתן לבחור תמונת רקע או להמשיך עם הרקע הדיפולטיבי
+            </p>
+          </div> */}
           <FileUpload handleFileChange={handleFileChange} handleClose={handleCloseModal} />
         </Modal>
       )}
@@ -757,7 +772,7 @@ export default function ClosetDesign() {
 
       {preview && (
         <div style={{ position: 'absolute' }}>
-          <img src={preview} alt="Selected" style={{ maxWidth: '100%', height: 'auto' }} />
+          <img src={preview} alt="Selected" style={{ maxWidth: '90%', height: 'auto' }} />
         </div>
       )}
 
@@ -775,18 +790,25 @@ export default function ClosetDesign() {
           height: '90vh',
         }}
       >
-        <MenuList sx={{ textAlign: 'right', width: '15vh' }}>
+        <MenuList sx={{ textAlign: 'right', width: '20vh', marginTop: 5 }}>
           <Button
             variant="outlined"
             sx={{
-              color: 'black',
+              color: '#334055',
+              fontFamily: 'Calibri, sans-serif',
+              fontWeight: 'bold',
               display: !isFirstOpen && 'none',
+              marginTop: 2.5,
               marginBottom: 1,
+              marginRight: 6,
               textAlign: 'right',
               minWidth: '100%', // Ensure buttons are the same width
-              borderColor: 'grey !important', // Grey border color
-              borderRadius: '10px', // Slightly rounded corners
+              borderColor: '#334055', // Grey border color
+              // borderRadius: '10px', // Slightly rounded corners
               borderWidth: '1px', // Border width
+              '&:hover': {
+                borderColor: '#cad8e4', // Border color on hover
+              },
               // margin: '8px 0', // Add margin between buttons
             }}
             onClick={() => {
@@ -795,19 +817,25 @@ export default function ClosetDesign() {
               handleResetRotation()
             }}
           >
-            קוביות
+            הוסף קובייה
           </Button>
           <Button
             variant="outlined"
             sx={{
-              color: 'black',
+              color: '#334055',
+              fontFamily: 'Calibri, sans-serif',
+              fontWeight: 'bold',
               display: !isFirstOpen && 'none',
               marginBottom: 1,
+              marginRight: 6,
               textAlign: 'right',
               minWidth: '100%', // Ensure buttons are the same width
-              borderColor: 'grey !important', // Grey border color
-              borderRadius: '10px', // Slightly rounded corners
+              borderColor: '#334055', // Grey border color
+              // borderRadius: '10px', // Slightly rounded corners
               borderWidth: '1px', // Border width
+              '&:hover': {
+                borderColor: '#cad8e4', // Border color on hover
+              },
               //margin: '8px 0', // Add margin between buttons
             }}
             onClick={() => {
@@ -816,21 +844,27 @@ export default function ClosetDesign() {
               handleResetRotation()
             }}
           >
-            מדפים
+            הוסף מדף
           </Button>
           <Button
             variant="outlined"
             color="info"
             onClick={removeLastAction}
             sx={{
-              color: 'black',
+              color: '#334055',
+              fontFamily: 'Calibri, sans-serif',
+              fontWeight: 'bold',
               display: !isFirstOpen && 'none',
               marginBottom: 1,
+              marginRight: 6,
               textAlign: 'right',
               minWidth: '100%', // Ensure buttons are the same width
-              borderColor: 'grey !important', // Grey border color
-              borderRadius: '10px', // Slightly rounded corners
+              borderColor: '#334055', // Grey border color
+              // borderRadius: '10px', // Slightly rounded corners
               borderWidth: '1px', // Border width
+              '&:hover': {
+                borderColor: '#cad8e4', // Border color on hover
+              },
               //margin: '8px 0', // Add margin between buttons
             }}
           >
@@ -839,13 +873,23 @@ export default function ClosetDesign() {
           <Button
             variant="outlined"
             sx={{
-              color: 'black',
+              color: 'white',
+              backgroundColor: '#5f7b8c',
+              fontFamily: 'Calibri, sans-serif',
+              fontWeight: 'bold',
               display: !isFirstOpen && 'none',
               textAlign: 'right',
+              marginRight: 6,
+              marginTop: 35,
               minWidth: '100%', // Ensure buttons are the same width
-              borderColor: 'grey !important', // Grey border color
-              borderRadius: '10px', // Slightly rounded corners
+              borderColor: '#5f7b8c', // Grey border color
+              // borderRadius: '10px', // Slightly rounded corners
               borderWidth: '1px', // Border width
+              '&:hover': {
+                backgroundColor: 'white', // Optional: Set a darker color for hover effect
+                color: '#5f7b8c',
+                borderColor: '#5f7b8c', // Grey border color
+              },
               // margin: '8px 0', // Add margin between buttons
             }}
             onClick={async () => {
@@ -929,7 +973,7 @@ export default function ClosetDesign() {
             הזמן
           </Button>
         </MenuList>
-        <MenuItem sx={{ color: 'black', display: isSecondaryOpen[0] && isSecondaryOpen[1] === 'קוביות' ? 'block' : 'none' }}>
+        <Box sx={{ color: 'black', display: isSecondaryOpen[0] && isSecondaryOpen[1] === 'קוביות' ? 'block' : 'none' }}>
           <Box
             sx={{
               display: 'flex',
@@ -941,7 +985,7 @@ export default function ClosetDesign() {
           >
             <CubeUi title="קוביות" newDraggingCube={newDraggingCube} closeSecondaryMenu={closeSecondaryMenu} />
           </Box>
-        </MenuItem>
+        </Box>
         {isSecondaryOpen[0] && isSecondaryOpen[1] === 'מדפים' && (
           <ShelfUi title={'מדפים'} addNewShelf={addNewShelf} closeSecondaryMenu={closeSecondaryMenu} />
         )}
@@ -968,6 +1012,15 @@ export default function ClosetDesign() {
             fov: 45,
             near: 0.1,
             far: 200,
+          }}
+          style={{
+            alignSelf: 'center',
+            alignItems: 'center',
+            alignContent: 'center',
+            // backgroundColor: 'yellow',
+            // width: '80vw',
+            // height: '75vh',
+            // marginLeft: '10%',
           }}
         >
           <Environment preset="city" />
