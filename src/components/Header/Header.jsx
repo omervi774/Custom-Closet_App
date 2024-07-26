@@ -110,7 +110,7 @@ export default function Header() {
             </List>
             <Box
               component="img"
-              src="/1.png"
+              src="/logotype.png"
               alt="Custom Closet"
               sx={{ maxWidth: '200px', height: 'auto', cursor: 'pointer' }}
               onClick={() => navigate('/')}
