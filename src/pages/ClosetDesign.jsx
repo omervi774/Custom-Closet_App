@@ -924,6 +924,7 @@ export default function ClosetDesign() {
                 APILevel: '10',
                 Codepage: '65001', // utf 8
                 ReturnValue: uniqueId,
+                MaxNumOfPayments: '12',
                 // ShowCardOwnerPhone: true,
                 // ReqCardOwnerPhone: true,
                 // ShowCardOwnerEmail: true,

@@ -4,6 +4,8 @@ import { Button } from '@mui/material'
 import UserDetailsModal from '../UserDetailsModal/UserDetailsModal'
 import { serverRoute } from '../consts/consts'
 import { useNavigate } from 'react-router-dom'
+import { appRoute } from '../consts/consts'
+
 let url = ''
 let lowProfileCode = ''
 let orderImgPath = ''
@@ -27,10 +29,12 @@ export default function CustomerHome({ data }) {
       Language: 'he',
       ProductName: 'ארון בהאתמה אישית',
       APILevel: '10',
+      MaxNumOfPayments: '12',
+
       Codepage: '65001', // utf 8
       IndicatorUrl: `${serverRoute}/payment-indicator`,
-      SuccessRedirectUrl: `${serverRoute}/pyament-success`,
-      ErrorRedirectUrl: `${serverRoute}/pyament-error`,
+      SuccessRedirectUrl: `${appRoute}paymentSuccess`,
+      ErrorRedirectUrl: `${appRoute}paymentFailure`,
       // Add more parameters as needed
     }
     try {
