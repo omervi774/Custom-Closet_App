@@ -32,7 +32,7 @@ export default function ClosetDesign() {
   }
   const [barObject] = useData(`${serverRoute}/stocks/מוטות ברזל`)
   // for the dragging cube
-  const [position, setPosition] = useState([-6, 2, 0])
+  const [position, setPosition] = useState([-6, 1, 0])
   // this state responssible to store the possitions and sizes of all the cubes
   const [cubes, setCubes] = useState(() => {
     if (!initalCubes) {
@@ -148,7 +148,7 @@ export default function ClosetDesign() {
     }
     setIsMenu(true)
     setIsDragging(false)
-    setPosition([-6, 2, 0])
+    setPosition([-6, 1, 0])
   }
 
   // this function return true if there is enough room for the cube (x-axis)
@@ -387,7 +387,7 @@ export default function ClosetDesign() {
           }
           setIsMenu(true)
           setIsDragging(false)
-          setPosition([-6, 2, 0])
+          setPosition([-6, 1, 0])
           return
         }
       }
@@ -538,7 +538,7 @@ export default function ClosetDesign() {
       closetRightEdge = 0 + width / 2
       return
     } else {
-      setPosition([-6, 2, 0])
+      setPosition([-6, 1, 0])
       setIsDragging(true)
       setIsMenu(false)
     }
@@ -602,7 +602,7 @@ export default function ClosetDesign() {
   }
   const cancelDragging = () => {
     setIsDragging(false)
-    setPosition([-6, 2, 0])
+    setPosition([-6, 1, 0])
     setIsMenu(true)
   }
   const CancelAddingDrawer = () => {

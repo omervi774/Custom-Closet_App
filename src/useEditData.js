@@ -12,7 +12,7 @@ const style = {
   boxShadow: 24,
   p: 4,
 }
-export default function useEditData(url, setData, data, objKey) {
+export default function useEditData(url, setData, data, objKey, inputLabel) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
   const [attributeName, setAttributeName] = useState('')
@@ -94,7 +94,7 @@ export default function useEditData(url, setData, data, objKey) {
             </Button>
             <TextField // TO BO CONTINIUED
               // id="outlined-controlled"
-              label="הזן כמות חדשה"
+              label={inputLabel ? inputLabel : 'הזן כמות חדשה'}
               value={name}
               variant="filled"
               onChange={(event) => {

@@ -4,7 +4,7 @@ import useEditData from '../../useEditData'
 import FileUpload from '../FileUpload/FileUpload'
 import { serverRoute } from '../consts/consts'
 export default function AdminHome({ data, setData }) {
-  const [jsx, handleOpen] = useEditData(`${serverRoute}/homePage`, setData, data, 'text_content')
+  const [jsx, handleOpen] = useEditData(`${serverRoute}/homePage`, setData, data, 'text_content', 'הזן טקסט חדש')
   const [jsx1, handleOpen1] = useEditData(`${serverRoute}/uploads`, setData, data, 'images')
   const uploadFile = (file) => {
     setData((prev) => {
