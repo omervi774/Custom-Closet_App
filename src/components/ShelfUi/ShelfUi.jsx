@@ -1,4 +1,4 @@
-import { Typography, Box, Button } from '@mui/material'
+import { Typography, Box, Button, Tooltip } from '@mui/material'
 import { useState } from 'react'
 
 const ShelfUi = ({ title, addNewShelf, closeSecondaryMenu }) => {
@@ -39,43 +39,48 @@ const ShelfUi = ({ title, addNewShelf, closeSecondaryMenu }) => {
           {title}
         </Typography>
         <Typography>צבע:</Typography>
-        <Box
-          onClick={() => setClicked('glass')}
-          sx={{
-            height: 40,
-            width: 40,
-            backgroundImage: 'linear-gradient(45deg, #dafbff, #eefdff, #bbf9ff)', // Gradient background
-            cursor: 'pointer',
-            borderColor: 'lightgreen',
-            borderStyle: clicked === 'glass' ? 'solid' : 'none',
-            borderRadius: '15px',
-          }}
-        />
-
-        <Box
-          onClick={() => setClicked('wood')}
-          sx={{
-            height: 40,
-            width: 40,
-            backgroundImage: 'linear-gradient(135deg, #df8402, #bc6a3c, #c69874, #d5b07c)', // Gradient background
-            cursor: 'pointer',
-            borderColor: 'lightgreen',
-            borderStyle: clicked === 'wood' && 'solid',
-            borderRadius: '15px',
-          }}
-        />
-        <Box
-          onClick={() => setClicked('metal')}
-          sx={{
-            height: 40,
-            width: 40,
-            backgroundColor: 'black',
-            cursor: 'pointer',
-            borderColor: 'lightgreen',
-            borderStyle: clicked === 'metal' && 'solid',
-            borderRadius: '15px',
-          }}
-        />
+        <Tooltip title="זכוכית" placement="left">
+          <Box
+            onClick={() => setClicked('glass')}
+            sx={{
+              height: 40,
+              width: 40,
+              backgroundImage: 'linear-gradient(45deg, #dafbff, #eefdff, #bbf9ff)', // Gradient background
+              cursor: 'pointer',
+              borderColor: 'lightgreen',
+              borderStyle: clicked === 'glass' ? 'solid' : 'none',
+              borderRadius: '15px',
+            }}
+          />
+        </Tooltip>
+        <Tooltip title="עץ" placement="left">
+          <Box
+            onClick={() => setClicked('wood')}
+            sx={{
+              height: 40,
+              width: 40,
+              backgroundImage: 'linear-gradient(135deg, #df8402, #bc6a3c, #c69874, #d5b07c)', // Gradient background
+              cursor: 'pointer',
+              borderColor: 'lightgreen',
+              borderStyle: clicked === 'wood' && 'solid',
+              borderRadius: '15px',
+            }}
+          />
+        </Tooltip>
+        <Tooltip title="ברזל" placement="left">
+          <Box
+            onClick={() => setClicked('metal')}
+            sx={{
+              height: 40,
+              width: 40,
+              backgroundColor: 'black',
+              cursor: 'pointer',
+              borderColor: 'lightgreen',
+              borderStyle: clicked === 'metal' && 'solid',
+              borderRadius: '15px',
+            }}
+          />
+        </Tooltip>
         <Button
           variant="contained"
           sx={{

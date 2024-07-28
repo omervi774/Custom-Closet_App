@@ -10,17 +10,17 @@ export function Shelf({ position, xSize, url }, ...props) {
   let scale = []
   const addingPosition = []
   if (xSize === 1) {
-    scale = [xSize / 2.2, 0.1, 0.4]
+    scale = [xSize / 2.2, 0.005, 0.4]
     addingPosition[0] = position[0]
     addingPosition[1] = position[1]
     addingPosition[2] = 0
   } else if (xSize === 2) {
-    scale = [(xSize - offset) / 2.1, 0.1, 0.4]
+    scale = [(xSize - offset) / 2.1, 0.005, 0.4]
     addingPosition[0] = position[0] + 0.5 * offset
     addingPosition[1] = position[1]
     addingPosition[2] = 0
   } else {
-    scale = [(xSize - offset * 2) / 2.1, 0.1, 0.4]
+    scale = [(xSize - offset * 2) / 2.1, 0.005, 0.4]
     addingPosition[0] = position[0] + offset
     addingPosition[1] = position[1]
     addingPosition[2] = 0
