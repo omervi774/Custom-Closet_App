@@ -3,14 +3,11 @@ import { Box, Paper, Icon } from '@mui/material'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import { ArrowBack } from '@mui/icons-material'
 
-// this component display container and inside it left/right arrow
-//when clicking on the arrow:
-// if it is right arrow display the next order
-// if is is left arrow display the prev order
-function Arrow({ arrowType, handleClick, leftPosition }) {
-  //   return <div style={{height:30,width:30,backgroundColor:"white"}}>
-
-  //   </div>
+// This component displays a container and inside it left/right arrow
+// When clicking on the arrow:
+// If it is right arrow, display the next order
+// If it is left arrow, display the previous order
+function Arrow({ arrowType, handleClick }) {
   return (
     <Box
       onClick={handleClick}
@@ -18,12 +15,9 @@ function Arrow({ arrowType, handleClick, leftPosition }) {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        //minHeight: '100vh', // Full screen height to center the container
-        backgroundColor: '#f5f5f5', // Light background color
-        position: 'absolute',
-        top: '93%',
-        left: `${leftPosition}%`,
+        backgroundColor: '#f5f5f5',
         borderRadius: '10px',
+        margin: '10px', // Add margin for spacing
       }}
     >
       <Paper
@@ -39,7 +33,7 @@ function Arrow({ arrowType, handleClick, leftPosition }) {
           cursor: 'pointer',
         }}
       >
-        <Icon component={arrowType === 'forward' ? ArrowForwardIcon : ArrowBack} fontSize="large" color="primary" />
+        <Icon component={arrowType === 'forward' ? ArrowForwardIcon : ArrowBack} fontSize="large" sx={{ color: '#5f7b8c' }} />
       </Paper>
     </Box>
   )

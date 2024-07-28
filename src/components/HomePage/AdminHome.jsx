@@ -21,7 +21,22 @@ export default function AdminHome({ data, setData }) {
 
             <Button
               variant="contained"
-              sx={{ textAlign: 'center', fontSize: '18px', marginBottom: '20px' }}
+              sx={{
+                textAlign: 'center',
+                fontSize: '18px',
+                marginBottom: '20px',
+                backgroundColor: '#5f7b8c',
+                fontFamily: 'Calibri, sans-serif',
+                fontWeight: 'bold',
+                borderColor: '#5f7b8c', // Grey border color
+                // borderRadius: '10px', // Slightly rounded corners
+                borderWidth: '1px', // Border width
+                '&:hover': {
+                  backgroundColor: 'white', // Optional: Set a darker color for hover effect
+                  color: '#5f7b8c',
+                  borderColor: '#5f7b8c', // Grey border color
+                },
+              }}
               onClick={() => {
                 handleOpen(data['text_content'][1].id, 'title')
               }}
@@ -33,7 +48,22 @@ export default function AdminHome({ data, setData }) {
 
             <Button
               variant="contained"
-              sx={{ textAlign: 'center', fontSize: '18px', marginBottom: '20px' }}
+              sx={{
+                textAlign: 'center',
+                fontSize: '18px',
+                marginBottom: '20px',
+                backgroundColor: '#5f7b8c',
+                fontFamily: 'Calibri, sans-serif',
+                fontWeight: 'bold',
+                borderColor: '#5f7b8c', // Grey border color
+                // borderRadius: '10px', // Slightly rounded corners
+                borderWidth: '1px', // Border width
+                '&:hover': {
+                  backgroundColor: 'white', // Optional: Set a darker color for hover effect
+                  color: '#5f7b8c',
+                  borderColor: '#5f7b8c', // Grey border color
+                },
+              }}
               onClick={() => {
                 handleOpen(data['text_content'][1].id, 'subTitle')
               }}
@@ -50,7 +80,22 @@ export default function AdminHome({ data, setData }) {
 
               <Button
                 variant="contained"
-                sx={{ textAlign: 'center', fontSize: '18px', marginBottom: '20px' }}
+                sx={{
+                  textAlign: 'center',
+                  fontSize: '18px',
+                  marginBottom: '20px',
+                  backgroundColor: '#5f7b8c',
+                  fontFamily: 'Calibri, sans-serif',
+                  fontWeight: 'bold',
+                  borderColor: '#5f7b8c', // Grey border color
+                  // borderRadius: '10px', // Slightly rounded corners
+                  borderWidth: '1px', // Border width
+                  '&:hover': {
+                    backgroundColor: 'white', // Optional: Set a darker color for hover effect
+                    color: '#5f7b8c',
+                    borderColor: '#5f7b8c', // Grey border color
+                  },
+                }}
                 onClick={() => {
                   handleOpen(data['text_content'][0].id, 'subTitle')
                 }}
@@ -64,7 +109,22 @@ export default function AdminHome({ data, setData }) {
 
               <Button
                 variant="contained"
-                sx={{ textAlign: 'center', fontSize: '18px', marginBottom: '20px' }}
+                sx={{
+                  textAlign: 'center',
+                  fontSize: '18px',
+                  marginBottom: '20px',
+                  backgroundColor: '#5f7b8c',
+                  fontFamily: 'Calibri, sans-serif',
+                  fontWeight: 'bold',
+                  borderColor: '#5f7b8c', // Grey border color
+                  // borderRadius: '10px', // Slightly rounded corners
+                  borderWidth: '1px', // Border width
+                  '&:hover': {
+                    backgroundColor: 'white', // Optional: Set a darker color for hover effect
+                    color: '#5f7b8c',
+                    borderColor: '#5f7b8c', // Grey border color
+                  },
+                }}
                 onClick={() => {
                   handleOpen(data['text_content'][3].id, 'subTitle')
                 }}
@@ -78,7 +138,22 @@ export default function AdminHome({ data, setData }) {
 
               <Button
                 variant="contained"
-                sx={{ textAlign: 'center', fontSize: '18px', marginBottom: '20px' }}
+                sx={{
+                  textAlign: 'center',
+                  fontSize: '18px',
+                  marginBottom: '20px',
+                  backgroundColor: '#5f7b8c',
+                  fontFamily: 'Calibri, sans-serif',
+                  fontWeight: 'bold',
+                  borderColor: '#5f7b8c', // Grey border color
+                  // borderRadius: '10px', // Slightly rounded corners
+                  borderWidth: '1px', // Border width
+                  '&:hover': {
+                    backgroundColor: 'white', // Optional: Set a darker color for hover effect
+                    color: '#5f7b8c',
+                    borderColor: '#5f7b8c', // Grey border color
+                  },
+                }}
                 onClick={() => {
                   handleOpen(data['text_content'][2].id, 'subTitle')
                 }}
@@ -103,17 +178,55 @@ export default function AdminHome({ data, setData }) {
 
                       <>
                         {img.price ? (
-                          <Button variant="contained" sx={{ marginBottom: '20px' }} onClick={() => handleOpen1(img.id, 'price')}>
+                          <Button
+                            variant="contained"
+                            sx={{
+                              textAlign: 'center',
+                              marginBottom: '20px',
+                              backgroundColor: '#5f7b8c',
+                              fontFamily: 'Calibri, sans-serif',
+                              // fontWeight: 'bold',
+                              borderColor: '#5f7b8c', // Grey border color
+                              // borderRadius: '10px', // Slightly rounded corners
+                              borderWidth: '1px', // Border width
+                              '&:hover': {
+                                backgroundColor: 'white', // Optional: Set a darker color for hover effect
+                                color: '#5f7b8c',
+                                borderColor: '#5f7b8c', // Grey border color
+                              },
+                            }}
+                            onClick={() => handleOpen1(img.id, 'price')}
+                          >
                             ערוך מחיר
                           </Button>
                         ) : (
-                          <Button Button variant="contained" sx={{ marginBottom: '20px' }} onClick={() => handleOpen1(img.id, 'price')}>
+                          <Button
+                            Button
+                            variant="contained"
+                            sx={{
+                              textAlign: 'center',
+                              marginBottom: '20px',
+                              backgroundColor: '#5f7b8c',
+                              fontFamily: 'Calibri, sans-serif',
+                              // fontWeight: 'bold',
+                              borderColor: '#5f7b8c', // Grey border color
+                              // borderRadius: '10px', // Slightly rounded corners
+                              borderWidth: '1px', // Border width
+                              '&:hover': {
+                                backgroundColor: 'white', // Optional: Set a darker color for hover effect
+                                color: '#5f7b8c',
+                                borderColor: '#5f7b8c', // Grey border color
+                              },
+                            }}
+                            onClick={() => handleOpen1(img.id, 'price')}
+                          >
                             קבע מחיר
                           </Button>
                         )}
                         <Button
                           variant="contained"
                           color="error"
+                          sx={{ fontFamily: 'Calibri, sans-serif' }}
                           onClick={async () => {
                             await fetch(`${serverRoute}/uploads/${img.id}`, {
                               method: 'DELETE',
@@ -138,26 +251,12 @@ export default function AdminHome({ data, setData }) {
             </div>
           </div>
         </div>
-        <div style={{ backgroundColor: '#007bff', padding: '50px 0' }}>
+        {/* <div style={{ backgroundColor: '#007bff', padding: '50px 0' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
             <h2 style={{ textAlign: 'center', fontSize: '30px', color: '#fff', marginBottom: '20px' }}> ?מוכנים להתחיל</h2>
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <button
-                style={{
-                  backgroundColor: '#fff',
-                  color: '#007bff',
-                  padding: '10px 20px',
-                  fontSize: '18px',
-                  borderRadius: '5px',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                עיצוב ארון
-              </button>
-            </div>
+            <div style={{ display: 'flex', justifyContent: 'center' }}></div>
           </div>
-        </div>
+        </div> */}
         {jsx()}
         {jsx1()}
       </div>

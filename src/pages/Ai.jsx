@@ -5,8 +5,6 @@ import { useNavigate } from 'react-router-dom'
 import { Preload, OrbitControls, Environment } from '@react-three/drei'
 import Cube from '../components/Cube/Cube'
 import { Button } from '@mui/material'
-// import useData from '../useData'
-//import TextSwap from '../components/TextSwap/TextSwap'
 import { serverRoute } from '../components/consts/consts'
 import CircularProgress from '@mui/material/CircularProgress'
 
@@ -14,16 +12,11 @@ function Ai(props) {
   const [chatMessages, setChatMessages] = useState([])
   const [userInput, setUserInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
-
   const [loading, setLoading] = useState(false)
-
   const navigate = useNavigate()
-  const [cubes, setCubes] = useState({
-    '-1': [],
-  })
-
-  // Popup modal
+  const [cubes, setCubes] = useState({ '-1': [] })
   const [isModalOpen, setIsModalOpen] = useState(true)
+
   const handleCloseModal = () => {
     setIsModalOpen(false)
   }
@@ -36,15 +29,10 @@ function Ai(props) {
     e.preventDefault()
     if (userInput.trim() !== '') {
       try {
-        // Set isTyping to true when sending message
         setIsTyping(true)
-        // Add user message to chat messages state immediately
         setChatMessages((prevMessages) => [...prevMessages, { text: userInput, sender: 'user' }])
-
-        // Clear user input
         setUserInput('')
 
-        // Send user input to the server
         const response = await fetch(`${serverRoute}/ai`, {
           method: 'POST',
           body: JSON.stringify({ text: userInput }),
@@ -57,7 +45,6 @@ function Ai(props) {
           throw new Error('Network response was not ok')
         }
 
-        // Get the response from the server
         const responseData = await response.json()
         if (responseData.text !== 'תשובתך לא הייתה בפורמט הנכון, רענן את הדף ונסה שוב בבקשה.') {
           const transformedData = {}
@@ -69,10 +56,7 @@ function Ai(props) {
           console.log(transformedData)
         }
 
-        // Add ChatGPT response to chat messages state
         setChatMessages((prevMessages) => [...prevMessages, { text: responseData.text, sender: 'ai' }])
-
-        // Set isTyping back to false after receiving response
         setIsTyping(false)
       } catch (error) {
         console.error('Error:', error)
@@ -80,7 +64,6 @@ function Ai(props) {
     }
   }
 
-  // Add initial message from ChatGPT if chat is empty
   if (chatMessages.length === 0) {
     setChatMessages([
       {
@@ -111,7 +94,6 @@ function Ai(props) {
                   direction: 'rtl',
                 }}
               >
-                {/* popup model */}
                 {isModalOpen && (
                   <Modal isOpen={isModalOpen} handleClose={handleCloseModal}>
                     <div style={{ padding: '20px', textAlign: 'right', fontFamily: 'calibri, sans-serif', color: '#333', width: '450px' }}>
@@ -149,7 +131,6 @@ function Ai(props) {
                     </div>
                   </div>
                 ))}
-                {/* Building indicator */}
                 {isTyping && (
                   <div
                     style={{
@@ -167,7 +148,6 @@ function Ai(props) {
                     בונה ארון....
                   </div>
                 )}
-                {/* אני רוצה ארון בגובה 4 מטר וברוחב 3 מטר בבקשה */}
               </div>
               <form onSubmit={handleSendMessage}>
                 <div style={{ display: 'flex' }}>
@@ -196,7 +176,6 @@ function Ai(props) {
                       borderRadius: '5px',
                       border: '1px solid #ccc',
                       fontFamily: 'calibri, sans-serif',
-
                       marginLeft: '10px',
                       direction: 'rtl',
                       fontSize: '20px',
@@ -209,115 +188,101 @@ function Ai(props) {
         </>
       ) : (
         <>
-          <Canvas
-            shadows
-            dpr={[1, 2]}
-            gl={{ preserveDrawingBuffer: true }}
-            camera={{
-              position: [0, 0, 10],
-              fov: 45,
-              near: 0.1,
-              far: 200,
-            }}
-            style={{
-              alignSelf: 'center',
-              alignItems: 'center',
-              alignContent: 'center',
-              // backgroundColor: 'yellow',
-              width: '90vw',
-              // height: '75vh',
-              // marginRight: '10%',
-            }}
-          >
-            <Environment preset="city" />
-
-            <Suspense fallback={null}>
-              <OrbitControls enableZoom={false} maxPolarAngle={Math.PI} minPolarAngle={Math.PI / 2} />
-
-              {Object.keys(cubes).map((key) =>
-                cubes[key].map(
-                  (cube, index) =>
-                    cube.display && (
-                      <Cube
-                        key={index}
-                        position={[cube.position[0] + cube.offset[0], cube.position[1] - cube.offset[1], 0]}
-                        url={`${cube.size[0]}X${cube.size[1]}`}
-                      />
-                    )
-                )
-              )}
-
-              <Preload all />
-            </Suspense>
-          </Canvas>
-
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: '10px', // Adjust the gap between buttons as needed
-              marginTop: '-150px', // Adjust the top margin as needed
-            }}
-          >
-            <Button
-              variant="contained"
-              onClick={() => navigate('/closetDesign', { state: { initalCubes: cubes } })}
-              sx={{
-                padding: '8px 16px',
-                borderRadius: '5px',
-                backgroundColor: '#5f7b8c',
-                color: '#f3efeb',
-                fontFamily: 'calibri, sans-serif',
-                border: 'none',
-                fontWeight: 'bold',
-                cursor: 'pointer',
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', gap: '10px', padding: '10px' }}>
+            <Canvas
+              shadows
+              dpr={[1, 2]}
+              gl={{ preserveDrawingBuffer: true }}
+              camera={{
+                position: [0, 0, 10],
+                fov: 45,
+                near: 0.1,
+                far: 200,
+              }}
+              style={{
+                width: '85vw',
+                height: '90vh',
+                // backgroundColor: 'yellow',
               }}
             >
-              המשך עם ארון זה
-            </Button>
-            <Button
-              variant="contained"
-              onClick={async () => {
-                setLoading(true)
-                const message = `please give me another design following the exact rules. User input: ${chatMessages[1].text}`
+              <Environment preset="city" />
+              <Suspense fallback={null}>
+                <OrbitControls enableZoom={false} maxPolarAngle={Math.PI} minPolarAngle={Math.PI / 2} />
+                {Object.keys(cubes).map((key) =>
+                  cubes[key].map(
+                    (cube, index) =>
+                      cube.display && (
+                        <Cube
+                          key={index}
+                          position={[cube.position[0] + cube.offset[0], cube.position[1] - cube.offset[1], 0]}
+                          url={`${cube.size[0]}X${cube.size[1]}`}
+                        />
+                      )
+                  )
+                )}
+                <Preload all />
+              </Suspense>
+            </Canvas>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '150px' }}>
+              <Button
+                variant="contained"
+                onClick={() => navigate('/closetDesign', { state: { initalCubes: cubes } })}
+                sx={{
+                  padding: '8px 16px',
+                  borderRadius: '5px',
+                  backgroundColor: '#5f7b8c',
+                  color: '#f3efeb',
+                  fontFamily: 'calibri, sans-serif',
+                  border: 'none',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                }}
+              >
+                המשך עם ארון זה
+              </Button>
+              <Button
+                variant="contained"
+                onClick={async () => {
+                  setLoading(true)
+                  const message = `please give me another design following the exact rules. User input: ${chatMessages[1].text}`
 
-                const response = await fetch(`${serverRoute}/ai`, {
-                  method: 'POST',
-                  body: JSON.stringify({ text: message }),
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                })
+                  const response = await fetch(`${serverRoute}/ai`, {
+                    method: 'POST',
+                    body: JSON.stringify({ text: message }),
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                  })
 
-                if (!response.ok) {
-                  throw new Error('Network response was not ok')
-                }
+                  if (!response.ok) {
+                    throw new Error('Network response was not ok')
+                  }
 
-                const responseData = await response.json()
-                const transformedData = {}
-                Object.keys(responseData.text).forEach((key) => {
-                  const newKey = parseInt(key) === 0 ? '-1' : parseInt(key) - 1
-                  transformedData[newKey] = responseData.text[key]
-                })
-                setCubes(transformedData)
-                console.log(transformedData)
-                setLoading(false)
-              }}
-              disabled={loading}
-              sx={{
-                padding: '8px 16px',
-                borderRadius: '5px',
-                backgroundColor: '#5f7b8c',
-                color: '#f3efeb',
-                fontFamily: 'calibri, sans-serif',
-                border: 'none',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-              }}
-            >
-              {loading ? <CircularProgress size={24} /> : 'נסה עיצוב נוסף'}
-            </Button>
+                  const responseData = await response.json()
+                  const transformedData = {}
+                  Object.keys(responseData.text).forEach((key) => {
+                    const newKey = parseInt(key) === 0 ? '-1' : parseInt(key) - 1
+                    transformedData[newKey] = responseData.text[key]
+                  })
+                  setCubes(transformedData)
+                  console.log(transformedData)
+                  setLoading(false)
+                }}
+                disabled={loading}
+                sx={{
+                  padding: '8px 16px',
+                  borderRadius: '5px',
+                  backgroundColor: '#5f7b8c',
+                  color: '#f3efeb',
+                  fontFamily: 'calibri, sans-serif',
+                  border: 'none',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                }}
+              >
+                {loading ? <CircularProgress size={24} /> : 'נסה עיצוב נוסף'}
+              </Button>
+            </div>
           </div>
         </>
       )}

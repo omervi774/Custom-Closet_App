@@ -250,7 +250,31 @@ const UserDetailsModal = ({ onSubmit, open, onClose }) => {
               },
             }}
           />
-          <Button variant="contained" fullWidth onClick={handleSubmit}>
+          <Button
+            variant="contained"
+            sx={{
+              color: 'white',
+              backgroundColor: '#5f7b8c',
+              fontFamily: 'Calibri, sans-serif',
+              fontWeight: 'bold',
+              // display: !isFirstOpen && 'none',
+              textAlign: 'right',
+              // marginRight: 6,
+              // marginTop: 35,
+              minWidth: '100%', // Ensure buttons are the same width
+              borderColor: '#5f7b8c', // Grey border color
+              // borderRadius: '10px', // Slightly rounded corners
+              borderWidth: '1px', // Border width
+              '&:hover': {
+                backgroundColor: 'white', // Optional: Set a darker color for hover effect
+                color: '#5f7b8c',
+                borderColor: '#5f7b8c', // Grey border color
+              },
+              // margin: '8px 0', // Add margin between buttons
+            }}
+            fullWidth
+            onClick={handleSubmit}
+          >
             מעבר לדף תשלום
           </Button>
         </Box>
