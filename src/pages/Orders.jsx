@@ -26,6 +26,7 @@ const modalStyle = {
 const titleStyle = {
   direction: 'rtl',
   textAlign: 'right',
+  // fontWeight: 'bold',
 }
 
 const closeButtonStyle = {
@@ -207,7 +208,7 @@ function Orders() {
             <IconButton aria-label="close" onClick={() => setDetailsModal(false)} sx={closeButtonStyle}>
               <CloseIcon />
             </IconButton>
-            <Typography variant="h6" component="h2" sx={titleStyle}>
+            <Typography variant="h6" component="h2" sx={{ ...titleStyle, fontWeight: 'bold' }}>
               פרטי תקשורת
             </Typography>
             <Typography variant="h6" component="h2" sx={titleStyle}>

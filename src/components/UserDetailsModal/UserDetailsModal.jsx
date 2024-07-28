@@ -68,6 +68,7 @@ const UserDetailsModal = ({ onSubmit, open, onClose }) => {
   const titleStyle = {
     direction: 'rtl',
     textAlign: 'right',
+    fontWeight: 'bold',
   }
 
   const closeButtonStyle = {
