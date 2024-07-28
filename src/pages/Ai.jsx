@@ -244,7 +244,10 @@ function Ai(props) {
                 variant="contained"
                 onClick={async () => {
                   setLoading(true)
-                  const message = `please give me another design following the exact rules. User input: ${chatMessages[1].text}`
+                  const message = `please give me another design following the exact rules. User input: ${
+                    chatMessages[chatMessages.length - 2].text
+                  }`
+                  console.log(message)
 
                   const response = await fetch(`${serverRoute}/ai`, {
                     method: 'POST',

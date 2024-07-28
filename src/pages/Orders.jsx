@@ -122,7 +122,7 @@ function Orders() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              height: '80vh',
+              height: '50vh',
             }}
           >
             <img
@@ -140,7 +140,7 @@ function Orders() {
         {ordersData.length > 0 && (
           <>
             <Typography variant="h6" sx={{ mb: 2 }}>
-              מספר הזמנה: {orderIndex}
+              מספר הזמנה: {orderIndex + 1}
             </Typography>
             <Button
               sx={{
