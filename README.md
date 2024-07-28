@@ -1,70 +1,55 @@
-# Getting Started with Create React App
+# Closet Design App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Overview
 
-## Available Scripts
+The Closet Design App is an interactive web application that allows users to design custom closets by dragging and arranging 3D cubes representing different closet components. In addition the users can get AI assistant for the closet design. The app provides functionality for placing orders, managing inventory, and handling user authentication. The admin user has exclusive access to certain routes such as order management and stock control.
 
-In the project directory, you can run:
+## Prerequisites
 
-### `npm start`
+Before you begin, ensure you have met the following requirements:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Node.js:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Version 14.x or higher is recommended.
 
-### `npm test`
+## Key Features
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **3D Closet Design**: Drag and arrange cubes to design custom closets.
+- **AI**: AI assistant for design suggestions.
+- **Order Management**: Create and manage orders based on custom closet designs.
+- **Payment Processing**: Integrated payment system with success and failure notifications.
+- **Stock Management**: Track and update inventory for closet components.
+- **User Authentication**: Secure login via phone number.
+- **Email Notifications**: Send email notifications on successful transactions.
 
-### `npm run build`
+## Installation
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. Clone the repository:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+   git clone https://github.com/omervi774/Custom-Closet_App.git
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+2. Navigate to the project directory:
 
-### `npm run eject`
+   cd Custom-Closet_App
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+3. Install dependencies:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+   npm install
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+4. Set up environment variables:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+   Ensure all environment variables are set.For the exact variables needed
 
-## Learn More
+   please contact omervainbrand2@gmail.com.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+5. Start the development server:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+   npm start
 
-### Code Splitting
+# Admin Access
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Routes for managing orders and stock are restricted to admin users.
 
-### Analyzing the Bundle Size
+# Contact
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+If you have any questions or suggestions, feel free to reach out to us at omervainbrand2@gmail.com
