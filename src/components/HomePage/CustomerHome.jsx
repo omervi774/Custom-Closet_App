@@ -99,12 +99,28 @@ export default function CustomerHome({ data }) {
           })}
         />
         <div>
-          <h1 style={{ textAlign: 'center', fontSize: '26px', marginBottom: '20px' }}>{data['text_content'][1].title}</h1>
-          <p style={{ textAlign: 'center', fontSize: '18px', color: 'black', marginBottom: '20px' }}>{data['text_content'][1].subTitle}</p>
+          <h1 style={{ textAlign: 'center', fontSize: '30px', marginBottom: '20px', marginTop: '40px' }}>
+            {data['text_content'][1].title}
+          </h1>
+          <p
+            style={{
+              textAlign: 'center',
+              fontSize: '18px',
+              color: 'black',
+              // marginBottom: '20px',
+              marginTop: '50px',
+              lineHeight: '2' /* Sets line spacing to 1.5 */,
+              width: '40%' /* Adjust this value as needed */,
+              margin: '0 auto' /* Centers the paragraph */,
+              fontFamily: 'Calibri, sans-serif',
+            }}
+          >
+            {data['text_content'][1].subTitle}
+          </p>
         </div>
         <div style={{ backgroundColor: 'white', padding: '50px 0' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            <h2 style={{ textAlign: 'center', fontSize: '30px', marginBottom: '20px' }}>המוצרים שלנו</h2>
+            <h2 style={{ textAlign: 'center', fontSize: '30px', marginBottom: '30px' }}>המוצרים שלנו</h2>
             <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
               {data['images'] &&
                 data['images'].map((img, index) => {
