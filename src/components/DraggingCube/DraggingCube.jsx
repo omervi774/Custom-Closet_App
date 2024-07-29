@@ -1,22 +1,17 @@
-import React, { useState, useRef } from 'react'
+import React, { useState } from 'react'
 import { useGLTF } from '@react-three/drei'
 
+// this component display 3D dragging cube on the screen
 const DraggingCube = ({ position, onDrag, url, size }) => {
   const { scene } = useGLTF(`cubes/${url}.gltf`)
-  const [isDragging, setIsDragging] = useState(false)
-  const timerRef = useRef(null)
+  const [isDragging, setIsdragging] = useState(false)
 
-  const startLongPress = () => {
-    timerRef.current = setTimeout(() => {
-      setIsDragging(true)
-    }, 500) // 500ms for a long press
+  const startDrag = () => {
+    setIsdragging(true)
   }
-
-  const stopLongPress = () => {
-    clearTimeout(timerRef.current)
-    setIsDragging(false)
+  const stopDrag = () => {
+    setIsdragging(false)
   }
-
   const movement = (e) => {
     if (!isDragging) {
       return
@@ -31,8 +26,8 @@ const DraggingCube = ({ position, onDrag, url, size }) => {
 
   return (
     <primitive
-      onPointerDown={startLongPress}
-      onPointerUp={stopLongPress}
+      onPointerDown={startDrag}
+      onPointerMissed={stopDrag}
       onPointerMove={movement}
       object={scene.clone(true)}
       scale={[1, 1, 0.84]}
