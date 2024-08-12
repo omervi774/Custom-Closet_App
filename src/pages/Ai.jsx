@@ -46,7 +46,10 @@ function Ai(props) {
         }
 
         const responseData = await response.json()
-        if (responseData.text !== 'תשובתך לא הייתה בפורמט הנכון, רענן את הדף ונסה שוב בבקשה.') {
+        if (
+          responseData.text !== 'תשובתך לא הייתה בפורמט הנכון, רענן את הדף ונסה שוב בבקשה.' &&
+          responseData.text !== 'הייתה בעיה בחישוב הארון. אנא נסה שוב'
+        ) {
           const transformedData = {}
           Object.keys(responseData.text).forEach((key) => {
             const newKey = parseInt(key) === 0 ? '-1' : parseInt(key) - 1
@@ -262,14 +265,22 @@ function Ai(props) {
                   }
 
                   const responseData = await response.json()
-                  const transformedData = {}
-                  Object.keys(responseData.text).forEach((key) => {
-                    const newKey = parseInt(key) === 0 ? '-1' : parseInt(key) - 1
-                    transformedData[newKey] = responseData.text[key]
-                  })
-                  setCubes(transformedData)
-                  console.log(transformedData)
-                  setLoading(false)
+                  if (
+                    responseData.text !== 'תשובתך לא הייתה בפורמט הנכון, רענן את הדף ונסה שוב בבקשה.' &&
+                    responseData.text !== 'הייתה בעיה בחישוב הארון. אנא נסה שוב'
+                  ) {
+                    const transformedData = {}
+                    Object.keys(responseData.text).forEach((key) => {
+                      const newKey = parseInt(key) === 0 ? '-1' : parseInt(key) - 1
+                      transformedData[newKey] = responseData.text[key]
+                    })
+                    setCubes(transformedData)
+                    console.log(transformedData)
+                    setLoading(false)
+                  } else {
+                    setCubes({ '-1': [] })
+                    setChatMessages(() => [{ text: responseData.text, sender: 'ai' }])
+                  }
                 }}
                 disabled={loading}
                 sx={{
